@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的视频库</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+        }
+        .video-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .video-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        video {
+            width: 100%;
+            border-radius: 8px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎬 我的视频库</h1>
+        <p>通过 GitHub + jsDelivr 托管的视频资源</p>
+    </div>
+
+    <div class="video-grid">
+        <!-- 视频1 -->
+        <div class="video-card">
+            <div class="video-title">产品介绍视频</div>
+            <video controls>
+                <source src="https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/info.mp4" type="video/mp4">
+                您的浏览器不支持视频播放
+            </video>
+        </div>
+
+        <!-- 视频2 -->
+        <div class="video-card">
+            <div class="video-title">使用教程</div>
+            <video controls>
+                <source src="https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/tutorial.mp4" type="video/mp4">
+                您的浏览器不支持视频播放
+            </video>
+        </div>
+
+        <!-- 视频3 -->
+        <div class="video-card">
+            <div class="video-title">功能演示</div>
+            <video controls>
+                <source src="https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/demo.mp4" type="video/mp4">
+                您的浏览器不支持视频播放
+            </video>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>视频托管服务由 GitHub + jsDelivr 提供</p>
+    </div>
+</body>
+</html>
