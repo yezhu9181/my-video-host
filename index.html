@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的视频库</title>
+    <title>视频库 API 演示</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
             background-color: #f5f5f5;
@@ -22,48 +22,66 @@
         }
         .video-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
         }
         .video-card {
             background: white;
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .video-card:hover {
+            transform: translateY(-5px);
         }
         .video-title {
             font-size: 18px;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             color: #333;
+        }
+        .video-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        .video-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 15px;
         }
         video {
             width: 100%;
             border-radius: 8px;
             background: #000;
         }
-        .video-links {
-            margin-top: 40px;
+        .api-section {
             background: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: 10px;
+            margin-top: 40px;
         }
-        .video-link {
-            display: block;
-            padding: 10px;
-            margin: 5px 0;
+        .code-block {
             background: #f8f9fa;
+            padding: 15px;
             border-radius: 5px;
-            text-decoration: none;
-            color: #0366d6;
-            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
         }
-        .video-link:hover {
-            background: #e7f3ff;
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
         }
-        .status-success {
-            background: #d4edda;
-            color: #155724;
+        .error {
+            background: #f8d7da;
+            color: #721c24;
             padding: 15px;
             border-radius: 5px;
             margin: 20px 0;
@@ -72,45 +90,127 @@
 </head>
 <body>
     <div class="header">
-        <h1>🎬 我的视频库</h1>
-        <p>通过 GitHub + jsDelivr 托管的视频资源</p>
-        <div class="status-success">
-            ✅ 视频文件已成功上传！现在可以正常播放了。
+        <h1>🎬 视频库 API 接口</h1>
+        <p>动态获取视频列表数据</p>
+    </div>
+
+    <div id="video-container">
+        <div class="loading" id="loading">
+            ⏳ 正在加载视频列表...
         </div>
     </div>
 
-    <div class="video-grid">
-        <div class="video-card">
-            <div class="video-title">介绍视频</div>
-            <video controls>
-                <source src="https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/intro.MP4" type="video/mp4">
-                您的浏览器不支持视频播放
-            </video>
-            <p>这是一个介绍视频，演示如何使用这个视频托管方案。</p>
-        </div>
-    </div>
-
-    <div class="video-links">
-        <h3>📎 视频直链（用于其他应用）：</h3>
-        <a class="video-link" href="https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/intro.MP4" target="_blank">
-            https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/intro.MP4
-        </a>
+    <div class="api-section">
+        <h2>📡 API 接口信息</h2>
         
-        <h4 style="margin-top: 20px;">在其他应用中使用的示例：</h4>
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 14px;">
-            // Android<br>
-            videoView.setVideoURI(Uri.parse("https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/intro.MP4"));<br><br>
-            
-            // iOS<br>
-            let videoURL = URL(string: "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/intro.MP4")<br><br>
-            
-            // 微信小程序<br>
-            &lt;video src="https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/intro.MP4" /&gt;
+        <h3>获取视频列表接口：</h3>
+        <div class="code-block">
+            GET https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json
+        </div>
+
+        <h3>JavaScript 调用示例：</h3>
+        <div class="code-block">
+// 获取视频列表
+fetch('https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json')
+  .then(response => response.json())
+  .then(data => {
+    console.log('视频列表:', data.videos);
+    // 处理视频数据
+    data.videos.forEach(video => {
+      console.log(`标题: ${video.title}, URL: ${video.url}`);
+    });
+  })
+  .catch(error => console.error('获取失败:', error));
+        </div>
+
+        <h3>其他语言调用示例：</h3>
+        
+        <h4>Python:</h4>
+        <div class="code-block">
+import requests
+
+response = requests.get('https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json')
+videos = response.json()['videos']
+for video in videos:
+    print(f"标题: {video['title']}, URL: {video['url']}")
+        </div>
+
+        <h4>Android (Kotlin):</h4>
+        <div class="code-block">
+// 使用 Retrofit
+interface VideoApi {
+    @GET("yezhu9181/my-video-host@main/videos.json")
+    suspend fun getVideos(): VideoResponse
+}
+
+// 或者直接使用 HttpURLConnection
+val url = URL("https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json")
+val connection = url.openConnection() as HttpURLConnection
+        </div>
+
+        <h4>iOS (Swift):</h4>
+        <div class="code-block">
+// 使用 URLSession
+let url = URL(string: "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json")!
+let task = URLSession.shared.dataTask(with: url) { data, response, error in
+    if let data = data {
+        let videos = try? JSONDecoder().decode(VideoResponse.self, from: data)
+        print(videos)
+    }
+}
+task.resume()
         </div>
     </div>
 
-    <div style="text-align: center; margin-top: 40px; color: #666;">
-        <p>视频托管服务由 GitHub + jsDelivr 提供</p>
-    </div>
+    <script>
+        // 动态加载视频列表
+        async function loadVideos() {
+            try {
+                const response = await fetch('https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json');
+                const data = await response.json();
+                
+                const container = document.getElementById('video-container');
+                const loading = document.getElementById('loading');
+                
+                if (data.videos && data.videos.length > 0) {
+                    loading.style.display = 'none';
+                    
+                    let html = '<div class="video-grid">';
+                    data.videos.forEach(video => {
+                        html += `
+                            <div class="video-card">
+                                <div class="video-title">${video.title}</div>
+                                <div class="video-description">${video.description}</div>
+                                <div class="video-meta">
+                                    <span>⏱️ ${video.duration}</span>
+                                    <span>📦 ${video.size}</span>
+                                    <span>📅 ${video.createdAt}</span>
+                                </div>
+                                <video controls>
+                                    <source src="${video.url}" type="video/mp4">
+                                    您的浏览器不支持视频播放
+                                </video>
+                                <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                                    <strong>文件:</strong> ${video.filename}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    
+                    container.innerHTML = html;
+                } else {
+                    loading.innerHTML = '<div class="error">❌ 没有找到视频数据</div>';
+                }
+            } catch (error) {
+                console.error('加载视频失败:', error);
+                document.getElementById('loading').innerHTML = 
+                    '<div class="error">❌ 加载视频列表失败: ' + error.message + '</div>';
+            }
+        }
+
+        // 页面加载时获取视频列表
+        document.addEventListener('DOMContentLoaded', loadVideos);
+    </script>
 </body>
 </html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的视频库</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+        }
+        .video-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .video-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        video {
+            width: 100%;
+            border-radius: 8px;
+            background: #000;
+        }
+        .video-links {
+            margin-top: 40px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .video-link {
+            display: block;
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #0366d6;
+            word-break: break-all;
+        }
+        .video-link:hover {
+            background: #e7f3ff;
+        }
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎬 我的视频库</h1>
+        <p>通过 GitHub + jsDelivr 托管的视频资源</p>
+        <div class="status-success">
+            ✅ 视频文件已成功上传！现在可以正常播放了。
+        </div>
+    </div>
+
+    <div class="video-grid">
+        <div class="video-card">
+            <div class="video-title">介绍视频</div>
+            <video controls>
+                <source src="https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/intro.MP4" type="video/mp4">
+                您的浏览器不支持视频播放
+            </video>
+            <p>这是一个介绍视频，演示如何使用这个视频托管方案。</p>
+        </div>
+    </div>
+
+    <div class="video-links">
+        <h3>📎 视频直链（用于其他应用）：</h3>
+        <a class="video-link" href="https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/intro.MP4" target="_blank">
+            https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/intro.MP4
+        </a>
+        
+        <h4 style="margin-top: 20px;">在其他应用中使用的示例：</h4>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 14px;">
+            // Android<br>
+            videoView.setVideoURI(Uri.parse("https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/intro.MP4"));<br><br>
+            
+            // iOS<br>
+            let videoURL = URL(string: "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/intro.MP4")<br><br>
+            
+            // 微信小程序<br>
+            &lt;video src="https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/intro.MP4" /&gt;
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px; color: #666;">
+        <p>视频托管服务由 GitHub + jsDelivr 提供</p>
+    </div>
+</body>
+</html>
