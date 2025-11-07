@@ -2,6 +2,20 @@
   "videos": [
     {
       "id": 1,
+      "title": "功能演示",
+      "filename": "demo.MP4",
+      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/demo.MP4",
+      "description": "核心功能的实际使用演示",
+      "duration": "2:44",
+      "size": "41.1 MB",
+      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/demo.svg",
+      "codec": "H.264",
+      "resolution": "854x480",
+      "createdAt": "2025-11-07",
+      "thumbnailType": "SVG"
+    },
+    {
+      "id": 2,
       "title": "产品介绍视频",
       "filename": "intro.MP4",
       "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/intro.MP4",
@@ -16,14 +30,14 @@
     }
   ],
   "pagination": {
-    "total": 1,
+    "total": 2,
     "page": 1,
     "pageSize": 10,
     "totalPages": 1,
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-07T17:10:17Z",
+  "lastUpdated": "2025-11-07T17:38:17Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "apiEndpoints": {
     "allVideos": "/videos.json",
