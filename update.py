@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-视频库自动更新脚本 - 从文件读取GitHub Token
+视频库自动更新脚本 - 使用FFmpeg提取视频第一帧作为缩略图
 """
 
 import os
@@ -19,6 +19,9 @@ class VideoLibraryUpdater:
         self.page_size = page_size
         self.token_file_path = Path(token_file_path)
         
+        # 检查FFmpeg是否可用
+        self.ffmpeg_available = self.check_ffmpeg()
+        
         # 初始化时读取token
         self.github_token = self.read_github_token()
         
@@ -26,6 +29,20 @@ class VideoLibraryUpdater:
         self.setup_git_commands()
         
         self.thumbnails_path.mkdir(exist_ok=True)
+    
+    def check_ffmpeg(self):
+        """检查FFmpeg是否可用"""
+        try:
+            result = subprocess.run(["ffmpeg", "-version"], capture_output=True, text=True, timeout=10)
+            if result.returncode == 0:
+                print("✅ FFmpeg可用")
+                return True
+            else:
+                print("❌ FFmpeg不可用")
+                return False
+        except:
+            print("❌ 未找到FFmpeg，将使用SVG占位图")
+            return False
     
     def read_github_token(self):
         """从文件读取GitHub Token"""
@@ -75,8 +92,42 @@ class VideoLibraryUpdater:
         
         return [Path(f).name for f in video_files]
     
+    def extract_video_thumbnail(self, video_filename):
+        """使用FFmpeg提取视频第一帧作为缩略图"""
+        video_path = self.videos_path / video_filename
+        thumbnail_name = Path(video_filename).stem + ".jpg"
+        thumbnail_path = self.thumbnails_path / thumbnail_name
+        
+        try:
+            # 使用FFmpeg提取第一帧
+            command = [
+                "ffmpeg",
+                "-i", str(video_path),
+                "-ss", "00:00:01",  # 从第1秒开始（避免黑屏）
+                "-vframes", "1",    # 只取1帧
+                "-q:v", "2",        # 高质量（1-31，2是最高质量）
+                "-y",               # 覆盖已存在文件
+                str(thumbnail_path)
+            ]
+            
+            result = subprocess.run(command, capture_output=True, text=True, timeout=30)
+            
+            if result.returncode == 0 and thumbnail_path.exists():
+                print(f"  ✅ 生成缩略图: {thumbnail_name}")
+                return thumbnail_name
+            else:
+                print(f"  ❌ FFmpeg提取失败: {result.stderr}")
+                return self.create_svg_thumbnail(video_filename, self.get_file_size(video_filename))
+                
+        except subprocess.TimeoutExpired:
+            print(f"  ⏰ FFmpeg提取超时")
+            return self.create_svg_thumbnail(video_filename, self.get_file_size(video_filename))
+        except Exception as e:
+            print(f"  ❌ FFmpeg提取错误: {e}")
+            return self.create_svg_thumbnail(video_filename, self.get_file_size(video_filename))
+    
     def create_svg_thumbnail(self, video_filename, file_size_mb):
-        """创建SVG缩略图"""
+        """创建SVG缩略图（备用方案）"""
         thumbnail_name = Path(video_filename).stem + ".svg"
         thumbnail_path = self.thumbnails_path / thumbnail_name
         
@@ -117,11 +168,59 @@ class VideoLibraryUpdater:
             with open(thumbnail_path, 'w', encoding='utf-8') as f:
                 f.write(svg_content)
             
+            print(f"  ⚠️  使用SVG占位图: {thumbnail_name}")
             return thumbnail_name
             
         except Exception as e:
             print(f"  ❌ 创建SVG缩略图失败: {e}")
             return ""
+    
+    def get_video_info(self, video_filename):
+        """使用FFmpeg获取视频详细信息"""
+        video_path = self.videos_path / video_filename
+        
+        try:
+            # 获取视频时长和分辨率
+            command = [
+                "ffmpeg",
+                "-i", str(video_path)
+            ]
+            
+            result = subprocess.run(command, capture_output=True, text=True, timeout=10)
+            
+            duration = "0:00"
+            resolution = "未知"
+            
+            # 解析输出获取时长
+            for line in result.stderr.split('\n'):
+                if "Duration" in line:
+                    # 示例: Duration: 00:01:30.50
+                    duration_str = line.split("Duration:")[1].split(",")[0].strip()
+                    time_parts = duration_str.split(":")
+                    if len(time_parts) >= 3:
+                        hours = int(time_parts[0])
+                        minutes = int(time_parts[1])
+                        seconds = int(float(time_parts[2]))
+                        if hours > 0:
+                            duration = f"{hours}:{minutes:02d}:{seconds:02d}"
+                        else:
+                            duration = f"{minutes}:{seconds:02d}"
+                
+                # 解析分辨率
+                if "Video:" in line and "x" in line:
+                    # 示例: 1920x1080
+                    import re
+                    resolution_match = re.search(r'(\d+)x(\d+)', line)
+                    if resolution_match:
+                        width = resolution_match.group(1)
+                        height = resolution_match.group(2)
+                        resolution = f"{width}x{height}"
+            
+            return duration, resolution
+            
+        except:
+            # 如果FFmpeg失败，使用估算方法
+            return self.estimate_duration(video_filename), self.get_video_dimensions_from_filename(video_filename)
     
     def get_file_size(self, filename):
         """获取文件大小（MB）"""
@@ -132,7 +231,7 @@ class VideoLibraryUpdater:
         return 0
     
     def estimate_duration(self, filename):
-        """估算视频时长"""
+        """估算视频时长（备用方法）"""
         size_mb = self.get_file_size(filename)
         estimated_seconds = int(size_mb / 0.25)  # 假设编码率为 2 Mbps
         estimated_seconds = min(estimated_seconds, 3600)
@@ -156,12 +255,20 @@ class VideoLibraryUpdater:
             description = self.generate_description(title)
             file_size = self.get_file_size(video_file)
             
-            # 创建SVG缩略图
-            thumbnail_filename = self.create_svg_thumbnail(video_file, file_size)
-            thumbnail_url = f"https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/{thumbnail_filename}" if thumbnail_filename else ""
+            # 获取视频详细信息
+            if self.ffmpeg_available:
+                duration, resolution = self.get_video_info(video_file)
+            else:
+                duration = self.estimate_duration(video_file)
+                resolution = self.get_video_dimensions_from_filename(video_file)
             
-            duration = self.estimate_duration(video_file)
-            resolution = self.get_video_dimensions_from_filename(video_file)
+            # 生成缩略图
+            if self.ffmpeg_available:
+                thumbnail_filename = self.extract_video_thumbnail(video_file)
+            else:
+                thumbnail_filename = self.create_svg_thumbnail(video_file, file_size)
+            
+            thumbnail_url = f"https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/{thumbnail_filename}" if thumbnail_filename else ""
             
             video_data = {
                 "id": i,
@@ -175,7 +282,7 @@ class VideoLibraryUpdater:
                 "codec": "H.264",
                 "resolution": resolution,
                 "createdAt": datetime.now().strftime("%Y-%m-%d"),
-                "thumbnailType": "SVG"
+                "thumbnailType": "JPG" if thumbnail_filename.endswith('.jpg') else "SVG"
             }
             
             videos.append(video_data)
@@ -298,8 +405,14 @@ class VideoLibraryUpdater:
     
     def update_videos_json(self):
         """更新videos.json文件"""
-        print("🎬 视频库更新脚本 - 自动Git提交版本")
+        print("🎬 视频库更新脚本 - 使用FFmpeg提取缩略图")
         print("=" * 60)
+        
+        # 显示FFmpeg状态
+        if self.ffmpeg_available:
+            print("✅ FFmpeg: 可用 - 将提取视频第一帧作为缩略图")
+        else:
+            print("⚠️  FFmpeg: 不可用 - 将使用SVG占位图")
         
         # 显示token状态
         if self.github_token:
@@ -345,6 +458,7 @@ class VideoLibraryUpdater:
             },
             "lastUpdated": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
             "repository": "https://github.com/yezhu9181/my-video-host",
+            "ffmpegAvailable": self.ffmpeg_available,
             "apiEndpoints": {
                 "allVideos": "/videos.json",
                 "paginated": "/videos.json?page={page}&limit={limit}",
@@ -363,6 +477,12 @@ class VideoLibraryUpdater:
             print(f"   - 总视频数: {total_videos}")
             print(f"   - 每页数量: {self.page_size}")
             print(f"   - 总页数: {total_pages}")
+            
+            # 统计缩略图类型
+            jpg_count = sum(1 for v in videos if v.get('thumbnailType') == 'JPG')
+            svg_count = sum(1 for v in videos if v.get('thumbnailType') == 'SVG')
+            print(f"   - JPG缩略图: {jpg_count}")
+            print(f"   - SVG缩略图: {svg_count}")
             
             # 执行Git命令
             git_success = self.run_git_commands()
