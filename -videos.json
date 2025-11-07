@@ -1,0 +1,20 @@
+{
+  "videos": [
+    {
+      "id": 1,
+      "title": "产品介绍视频",
+      "filename": "intro.MP4",
+      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/intro.MP4",
+      "description": "全面介绍产品的功能特性和使用场景",
+      "duration": "0:35",
+      "size": "13.1 MB",
+      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/intro.jpg",
+      "codec": "h264",
+      "resolution": "720x1280",
+      "createdAt": "2025-11-07"
+    }
+  ],
+  "total": 1,
+  "lastUpdated": "2025-11-07T16:55:14Z",
+  "repository": "https://github.com/yezhu9181/my-video-host"
+}

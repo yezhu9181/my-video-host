@@ -6,15 +6,29 @@
       "filename": "intro.MP4",
       "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/intro.MP4",
       "description": "全面介绍产品的功能特性和使用场景",
-      "duration": "0:35",
+      "duration": "0:52",
       "size": "13.1 MB",
-      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/intro.jpg",
-      "codec": "h264",
-      "resolution": "720x1280",
-      "createdAt": "2025-11-07"
+      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/intro.svg",
+      "codec": "H.264",
+      "resolution": "854x480",
+      "createdAt": "2025-11-07",
+      "thumbnailType": "SVG"
     }
   ],
-  "total": 1,
-  "lastUpdated": "2025-11-07T16:55:14Z",
-  "repository": "https://github.com/yezhu9181/my-video-host"
+  "pagination": {
+    "total": 1,
+    "page": 1,
+    "pageSize": 10,
+    "totalPages": 1,
+    "hasNext": false,
+    "hasPrev": false
+  },
+  "lastUpdated": "2025-11-07T17:10:17Z",
+  "repository": "https://github.com/yezhu9181/my-video-host",
+  "apiEndpoints": {
+    "allVideos": "/videos.json",
+    "paginated": "/videos.json?page={page}&limit={limit}",
+    "search": "/videos.json?search={keyword}",
+    "byId": "/videos.json?id={id}"
+  }
 }
