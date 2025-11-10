@@ -95,7 +95,7 @@ class VideoLibraryUpdater:
         
         return [Path(f).name for f in video_files]
     
-    def compress_video_to_size(self, video_path, target_size_mb=20):
+    def compress_video_to_size(self, video_path, target_size_mb=19.9):
         """使用FFmpeg压缩视频到指定大小（MB），严格小于等于目标大小"""
         video_path = Path(video_path)
         if not video_path.exists():
@@ -287,7 +287,7 @@ class VideoLibraryUpdater:
         return False
     
     def compress_large_videos(self, max_size_mb=20):
-        """检查并压缩所有大于指定大小的视频文件"""
+        """检查并压缩所有大于指定大小的视频文件（默认检查大于20MB的文件，压缩到19.9MB）"""
         if not self.ffmpeg_available:
             print("⚠️  FFmpeg不可用，跳过视频压缩")
             return
@@ -305,7 +305,8 @@ class VideoLibraryUpdater:
             
             if file_size_mb > max_size_mb:
                 print(f"\n🎬 发现大文件: {video_file} ({file_size_mb:.1f} MB)")
-                if self.compress_video_to_size(video_path, max_size_mb):
+                # 压缩到19.9MB（严格小于等于19.9MB）
+                if self.compress_video_to_size(video_path, target_size_mb=19.9):
                     compressed_count += 1
                 else:
                     skipped_count += 1
@@ -664,7 +665,7 @@ class VideoLibraryUpdater:
         
         print(f"📁 找到 {len(video_files)} 个视频文件")
         
-        # 在更新文件之前，压缩大于20MB的视频文件
+        # 在更新文件之前，压缩大于20MB的视频文件（压缩到19.9MB）
         self.compress_large_videos(max_size_mb=20)
         
         videos = self.generate_video_data(video_files)
