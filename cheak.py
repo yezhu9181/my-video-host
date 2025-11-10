@@ -12,7 +12,7 @@ from pathlib import Path
 
 
 class VideoCompressor:
-    def __init__(self, videos_path="./videos", backup_path="/Users/syh/my-video-back", check_size_mb=19.5, target_size_mb=16):
+    def __init__(self, videos_path="./videos", backup_path="/Users/syh/my-video-back", check_size_mb=19.5, target_size_mb=19.5):
         """
         初始化视频压缩器
         
@@ -301,7 +301,7 @@ def main():
     parser.add_argument('--videos-path', default='./videos', help='视频文件夹路径')
     parser.add_argument('--backup-path', default='/Users/syh/my-video-back', help='备份文件夹路径')
     parser.add_argument('--check-size', type=float, default=19.5, help='检查阈值（MB），大于此大小的文件会被压缩')
-    parser.add_argument('--target-size', type=float, default=16, help='压缩目标大小（MB）')
+    parser.add_argument('--target-size', type=float, default=19.5, help='压缩目标大小（MB）')
     
     args = parser.parse_args()
     
