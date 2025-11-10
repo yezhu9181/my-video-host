@@ -306,7 +306,7 @@ class VideoLibraryUpdater:
             if file_size_mb > max_size_mb:
                 print(f"\n🎬 发现大文件: {video_file} ({file_size_mb:.1f} MB)")
                 # 压缩到19.9MB（严格小于等于19.9MB）
-                if self.compress_video_to_size(video_path, target_size_mb=19.5):
+                if self.compress_video_to_size(video_path, target_size_mb=19.9):
                     compressed_count += 1
                 else:
                     skipped_count += 1
