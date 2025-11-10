@@ -7,11 +7,11 @@
       "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/demo.MP4",
       "description": "核心功能的实际使用演示",
       "duration": "0:24",
-      "size": "41.1 MB",
+      "size": "19.5 MB",
       "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/demo.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-09",
+      "createdAt": "2025-11-10",
       "thumbnailType": "JPG"
     },
     {
@@ -25,7 +25,7 @@
       "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/intro.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-09",
+      "createdAt": "2025-11-10",
       "thumbnailType": "JPG"
     }
   ],
@@ -37,7 +37,7 @@
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-09T19:58:36Z",
+  "lastUpdated": "2025-11-10T14:12:57Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
   "apiEndpoints": {

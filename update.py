@@ -92,6 +92,182 @@ class VideoLibraryUpdater:
         
         return [Path(f).name for f in video_files]
     
+    def compress_video_to_size(self, video_path, target_size_mb=20):
+        """使用FFmpeg压缩视频到指定大小（MB）"""
+        video_path = Path(video_path)
+        if not video_path.exists():
+            return False
+        
+        # 获取视频时长（秒）- 使用ffmpeg获取
+        try:
+            duration_command = [
+                "ffmpeg",
+                "-i", str(video_path)
+            ]
+            result = subprocess.run(duration_command, capture_output=True, text=True, timeout=10)
+            
+            duration = 0
+            # 从stderr中解析时长（ffmpeg将信息输出到stderr）
+            for line in result.stderr.split('\n'):
+                if "Duration" in line:
+                    # 示例: Duration: 00:01:30.50
+                    try:
+                        duration_str = line.split("Duration:")[1].split(",")[0].strip()
+                        time_parts = duration_str.split(":")
+                        if len(time_parts) >= 3:
+                            hours = float(time_parts[0])
+                            minutes = float(time_parts[1])
+                            seconds = float(time_parts[2])
+                            duration = hours * 3600 + minutes * 60 + seconds
+                            break
+                    except:
+                        continue
+            
+            if duration <= 0:
+                print(f"  ⚠️  无法解析视频时长，跳过压缩")
+                return False
+        except Exception as e:
+            print(f"  ⚠️  无法获取视频时长: {e}，跳过压缩")
+            return False
+        
+        # 计算目标比特率（kbps）
+        # 目标大小（MB）* 8（转换为Mbit）* 1024（转换为kbit）/ 时长（秒）
+        # 预留一些空间给音频（假设音频128kbps）
+        audio_bitrate = 128
+        target_bitrate_kbps = int((target_size_mb * 8 * 1024) / duration - audio_bitrate)
+        
+        # 确保比特率不会太低（至少500kbps）
+        target_bitrate_kbps = max(target_bitrate_kbps, 500)
+        
+        # 创建临时输出文件
+        temp_output = video_path.parent / f"{video_path.stem}_compressed{video_path.suffix}"
+        
+        try:
+            # 使用两遍编码来精确控制文件大小
+            # 第一遍：分析视频
+            pass1_command = [
+                "ffmpeg",
+                "-i", str(video_path),
+                "-c:v", "libx264",
+                "-b:v", f"{target_bitrate_kbps}k",
+                "-pass", "1",
+                "-passlogfile", str(video_path.parent / "ffmpeg2pass"),
+                "-an",  # 第一遍不编码音频
+                "-f", "null",
+                "-y",
+                "/dev/null" if os.name != 'nt' else "NUL"
+            ]
+            
+            print(f"  🔄 开始压缩（第一遍分析）...")
+            result1 = subprocess.run(pass1_command, capture_output=True, text=True, timeout=300)
+            
+            if result1.returncode != 0:
+                print(f"  ❌ 第一遍编码失败: {result1.stderr[:200]}")
+                return False
+            
+            # 第二遍：实际编码
+            pass2_command = [
+                "ffmpeg",
+                "-i", str(video_path),
+                "-c:v", "libx264",
+                "-b:v", f"{target_bitrate_kbps}k",
+                "-pass", "2",
+                "-passlogfile", str(video_path.parent / "ffmpeg2pass"),
+                "-c:a", "aac",
+                "-b:a", f"{audio_bitrate}k",
+                "-movflags", "+faststart",  # 优化网络播放
+                "-y",
+                str(temp_output)
+            ]
+            
+            print(f"  🔄 开始压缩（第二遍编码）...")
+            result2 = subprocess.run(pass2_command, capture_output=True, text=True, timeout=600)
+            
+            # 清理两遍编码的日志文件
+            log_files = [
+                video_path.parent / "ffmpeg2pass-0.log",
+                video_path.parent / "ffmpeg2pass-0.log.mbtree"
+            ]
+            for log_file in log_files:
+                if log_file.exists():
+                    try:
+                        log_file.unlink()
+                    except:
+                        pass
+            
+            if result2.returncode == 0 and temp_output.exists():
+                # 检查压缩后的文件大小
+                compressed_size_mb = temp_output.stat().st_size / (1024 * 1024)
+                
+                if compressed_size_mb <= target_size_mb * 1.1:  # 允许10%的误差
+                    # 备份原文件
+                    backup_path = video_path.parent / f"{video_path.stem}_backup{video_path.suffix}"
+                    try:
+                        import shutil
+                        shutil.move(str(video_path), str(backup_path))
+                        shutil.move(str(temp_output), str(video_path))
+                        # 删除备份文件（可选，如果需要保留备份可以注释掉）
+                        # backup_path.unlink()
+                        print(f"  ✅ 压缩成功: {compressed_size_mb:.1f} MB (原文件已备份)")
+                        return True
+                    except Exception as e:
+                        print(f"  ❌ 替换文件失败: {e}")
+                        if temp_output.exists():
+                            temp_output.unlink()
+                        return False
+                else:
+                    print(f"  ⚠️  压缩后文件仍大于目标大小: {compressed_size_mb:.1f} MB")
+                    if temp_output.exists():
+                        temp_output.unlink()
+                    return False
+            else:
+                print(f"  ❌ 第二遍编码失败: {result2.stderr[:200] if result2.stderr else '未知错误'}")
+                if temp_output.exists():
+                    temp_output.unlink()
+                return False
+                
+        except subprocess.TimeoutExpired:
+            print(f"  ⏰ 压缩超时")
+            if temp_output.exists():
+                temp_output.unlink()
+            return False
+        except Exception as e:
+            print(f"  ❌ 压缩过程出错: {e}")
+            if temp_output.exists():
+                temp_output.unlink()
+            return False
+    
+    def compress_large_videos(self, max_size_mb=20):
+        """检查并压缩所有大于指定大小的视频文件"""
+        if not self.ffmpeg_available:
+            print("⚠️  FFmpeg不可用，跳过视频压缩")
+            return
+        
+        print(f"\n📦 检查并压缩大于 {max_size_mb}MB 的视频文件...")
+        print("=" * 60)
+        
+        video_files = self.get_video_files()
+        compressed_count = 0
+        skipped_count = 0
+        
+        for video_file in video_files:
+            video_path = self.videos_path / video_file
+            file_size_mb = self.get_file_size(video_file)
+            
+            if file_size_mb > max_size_mb:
+                print(f"\n🎬 发现大文件: {video_file} ({file_size_mb:.1f} MB)")
+                if self.compress_video_to_size(video_path, max_size_mb):
+                    compressed_count += 1
+                else:
+                    skipped_count += 1
+            else:
+                print(f"  ✓ {video_file} ({file_size_mb:.1f} MB) - 无需压缩")
+        
+        print(f"\n📊 压缩完成:")
+        print(f"   - 已压缩: {compressed_count} 个文件")
+        print(f"   - 跳过: {skipped_count} 个文件")
+        print("=" * 60)
+    
     def extract_video_thumbnail(self, video_filename):
         """使用FFmpeg提取视频第一帧作为缩略图"""
         video_path = self.videos_path / video_filename
@@ -438,6 +614,9 @@ class VideoLibraryUpdater:
             return False
         
         print(f"📁 找到 {len(video_files)} 个视频文件")
+        
+        # 在更新文件之前，压缩大于20MB的视频文件
+        self.compress_large_videos(max_size_mb=20)
         
         videos = self.generate_video_data(video_files)
         
