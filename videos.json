@@ -4,33 +4,33 @@
       "id": 1,
       "title": "八级拳",
       "filename": "ZGVtbw==.MP4",
-      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/ZGVtbw==.MP4?v=3c4d15a",
+      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/ZGVtbw==.MP4?v=551adb5",
       "description": "这是关于八级拳的详细说明视频",
       "duration": "0:24",
       "size": "41.1 MB",
-      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/ZGVtbw==.jpg?v=3c4d15a",
+      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/ZGVtbw==.jpg?v=551adb5",
       "codec": "H.264",
       "resolution": "0x1",
       "createdAt": "2025-11-11",
       "thumbnailType": "JPG",
-      "cacheVersion": "3c4d15a",
-      "lastUpdated": "2025-11-11T19:14:10.606042"
+      "cacheVersion": "551adb5",
+      "lastUpdated": "2025-11-11T19:17:39.780900"
     },
     {
       "id": 2,
       "title": "街舞",
       "filename": "aW50cm8=.MP4",
-      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/aW50cm8=.MP4?v=3c4d15a",
+      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/aW50cm8=.MP4?v=551adb5",
       "description": "这是关于街舞的详细说明视频",
       "duration": "0:35",
       "size": "13.1 MB",
-      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/aW50cm8=.jpg?v=3c4d15a",
+      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/aW50cm8=.jpg?v=551adb5",
       "codec": "H.264",
       "resolution": "0x1",
       "createdAt": "2025-11-11",
       "thumbnailType": "JPG",
-      "cacheVersion": "3c4d15a",
-      "lastUpdated": "2025-11-11T19:14:10.702762"
+      "cacheVersion": "551adb5",
+      "lastUpdated": "2025-11-11T19:17:39.882051"
     }
   ],
   "pagination": {
@@ -41,10 +41,10 @@
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-11T19:14:10Z",
+  "lastUpdated": "2025-11-11T19:17:39Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
-  "cacheVersion": "3c4d15a",
+  "cacheVersion": "551adb5",
   "apiEndpoints": {
     "allVideos": "/videos.json",
     "paginated": "/videos.json?page={page}&limit={limit}",
