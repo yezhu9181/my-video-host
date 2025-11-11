@@ -11,7 +11,8 @@ from pathlib import Path
 def test_cdn_cache():
     """测试 CDN 缓存"""
     local_file = Path("videos.json")
-    cdn_url = "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json"
+    cdn_base = "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host"
+    cdn_url = f"{cdn_base}@main/videos.json"
     
     print("=" * 60)
     print("测试 CDN 缓存一致性")
@@ -35,11 +36,39 @@ def test_cdn_cache():
     print(f"   - 缓存版本: {local_cache_version}")
     print(f"   - 视频数量: {local_video_count}")
     
-    # 从 CDN 获取数据（多次尝试，使用不同的缓存破坏参数）
-    print(f"\n2. 从 CDN 获取数据...")
+    # 优先测试使用 commit SHA 的 CDN URL
+    commit_sha = local_data.get('latestCommitSha', None)
+    
+    if commit_sha:
+        print(f"\n2. 测试使用 commit SHA 的 CDN URL（推荐方法）...")
+        cdn_url_with_sha = f"{cdn_base}@{commit_sha}/videos.json"
+        print(f"   URL: {cdn_url_with_sha}")
+        
+        try:
+            response = requests.get(cdn_url_with_sha, timeout=10)
+            if response.status_code == 200:
+                cdn_data = response.json()
+                cdn_last_updated = cdn_data.get('lastUpdated', 'N/A')
+                cdn_cache_version = cdn_data.get('cacheVersion', 'N/A')
+                
+                print(f"   ✅ 请求成功")
+                print(f"   - 更新时间: {cdn_last_updated}")
+                print(f"   - 缓存版本: {cdn_cache_version}")
+                
+                if (cdn_last_updated == local_last_updated and 
+                    cdn_cache_version == local_cache_version):
+                    print(f"\n   ✅ 数据一致！使用 commit SHA 的 CDN URL 返回的是最新数据")
+                    return True
+                else:
+                    print(f"\n   ⚠️  数据不一致（即使使用 commit SHA）")
+        except Exception as e:
+            print(f"   ❌ 请求失败: {e}")
+    
+    # 从 CDN 获取数据（使用 @main，多次尝试，使用不同的缓存破坏参数）
+    print(f"\n3. 测试使用 @main 的 CDN URL（对比）...")
     print(f"   URL: {cdn_url}")
     
-    max_attempts = 5
+    max_attempts = 3
     cdn_data = None
     
     for attempt in range(1, max_attempts + 1):
@@ -75,7 +104,7 @@ def test_cdn_cache():
                     print(f"\n   ✅ 数据一致！CDN 返回的是最新数据")
                     break
                 else:
-                    print(f"\n   ⚠️  数据不一致，可能是缓存问题")
+                    print(f"\n   ⚠️  数据不一致，@main 可能返回缓存数据")
                     if attempt < max_attempts:
                         print(f"   等待 2 秒后重试...")
                         time.sleep(2)
@@ -89,7 +118,7 @@ def test_cdn_cache():
                 time.sleep(2)
     
     # 详细比较
-    print(f"\n3. 详细比较...")
+    print(f"\n4. 详细比较...")
     print("=" * 60)
     
     if cdn_data is None:
