@@ -241,8 +241,8 @@
         let currentCDN = null;
         let cdnSpeeds = {};
         // 全局 commit SHA，由 update.py 自动更新，用于自动替换 @main
-        // 格式: let globalCommitSha = "COMMIT_SHA_PLACEHOLDER";
-        let globalCommitSha = null;
+        // 格式: let globalCommitSha = "f428468b22baf375bd4552525bced290abcfa20f";
+        let globalCommitSha = "f428468b22baf375bd4552525bced290abcfa20f";
 
         // 初始化视频播放器
         const player = videojs('my-video');
@@ -559,76 +559,7 @@
             }
         }
 
-        // 从 GitHub API 获取最新的 commit SHA（index.html 内部使用，不对外暴露）
-        async function fetchLatestCommitSha() {
-            if (globalCommitSha) {
-                return globalCommitSha;
-            }
-            
-            console.log('🔄 [index.html 内部] 从 GitHub API 获取最新的 commit SHA...');
-            
-            try {
-                // 方法1: 使用 GitHub API 获取 main 分支的最新 commit SHA
-                const apiUrl = 'https://api.github.com/repos/yezhu9181/my-video-host/commits/main';
-                const timestamp = Date.now();
-                const response = await fetch(`${apiUrl}?t=${timestamp}`, {
-                    method: 'GET',
-                    cache: 'no-store',
-                    credentials: 'omit',
-                    headers: {
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Cache-Control': 'no-cache, no-store, must-revalidate',
-                        'Pragma': 'no-cache'
-                    }
-                });
-                
-                if (response.ok) {
-                    const commitData = await response.json();
-                    const commitSha = commitData.sha;
-                    
-                    if (commitSha) {
-                        globalCommitSha = commitSha;
-                        console.log(`✅ [index.html 内部] 获取到最新 commit SHA: ${commitSha.substring(0, 7)}...`);
-                        return commitSha;
-                    }
-                }
-                
-                // 方法2: 如果 GitHub API 失败，尝试从 GitHub Raw URL 获取（但不获取文件内容）
-                // 通过 HEAD 请求获取 ETag 或其他信息来推断 commit SHA
-                // 或者使用 GitHub 的 refs API
-                console.warn('[index.html 内部] GitHub API 失败，尝试备用方法...');
-                
-                // 备用方法：使用 GitHub refs API
-                const refsUrl = 'https://api.github.com/repos/yezhu9181/my-video-host/git/refs/heads/main';
-                const refsResponse = await fetch(`${refsUrl}?t=${timestamp}`, {
-                    method: 'GET',
-                    cache: 'no-store',
-                    credentials: 'omit',
-                    headers: {
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Cache-Control': 'no-cache, no-store, must-revalidate',
-                        'Pragma': 'no-cache'
-                    }
-                });
-                
-                if (refsResponse.ok) {
-                    const refsData = await refsResponse.json();
-                    const commitSha = refsData.object?.sha;
-                    
-                    if (commitSha) {
-                        globalCommitSha = commitSha;
-                        console.log(`✅ [index.html 内部] 通过备用方法获取到 commit SHA: ${commitSha.substring(0, 7)}...`);
-                        return commitSha;
-                    }
-                }
-                
-                throw new Error('所有方法都失败');
-            } catch (error) {
-                console.error('[index.html 内部] 获取 commit SHA 失败:', error);
-                console.warn('[index.html 内部] 将使用 @main（可能返回缓存数据）');
-                return null;
-            }
-        }
+        // commit SHA 由 update.py 自动更新，前端不再需要获取
 
         // 使用 commit SHA 替换 CDN URL 中的 @main（index.html 内部自动替换）
         // 如果提供了 commitSha，使用它；否则使用全局的 globalCommitSha
