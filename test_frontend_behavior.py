@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-测试前端行为：模拟前端代码的执行流程
+测试前端行为：直接使用 @main 的 URL 是否能获取最新数据
 """
 
 import json
@@ -9,9 +9,9 @@ import time
 from pathlib import Path
 
 def test_frontend_behavior():
-    """模拟前端代码的执行流程"""
+    """测试直接使用 @main 的 URL 是否能获取最新数据"""
     print("=" * 60)
-    print("测试前端行为：模拟前端代码执行流程")
+    print("测试前端行为：直接使用 @main 的 URL")
     print("=" * 60)
     
     # 读取本地文件
@@ -21,118 +21,98 @@ def test_frontend_behavior():
     
     local_last_updated = local_data.get('lastUpdated')
     local_cache_version = local_data.get('cacheVersion')
-    expected_commit_sha = local_data.get('latestCommitSha')
     
     print(f"\n1. 本地数据:")
     print(f"   - 更新时间: {local_last_updated}")
     print(f"   - 缓存版本: {local_cache_version}")
-    print(f"   - Commit SHA: {expected_commit_sha}")
     
-    # 步骤1: 从 GitHub Raw URL 获取数据（模拟前端步骤1）
-    print(f"\n2. 步骤1: 从 GitHub Raw URL 获取数据和 commit SHA...")
-    try:
-        timestamp = int(time.time())
-        random_str = str(time.time()).replace('.', '')
-        raw_url = f"https://raw.githubusercontent.com/yezhu9181/my-video-host/main/videos.json?t={timestamp}&r={random_str}&_cb={timestamp}_{random_str}&nocache=1"
-        
-        response = requests.get(raw_url, timeout=10)
-        if response.status_code == 200:
-            data = response.json()
-            commit_sha = data.get('latestCommitSha')
-            last_updated = data.get('lastUpdated')
-            cache_version = data.get('cacheVersion')
-            
-            print(f"   ✅ GitHub Raw URL 请求成功")
-            print(f"   - 更新时间: {last_updated}")
-            print(f"   - 缓存版本: {cache_version}")
-            print(f"   - Commit SHA: {commit_sha}")
-            
-            if commit_sha != expected_commit_sha:
-                print(f"   ⚠️  Commit SHA 不匹配！")
-                print(f"      - 期望: {expected_commit_sha}")
-                print(f"      - 实际: {commit_sha}")
-        else:
-            print(f"   ❌ GitHub Raw URL 请求失败: HTTP {response.status_code}")
-            commit_sha = None
-    except Exception as e:
-        print(f"   ❌ GitHub Raw URL 请求失败: {e}")
-        commit_sha = None
+    # 测试使用 @main 的 URL（前端配置中的 URL）
+    print(f"\n2. 测试使用 @main 的 URL（前端配置）...")
+    cdn_url = "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json"
+    print(f"   URL: {cdn_url}")
     
-    # 步骤2: 使用 commit SHA 从 CDN 获取数据（模拟前端步骤2）
-    if commit_sha:
-        print(f"\n3. 步骤2: 使用 commit SHA 从 CDN 获取数据...")
+    max_attempts = 5
+    success = False
+    
+    for attempt in range(1, max_attempts + 1):
+        # 使用不同的缓存破坏参数
+        cache_buster = f"?v={int(time.time())}&_t={time.time()}&attempt={attempt}&nocache=1&_cb={time.time()}"
+        test_url = f"{cdn_url}{cache_buster}"
         
-        # 原始 URL（前端配置中的 @main）
-        original_url = "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json"
-        print(f"   原始 URL（前端配置）: {original_url}")
-        
-        # 替换后的 URL（应该使用的）
-        replaced_url = original_url.replace("@main", f"@{commit_sha}")
-        print(f"   替换后 URL（实际请求）: {replaced_url}")
+        print(f"\n   尝试 {attempt}/{max_attempts}: {test_url}")
         
         try:
-            response = requests.get(replaced_url, timeout=10)
+            response = requests.get(test_url, 
+                                  headers={
+                                      'Cache-Control': 'no-cache, no-store, must-revalidate, proxy-revalidate, max-age=0',
+                                      'Pragma': 'no-cache',
+                                      'Expires': '0',
+                                      'If-Modified-Since': 'Thu, 01 Jan 1970 00:00:00 GMT',
+                                      'If-None-Match': '*',
+                                      'X-Requested-With': 'XMLHttpRequest'
+                                  },
+                                  timeout=10)
+            
+            # 处理 304 Not Modified - 尝试强制刷新
+            if response.status_code == 304:
+                print(f"   ⚠️  HTTP 304 Not Modified，尝试强制刷新...")
+                # 使用不同的 URL 参数强制刷新
+                force_refresh_url = f"{cdn_url}?t={int(time.time() * 1000)}&_force_refresh=1&_nocache={int(time.time())}"
+                response = requests.get(force_refresh_url,
+                                      headers={
+                                          'Cache-Control': 'no-cache, no-store, must-revalidate',
+                                          'Pragma': 'no-cache',
+                                          'Expires': '0'
+                                      },
+                                      timeout=10)
+            
             if response.status_code == 200:
-                cdn_data = response.json()
-                cdn_last_updated = cdn_data.get('lastUpdated')
-                cdn_cache_version = cdn_data.get('cacheVersion')
+                data = response.json()
+                cdn_last_updated = data.get('lastUpdated')
+                cdn_cache_version = data.get('cacheVersion')
                 
                 print(f"   ✅ CDN 请求成功")
                 print(f"   - 更新时间: {cdn_last_updated}")
                 print(f"   - 缓存版本: {cdn_cache_version}")
                 
-                # 验证数据是否一致
-                if (cdn_last_updated == last_updated and 
-                    cdn_cache_version == cache_version):
-                    print(f"   ✅ CDN 数据与 GitHub Raw URL 数据一致")
-                    
-                    # 验证是否是最新数据
-                    if (cdn_last_updated == local_last_updated and 
-                        cdn_cache_version == local_cache_version):
-                        print(f"   ✅ CDN 数据是最新的（与本地一致）")
-                        return True
-                    else:
-                        print(f"   ⚠️  CDN 数据不是最新的")
-                        print(f"      - 本地: {local_last_updated} / {local_cache_version}")
-                        print(f"      - CDN:  {cdn_last_updated} / {cdn_cache_version}")
+                # 比较数据是否一致
+                if (cdn_last_updated == local_last_updated and 
+                    cdn_cache_version == local_cache_version):
+                    print(f"\n   ✅ 数据一致！使用 @main 的 URL 返回的是最新数据")
+                    success = True
+                    break
                 else:
-                    print(f"   ❌ CDN 数据与 GitHub Raw URL 数据不一致")
-                    print(f"      - GitHub: {last_updated} / {cache_version}")
-                    print(f"      - CDN:    {cdn_last_updated} / {cdn_cache_version}")
+                    print(f"\n   ⚠️  数据不一致（尝试 {attempt}/{max_attempts}）")
+                    print(f"      - 本地: {local_last_updated} / {local_cache_version}")
+                    print(f"      - CDN:  {cdn_last_updated} / {cdn_cache_version}")
+                    if attempt < max_attempts:
+                        print(f"      - 等待 3 秒后重试...")
+                        time.sleep(3)
             else:
-                print(f"   ❌ CDN 请求失败: HTTP {response.status_code}")
+                print(f"   ❌ HTTP {response.status_code}: {response.reason if hasattr(response, 'reason') else 'Unknown'}")
+                
         except Exception as e:
-            print(f"   ❌ CDN 请求失败: {e}")
+            print(f"   ❌ 请求失败: {e}")
+            if attempt < max_attempts:
+                print(f"      - 等待 3 秒后重试...")
+                time.sleep(3)
+    
+    # 总结
+    print(f"\n3. 测试总结:")
+    print("=" * 60)
+    if success:
+        print("✅ 测试通过：使用 @main 的 URL 可以获取到最新数据")
+        print("💡 说明：CDN 缓存已更新，或者缓存破坏参数生效")
     else:
-        print(f"\n3. 步骤2: 跳过（未获取到 commit SHA）")
+        print("❌ 测试失败：使用 @main 的 URL 无法获取到最新数据")
+        print("💡 问题：CDN 缓存可能尚未更新")
+        print("💡 建议：")
+        print("   1. 等待几分钟后重试（CDN 缓存可能需要时间更新）")
+        print("   2. 清除 CDN 缓存（如果支持）")
+        print("   3. 使用 commit SHA 替换 @main（推荐方案）")
     
-    # 测试使用 @main 的 URL（对比）
-    print(f"\n4. 对比测试: 使用 @main 的 URL...")
-    try:
-        main_url = "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json"
-        response = requests.get(main_url, timeout=10)
-        if response.status_code == 200:
-            main_data = response.json()
-            main_last_updated = main_data.get('lastUpdated')
-            main_cache_version = main_data.get('cacheVersion')
-            
-            print(f"   ✅ @main URL 请求成功")
-            print(f"   - 更新时间: {main_last_updated}")
-            print(f"   - 缓存版本: {main_cache_version}")
-            
-            if (main_last_updated == local_last_updated and 
-                main_cache_version == local_cache_version):
-                print(f"   ⚠️  @main 返回的是最新数据（不应该）")
-            else:
-                print(f"   ✅ @main 返回的是旧数据（预期）")
-                print(f"      - 本地: {local_last_updated} / {local_cache_version}")
-                print(f"      - @main: {main_last_updated} / {main_cache_version}")
-    except Exception as e:
-        print(f"   ❌ @main URL 请求失败: {e}")
-    
-    return False
+    return success
 
 if __name__ == "__main__":
     success = test_frontend_behavior()
     exit(0 if success else 1)
-
