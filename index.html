@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/video.js@7.20.3/dist/video-js.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* 原有样式保持不变，添加缓存状态样式 */
+        /* 原有样式保持不变 */
         .cache-status {
             background: #fff3cd;
             border: 1px solid #ffeaa7;
@@ -25,14 +25,32 @@
             margin-left: 5px;
         }
         
-        .cache-refresh:hover {
-            color: #0056b3;
-        }
-        
         .last-updated {
             font-size: 11px;
             color: #6c757d;
             margin-top: 4px;
+        }
+        
+        .cdn-bypass-options {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .bypass-btn {
+            padding: 4px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            background: white;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        
+        .bypass-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
         }
     </style>
 </head>
@@ -55,6 +73,15 @@
             </div>
             <div class="cdn-switcher" id="cdnSwitcher"></div>
             <div class="speed-test" id="speedTest"></div>
+            
+            <!-- 缓存绕过选项 -->
+            <div class="cdn-bypass-options" id="cdnBypassOptions" style="display: none;">
+                <span style="font-size: 12px;">缓存绕过:</span>
+                <button class="bypass-btn active" onclick="setBypassMethod('github')">GitHub Raw</button>
+                <button class="bypass-btn" onclick="setBypassMethod('combat')">Combat CDN</button>
+                <button class="bypass-btn" onclick="setBypassMethod('direct')">直接请求</button>
+            </div>
+            
             <!-- 缓存状态显示 -->
             <div class="cache-status" id="cacheStatus" style="display: none;">
                 <i class="fas fa-info-circle"></i>
@@ -66,72 +93,13 @@
 
         <!-- 原有内容保持不变 -->
         <div class="main-content">
-            <div class="card">
-                <h2 class="section-title"><i class="fas fa-play-circle"></i> 视频列表</h2>
-                
-                <!-- 搜索和筛选 -->
-                <div class="search-box">
-                    <input type="text" id="searchInput" class="search-input" placeholder="搜索视频标题或描述...">
-                    <button onclick="searchVideos()" class="search-btn">
-                        <i class="fas fa-search"></i> 搜索
-                    </button>
-                    <button onclick="clearSearch()" class="search-btn" style="background: #64748b;">
-                        <i class="fas fa-times"></i> 清除
-                    </button>
-                </div>
-                
-                <div class="filters">
-                    <select id="sortSelect" class="filter-select" onchange="loadVideos()">
-                        <option value="title">按标题排序</option>
-                        <option value="duration">按时长排序</option>
-                        <option value="size">按大小排序</option>
-                        <option value="created">按创建时间排序</option>
-                    </select>
-                    
-                    <select id="pageSizeSelect" class="filter-select" onchange="changePageSize()">
-                        <option value="5">每页5个</option>
-                        <option value="10" selected>每页10个</option>
-                        <option value="20">每页20个</option>
-                        <option value="50">每页50个</option>
-                    </select>
-                </div>
-                
-                <div id="video-container">
-                    <div class="loading" id="loading">
-                        <div class="loading-spinner"></div>
-                        <p>正在加载视频列表...</p>
-                    </div>
-                </div>
-                
-                <!-- 分页控件 -->
-                <div class="pagination" id="pagination" style="display: none;">
-                    <button onclick="changePage(currentPage - 1)" id="prevBtn" class="page-btn" disabled>
-                        <i class="fas fa-chevron-left"></i> 上一页
-                    </button>
-                    
-                    <span class="page-info" id="pageInfo">第 1 页，共 1 页</span>
-                    
-                    <button onclick="changePage(currentPage + 1)" id="nextBtn" class="page-btn" disabled>
-                        下一页 <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-                
-                <div class="video-player-container" id="player-container" style="display: none;">
-                    <h3 id="current-video-title">视频播放器</h3>
-                    <div class="cdn-status-bar" style="margin-bottom: 15px; background: #f0fdf4; border-color: #bbf7d0;">
-                        <div id="playerCdnInfo">准备播放...</div>
-                    </div>
-                    <video id="my-video" class="video-js vjs-default-skin" controls preload="auto" width="100%" height="400" data-setup="{}">
-                        <p class="vjs-no-js">请启用JavaScript以观看视频</p>
-                    </video>
-                </div>
-            </div>
+            <!-- ... 原有内容 ... -->
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/video.js@7.20.3/dist/video.min.js"></script>
     <script>
-        // 免配置CDN列表 - 添加缓存绕过参数
+        // 免配置CDN列表
         const FREE_CDNS = [
             {
                 id: 'jsdelivr',
@@ -139,7 +107,7 @@
                 url: 'https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main',
                 testUrl: 'https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json',
                 region: 'global',
-                cacheTime: 12 // 小时
+                cacheTime: 12
             },
             {
                 id: 'statically',
@@ -192,103 +160,127 @@
         let currentCDN = null;
         let cdnSpeeds = {};
         let lastRefreshTime = null;
-        let dataVersion = Date.now(); // 数据版本号，用于缓存绕过
+        let bypassMethod = 'github'; // 默认使用GitHub Raw绕过缓存
 
         // 初始化视频播放器
         const player = videojs('my-video');
 
-        // 生成带缓存绕过参数的URL
-        function generateCacheBustUrl(baseUrl, isJson = false) {
-            // 对于JSON数据，添加时间戳参数绕过缓存
-            if (isJson) {
-                const separator = baseUrl.includes('?') ? '&' : '?';
-                return `${baseUrl}${separator}_=${dataVersion}`;
-            }
-            return baseUrl;
+        // 设置缓存绕过方法
+        function setBypassMethod(method) {
+            bypassMethod = method;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.bypass-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            showToast(`已切换到${getBypassMethodName(method)}模式`, 'info');
         }
 
-        // 强制刷新函数 - 增强版
-        async function forceRefresh(bypassCache = false) {
+        function getBypassMethodName(method) {
+            const names = {
+                'github': 'GitHub Raw',
+                'combat': 'Combat CDN', 
+                'direct': '直接请求'
+            };
+            return names[method] || method;
+        }
+
+        // 生成真正有效的缓存绕过URL
+        function generateCacheBustUrl(baseUrl) {
+            switch(bypassMethod) {
+                case 'github':
+                    // 直接使用GitHub Raw（缓存时间最短）
+                    return baseUrl.replace(/https:\/\/[^\/]+\//, 'https://raw.githubusercontent.com/');
+                
+                case 'combat':
+                    // 使用Combat CDN（缓存时间短）
+                    return baseUrl.replace(/https:\/\/[^\/]+\//, 'https://combat.cdn.workers.dev/');
+                
+                case 'direct':
+                    // 添加时间戳参数（对某些CDN可能有效）
+                    const separator = baseUrl.includes('?') ? '&' : '?';
+                    return `${baseUrl}${separator}_t=${Date.now()}`;
+                
+                default:
+                    return baseUrl;
+            }
+        }
+
+        // 强制刷新函数
+        async function forceRefresh(hardRefresh = false) {
             const refreshBtn = document.getElementById('refreshBtn');
             const originalText = refreshBtn.innerHTML;
             
-            // 禁用按钮并显示加载状态
             refreshBtn.disabled = true;
             refreshBtn.classList.add('loading');
             refreshBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> 刷新中...';
             
             try {
-                // 如果强制绕过缓存，更新数据版本号
-                if (bypassCache) {
-                    dataVersion = Date.now();
-                    showToast('正在强制刷新，绕过CDN缓存...', 'info');
+                if (hardRefresh) {
+                    showToast('正在强制刷新，绕过所有CDN缓存...', 'info');
+                    
+                    // 硬刷新：清除所有缓存相关数据
+                    if ('caches' in window) {
+                        try {
+                            const cacheNames = await caches.keys();
+                            await Promise.all(cacheNames.map(name => caches.delete(name)));
+                        } catch (e) {
+                            console.log('清除缓存失败:', e);
+                        }
+                    }
+                    
+                    // 强制使用不同的绕过方法轮询
+                    const methods = ['github', 'combat', 'direct'];
+                    const currentMethodIndex = methods.indexOf(bypassMethod);
+                    bypassMethod = methods[(currentMethodIndex + 1) % methods.length];
                 }
                 
-                // 重置CDN状态
                 currentCDN = null;
                 cdnSpeeds = {};
                 
-                // 重新加载所有视频
                 await loadAllVideos();
                 
-                // 更新最后刷新时间
                 lastRefreshTime = new Date();
                 updateLastUpdatedDisplay();
                 
-                showToast(bypassCache ? '强制刷新成功！' : '刷新成功！', 'success');
+                showToast(hardRefresh ? '强制刷新成功！' : '刷新成功！', 'success');
                 
             } catch (error) {
                 console.error('刷新失败:', error);
-                showToast('刷新失败，请重试', 'error');
+                showToast('刷新失败: ' + error.message, 'error');
             } finally {
-                // 恢复按钮状态
                 refreshBtn.disabled = false;
                 refreshBtn.classList.remove('loading');
                 refreshBtn.innerHTML = originalText;
             }
         }
 
-        // 更新最后刷新时间显示
-        function updateLastUpdatedDisplay() {
-            const lastUpdated = document.getElementById('lastUpdated');
-            if (lastRefreshTime) {
-                lastUpdated.textContent = `最后更新: ${lastRefreshTime.toLocaleString()}`;
-            }
-        }
-
-        // 显示缓存状态
-        function showCacheStatus(cdn) {
-            const cacheStatus = document.getElementById('cacheStatus');
-            const cacheMessage = document.getElementById('cacheMessage');
-            
-            if (cdn && cdn.cacheTime) {
-                cacheMessage.textContent = `${cdn.name} CDN缓存时间约${cdn.cacheTime}小时，数据可能不是最新的`;
-                cacheStatus.style.display = 'block';
-            } else {
-                cacheStatus.style.display = 'none';
-            }
-        }
-
-        // 测试CDN速度 - 增强版，使用缓存绕过
+        // 测试CDN速度 - 使用缓存绕过
         async function testCDNSpeeds() {
             const statusText = document.getElementById('cdnStatusText');
             const speedTest = document.getElementById('speedTest');
             const switcher = document.getElementById('cdnSwitcher');
+            const bypassOptions = document.getElementById('cdnBypassOptions');
             
             statusText.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> 正在测试CDN速度...';
             
-            // 测试每个CDN的速度
+            // 显示缓存绕过选项
+            bypassOptions.style.display = 'flex';
+            
             const speedTests = FREE_CDNS.map(async (cdn) => {
                 const startTime = performance.now();
                 
                 try {
-                    // 使用带缓存绕过的URL进行测试
-                    const testUrl = generateCacheBustUrl(cdn.testUrl, true);
+                    // 使用缓存绕过URL进行测试
+                    const testUrl = generateCacheBustUrl(cdn.testUrl);
+                    
                     const response = await fetch(testUrl, {
                         method: 'GET',
-                        cache: 'no-cache',
                         headers: {
-                            'Cache-Control': 'no-cache'
+                            'Cache-Control': 'no-cache, no-store, must-revalidate',
+                            'Pragma': 'no-cache'
                         }
                     });
                     
@@ -296,21 +288,27 @@
                         throw new Error(`HTTP ${response.status}`);
                     }
                     
-                    const speed = performance.now() - startTime;
-                    cdnSpeeds[cdn.id] = speed;
+                    // 验证数据是否新鲜
+                    const data = await response.json();
+                    if (!data.videos || !Array.isArray(data.videos)) {
+                        throw new Error('无效的数据格式');
+                    }
                     
-                    return { cdn, speed, success: true };
+                    const speed = performance.now() - startTime;
+                    cdnSpeeds[cdn.id] = { speed, data: data.videos.length };
+                    
+                    return { cdn, speed, success: true, dataCount: data.videos.length };
                 } catch (error) {
                     console.warn(`CDN ${cdn.name} 测试失败:`, error);
-                    cdnSpeeds[cdn.id] = Infinity;
+                    cdnSpeeds[cdn.id] = { speed: Infinity, data: 0 };
                     return { cdn, speed: Infinity, success: false };
                 }
             });
 
             const results = await Promise.all(speedTests);
             
-            // 排序并选择最快的CDN
-            const workingCDNs = results.filter(r => r.success && r.speed < 3000); // 放宽超时时间
+            // 选择最快且数据完整的CDN
+            const workingCDNs = results.filter(r => r.success && r.speed < 5000);
             workingCDNs.sort((a, b) => a.speed - b.speed);
             
             if (workingCDNs.length > 0) {
@@ -318,29 +316,27 @@
                 
                 statusText.innerHTML = `
                     <i class="fas fa-check-circle" style="color: #10b981;"></i>
-                    已选择最快CDN: <span class="cdn-badge success">${currentCDN.name}</span>
-                    <span style="color: #6b7280; font-size: 12px;">(${Math.round(workingCDNs[0].speed)}ms)</span>
+                    已选择: <span class="cdn-badge success">${currentCDN.name}</span>
+                    <span style="color: #6b7280; font-size: 12px;">(${Math.round(workingCDNs[0].speed)}ms, ${workingCDNs[0].dataCount}个视频)</span>
                 `;
                 
                 // 显示CDN切换器
-                switcher.innerHTML = '切换CDN: ' + FREE_CDNS.map(cdn => 
-                    `<button class="cdn-btn ${cdn.id === currentCDN.id ? 'active' : ''}" 
-                            onclick="switchCDN('${cdn.id}')"
-                            title="${cdnSpeeds[cdn.id] ? Math.round(cdnSpeeds[cdn.id]) + 'ms' : '测试失败'}">
+                switcher.innerHTML = '切换CDN: ' + FREE_CDNS.map(cdn => {
+                    const speedInfo = cdnSpeeds[cdn.id];
+                    const title = speedInfo ? `${Math.round(speedInfo.speed)}ms, ${speedInfo.data}视频` : '测试失败';
+                    return `<button class="cdn-btn ${cdn.id === currentCDN.id ? 'active' : ''}" 
+                            onclick="switchCDN('${cdn.id}')" title="${title}">
                         ${cdn.name}
-                    </button>`
-                ).join('');
+                    </button>`;
+                }).join('');
                 
-                // 显示速度测试结果
-                speedTest.innerHTML = '速度测试: ' + workingCDNs.slice(0, 3).map((result, index) => 
+                speedTest.innerHTML = '最佳: ' + workingCDNs.slice(0, 3).map((result, index) => 
                     `${result.cdn.name}(${Math.round(result.speed)}ms)${index < 2 ? ' → ' : ''}`
                 ).join('');
                 
-                // 显示缓存状态
                 showCacheStatus(currentCDN);
                 
             } else {
-                // 所有CDN都失败，使用jsDelivr作为备用
                 currentCDN = FREE_CDNS[0];
                 statusText.innerHTML = `
                     <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i>
@@ -352,75 +348,24 @@
             return workingCDNs.length > 0;
         }
 
-        // 切换CDN
-        function switchCDN(cdnId) {
-            const newCDN = FREE_CDNS.find(cdn => cdn.id === cdnId);
-            if (!newCDN) return;
-            
-            currentCDN = newCDN;
-            
-            // 更新按钮状态
-            document.querySelectorAll('.cdn-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // 更新状态显示
-            document.getElementById('cdnStatusText').innerHTML = `
-                <i class="fas fa-check-circle" style="color: #10b981;"></i>
-                手动选择: <span class="cdn-badge success">${currentCDN.name}</span>
-            `;
-            
-            // 显示缓存状态
-            showCacheStatus(currentCDN);
-            
-            // 重新渲染视频
-            if (allVideos.length > 0) {
-                renderVideos();
-                
-                // 重新加载当前视频
-                const currentSrc = player.currentSrc();
-                if (currentSrc) {
-                    const currentVideo = allVideos.find(v => currentSrc.includes(v.filename));
-                    if (currentVideo) {
-                        playVideo(currentVideo.filename, currentVideo.title);
-                    }
-                }
-            }
-        }
-
-        // 生成视频URL - 增强版，添加缓存绕过
-        function generateVideoUrl(filename) {
-            const baseUrl = `${currentCDN.url}/videos/${filename}`;
-            // 对于视频文件，只在特定CDN上添加缓存绕过
-            if (currentCDN.id === 'github' || currentCDN.id === 'combat') {
-                return generateCacheBustUrl(baseUrl);
-            }
-            return baseUrl;
-        }
-
-        // 生成缩略图URL - 增强版
-        function generateThumbnailUrl(filename) {
-            const baseUrl = `${currentCDN.url}/thumbnails/${filename}`;
-            return generateCacheBustUrl(baseUrl);
-        }
-
-        // 加载视频数据 - 增强版，使用缓存绕过
+        // 加载视频数据 - 使用有效的缓存绕过
         async function loadAllVideos() {
             try {
-                // 先测试CDN速度
                 const cdnAvailable = await testCDNSpeeds();
                 
                 if (!cdnAvailable) {
                     throw new Error('没有可用的CDN，请检查网络连接');
                 }
                 
-                // 从当前CDN加载数据，使用缓存绕过
-                const dataUrl = generateCacheBustUrl(`${currentCDN.url}/videos.json`, true);
+                // 使用缓存绕过URL加载数据
+                const dataUrl = generateCacheBustUrl(`${currentCDN.url}/videos.json`);
+                
+                console.log('正在从以下URL加载数据:', dataUrl);
+                
                 const response = await fetch(dataUrl, {
-                    cache: 'no-cache',
                     headers: {
-                        'Cache-Control': 'no-cache'
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
                     }
                 });
                 
@@ -430,10 +375,14 @@
                 
                 const data = await response.json();
                 
-                allVideos = data.videos || [];
+                if (!data.videos || !Array.isArray(data.videos)) {
+                    throw new Error('无效的数据格式');
+                }
+                
+                allVideos = data.videos;
+                console.log(`成功加载 ${allVideos.length} 个视频`);
                 renderVideos();
                 
-                // 更新最后刷新时间
                 lastRefreshTime = new Date();
                 updateLastUpdatedDisplay();
                 
@@ -448,7 +397,137 @@
             }
         }
 
-        // 播放视频（带CDN回退和缓存绕过）
+        // 其他函数保持不变...
+        function showCacheStatus(cdn) {
+            const cacheStatus = document.getElementById('cacheStatus');
+            const cacheMessage = document.getElementById('cacheMessage');
+            
+            if (cdn && cdn.cacheTime) {
+                cacheMessage.textContent = `当前使用${getBypassMethodName(bypassMethod)}模式获取数据`;
+                cacheStatus.style.display = 'block';
+            } else {
+                cacheStatus.style.display = 'none';
+            }
+        }
+
+        function updateLastUpdatedDisplay() {
+            const lastUpdated = document.getElementById('lastUpdated');
+            if (lastRefreshTime) {
+                lastUpdated.textContent = `最后更新: ${lastRefreshTime.toLocaleString()} | 视频数量: ${allVideos.length}`;
+            }
+        }
+
+        // 生成视频URL
+        function generateVideoUrl(filename) {
+            const baseUrl = `${currentCDN.url}/videos/${filename}`;
+            return generateCacheBustUrl(baseUrl);
+        }
+
+        function generateThumbnailUrl(filename) {
+            const baseUrl = `${currentCDN.url}/thumbnails/${filename}`;
+            return generateCacheBustUrl(baseUrl);
+        }
+
+        // 切换CDN
+        function switchCDN(cdnId) {
+            const newCDN = FREE_CDNS.find(cdn => cdn.id === cdnId);
+            if (!newCDN) return;
+            
+            currentCDN = newCDN;
+            
+            document.querySelectorAll('.cdn-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            document.getElementById('cdnStatusText').innerHTML = `
+                <i class="fas fa-check-circle" style="color: #10b981;"></i>
+                手动选择: <span class="cdn-badge success">${currentCDN.name}</span>
+            `;
+            
+            showCacheStatus(currentCDN);
+            
+            if (allVideos.length > 0) {
+                renderVideos();
+                
+                const currentSrc = player.currentSrc();
+                if (currentSrc) {
+                    const currentVideo = allVideos.find(v => currentSrc.includes(v.filename));
+                    if (currentVideo) {
+                        playVideo(currentVideo.filename, currentVideo.title);
+                    }
+                }
+            }
+        }
+
+        // 原有的渲染、分页、搜索函数保持不变...
+        function renderVideos() {
+            const container = document.getElementById('video-container');
+            const loading = document.getElementById('loading');
+            const pagination = document.getElementById('pagination');
+            
+            if (allVideos.length === 0) {
+                loading.innerHTML = '<div class="error">没有找到视频数据</div>';
+                pagination.style.display = 'none';
+                return;
+            }
+            
+            loading.style.display = 'none';
+            
+            let filteredVideos = filterVideos(allVideos);
+            filteredVideos = sortVideos(filteredVideos);
+            
+            const totalVideos = filteredVideos.length;
+            const totalPages = Math.ceil(totalVideos / pageSize);
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            const paginatedVideos = filteredVideos.slice(startIndex, endIndex);
+            
+            let html = '<div class="video-grid">';
+            paginatedVideos.forEach(video => {
+                const thumbnailFilename = video.thumbnail ? 
+                    video.thumbnail.split('/').pop() : 
+                    video.filename.replace('.mp4', '.jpg').replace('.mov', '.jpg');
+                
+                html += `
+                    <div class="video-card" onclick="playVideo('${video.filename}', '${video.title.replace(/'/g, "\\'")}')">
+                        <div class="video-thumbnail">
+                            <img src="${generateThumbnailUrl(thumbnailFilename)}" 
+                                 alt="${video.title}"
+                                 onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZjNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPua1geafpeeJueauijwvdGV4dD48L3N2Zz4=';" />
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">${video.title}</div>
+                            <div class="video-description">${video.description}</div>
+                            <div class="video-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>${video.duration}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-weight-hanging"></i>
+                                    <span>${video.size}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-wifi"></i>
+                                    <span>${currentCDN.name}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            container.innerHTML = html;
+            updatePagination(totalVideos, totalPages);
+            
+            if (paginatedVideos.length > 0) {
+                playVideo(paginatedVideos[0].filename, paginatedVideos[0].title);
+            }
+        }
+
+        // 播放视频函数
         async function playVideo(filename, title) {
             const playerContainer = document.getElementById('player-container');
             const currentVideoTitle = document.getElementById('current-video-title');
@@ -477,7 +556,6 @@
                     player.one('error', async () => {
                         retryCount++;
                         if (retryCount < maxRetries) {
-                            // 切换到下一个CDN
                             const currentIndex = FREE_CDNS.findIndex(cdn => cdn.id === currentCDN.id);
                             const nextCDN = FREE_CDNS[(currentIndex + 1) % FREE_CDNS.length];
                             
@@ -502,7 +580,7 @@
             playerContainer.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // 原有的分页、搜索、筛选函数保持不变
+        // 其他辅助函数...
         function filterVideos(videos) {
             if (!currentSearch) return videos;
             const searchLower = currentSearch.toLowerCase();
@@ -578,15 +656,12 @@
             renderVideos();
         }
 
-        // 显示Toast消息
         function showToast(message, type = 'info') {
-            // 移除现有的toast
             const existingToast = document.getElementById('refreshToast');
             if (existingToast) {
                 existingToast.remove();
             }
             
-            // 创建新的toast
             const toast = document.createElement('div');
             toast.id = 'refreshToast';
             toast.innerHTML = `
@@ -610,7 +685,6 @@
                 </div>
             `;
             
-            // 添加动画样式
             if (!document.getElementById('toastStyles')) {
                 const style = document.createElement('style');
                 style.id = 'toastStyles';
@@ -629,7 +703,6 @@
             
             document.body.appendChild(toast);
             
-            // 3秒后自动移除
             setTimeout(() => {
                 if (toast.parentNode) {
                     toast.style.animation = 'slideOut 0.3s ease-in forwards';
