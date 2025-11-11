@@ -1,0 +1,47 @@
+{
+  "videos": [
+    {
+      "id": 1,
+      "title": "Zgvtbw==",
+      "filename": "ZGVtbw==.MP4",
+      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/ZGVtbw==.MP4",
+      "description": "这是关于Zgvtbw==的详细说明视频",
+      "duration": "0:24",
+      "size": "41.1 MB",
+      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/ZGVtbw==.jpg",
+      "codec": "H.264",
+      "resolution": "0x1",
+      "createdAt": "2025-11-11",
+      "thumbnailType": "JPG",
+      "timestamp": 1762854515
+    },
+    {
+      "id": 2,
+      "title": "Aw50Cm8=",
+      "filename": "aW50cm8=.MP4",
+      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/aW50cm8=.MP4",
+      "description": "这是关于Aw50Cm8=的详细说明视频",
+      "duration": "0:35",
+      "size": "13.1 MB",
+      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/aW50cm8=.jpg",
+      "codec": "H.264",
+      "resolution": "0x1",
+      "createdAt": "2025-11-11",
+      "thumbnailType": "JPG",
+      "timestamp": 1762854515
+    }
+  ],
+  "pagination": {
+    "total": 2,
+    "page": 1,
+    "pageSize": 10,
+    "totalPages": 1,
+    "hasNext": false,
+    "hasPrev": false
+  },
+  "lastUpdated": "2025-11-11T17:48:36Z",
+  "timestamp": 1762854515,
+  "filename": "videos_1762854515.json",
+  "repository": "https://github.com/yezhu9181/my-video-host",
+  "ffmpegAvailable": true
+}

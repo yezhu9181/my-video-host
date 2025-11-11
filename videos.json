@@ -4,33 +4,35 @@
       "id": 1,
       "title": "功能演示",
       "filename": "ZGVtbw==.MP4",
-      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/ZGVtbw==.MP4?v=223b1ce",
+      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/ZGVtbw==.MP4?v=252d1f8",
       "description": "核心功能的实际使用演示",
       "duration": "0:24",
       "size": "41.1 MB",
-      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/ZGVtbw==.jpg?v=223b1ce",
+      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/ZGVtbw==.jpg?v=252d1f8",
       "codec": "H.264",
       "resolution": "0x1",
       "createdAt": "2025-11-11",
       "thumbnailType": "JPG",
-      "cacheVersion": "223b1ce",
-      "lastUpdated": "2025-11-11T17:40:00.070001"
+      "cacheVersion": "252d1f8",
+      "lastUpdated": "2025-11-11T17:55:59.923286",
+      "namingScheme": "base64"
     },
     {
       "id": 2,
       "title": "产品介绍视频",
       "filename": "aW50cm8=.MP4",
-      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/aW50cm8=.MP4?v=223b1ce",
+      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/aW50cm8=.MP4?v=252d1f8",
       "description": "全面介绍产品的功能特性和使用场景",
       "duration": "0:35",
       "size": "13.1 MB",
-      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/aW50cm8=.jpg?v=223b1ce",
+      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/aW50cm8=.jpg?v=252d1f8",
       "codec": "H.264",
       "resolution": "0x1",
       "createdAt": "2025-11-11",
       "thumbnailType": "JPG",
-      "cacheVersion": "223b1ce",
-      "lastUpdated": "2025-11-11T17:40:00.188305"
+      "cacheVersion": "252d1f8",
+      "lastUpdated": "2025-11-11T17:56:00.023635",
+      "namingScheme": "base64"
     }
   ],
   "pagination": {
@@ -41,10 +43,12 @@
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-11T17:40:00Z",
+  "lastUpdated": "2025-11-11T17:56:00Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
-  "cacheVersion": "223b1ce",
+  "cacheVersion": "252d1f8",
+  "namingScheme": "base64",
+  "preserveOriginalNames": false,
   "apiEndpoints": {
     "allVideos": "/videos.json",
     "paginated": "/videos.json?page={page}&limit={limit}",

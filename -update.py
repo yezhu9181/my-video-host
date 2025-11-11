@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-视频库自动更新脚本 - 使用FFmpeg提取视频第一帧作为缩略图 + 缓存优化 + 多方案文件名生成
+视频库自动更新脚本 - 使用FFmpeg提取视频第一帧作为缩略图 + 缓存优化
 """
 
 import os
@@ -9,23 +9,18 @@ import glob
 import subprocess
 import base64
 import time
-import hashlib
-import uuid
 import requests
 from datetime import datetime
 from pathlib import Path
 
 class VideoLibraryUpdater:
-    def __init__(self, repo_path=".", page_size=10, token_file_path="/Users/syh/git_token.txt", 
-                 naming_scheme="base64", preserve_original_names=False):
+    def __init__(self, repo_path=".", page_size=10, token_file_path="/Users/syh/git_token.txt"):
         self.repo_path = Path(repo_path)
         self.videos_path = self.repo_path / "videos"
         self.thumbnails_path = self.repo_path / "thumbnails"
         self.json_path = self.repo_path / "videos.json"
         self.page_size = page_size
         self.token_file_path = Path(token_file_path)
-        self.naming_scheme = naming_scheme  # base64, hash, timestamp, uuid, friendly
-        self.preserve_original_names = preserve_original_names
         
         # 缓存优化配置
         self.cache_version = self.get_cache_version()
@@ -176,68 +171,6 @@ class VideoLibraryUpdater:
         encoded = encoded.replace('/', '-')
         return encoded
     
-    def generate_filename_hash(self, filename):
-        """生成文件内容的MD5哈希作为文件名"""
-        file_path = self.videos_path / filename
-        if file_path.exists():
-            # 计算文件内容的MD5
-            hash_md5 = hashlib.md5()
-            with open(file_path, "rb") as f:
-                for chunk in iter(lambda: f.read(4096), b""):
-                    hash_md5.update(chunk)
-            return hash_md5.hexdigest()[:12]  # 取前12位
-        else:
-            # 如果文件不存在，使用文件名生成哈希
-            return hashlib.md5(filename.encode('utf-8')).hexdigest()[:12]
-    
-    def generate_timestamp_filename(self, filename):
-        """生成基于时间戳的文件名"""
-        timestamp = int(time.time() * 1000)  # 毫秒级时间戳
-        return f"video_{timestamp}"
-    
-    def generate_uuid_filename(self, filename):
-        """生成UUID文件名"""
-        return str(uuid.uuid4())
-    
-    def generate_friendly_filename(self, filename):
-        """生成友好的文件名（清理特殊字符）"""
-        name_without_ext = Path(filename).stem
-        
-        # 替换特殊字符为下划线
-        import re
-        friendly_name = re.sub(r'[^\w\u4e00-\u9fa5]', '_', name_without_ext)
-        
-        # 限制长度
-        if len(friendly_name) > 50:
-            friendly_name = friendly_name[:50]
-        
-        return friendly_name
-    
-    def is_renamed_filename(self, filename):
-        """检查文件名是否已经是重命名后的格式"""
-        name_without_ext = Path(filename).stem
-        
-        # 检查base64格式
-        if self.is_base64_filename(filename):
-            return True
-        
-        # 检查哈希格式（12位十六进制）
-        if re.match(r'^[a-f0-9]{12}$', name_without_ext):
-            return True
-        
-        # 检查时间戳格式
-        if name_without_ext.startswith('video_') and name_without_ext[6:].isdigit():
-            return True
-        
-        # 检查UUID格式
-        try:
-            uuid.UUID(name_without_ext)
-            return True
-        except:
-            pass
-        
-        return False
-    
     def is_base64_filename(self, filename):
         """检查文件名是否是base64格式"""
         name_without_ext = Path(filename).stem
@@ -276,8 +209,8 @@ class VideoLibraryUpdater:
         except:
             return None
     
-    def rename_video_file(self, video_path):
-        """根据命名方案重命名视频文件"""
+    def rename_video_to_base64(self, video_path):
+        """将视频文件重命名为base64编码的名称"""
         original_path = Path(video_path)
         if not original_path.exists():
             return None
@@ -286,45 +219,20 @@ class VideoLibraryUpdater:
         original_name = original_path.name
         extension = original_path.suffix
         
-        # 如果启用了保留原始文件名，直接返回原文件名
-        if self.preserve_original_names:
-            print(f"  ✅ 保留原始文件名: {original_name}")
-            return original_name
-        
-        # 检查是否已经是重命名后的格式
-        if self.is_renamed_filename(original_name):
-            print(f"  ✅ 文件已是{self.naming_scheme}格式: {original_name}")
-            return original_name
-        
-        # 根据命名方案生成新文件名
-        if self.naming_scheme == "base64":
-            new_name = self.encode_filename_to_base64(original_name)
-        elif self.naming_scheme == "hash":
-            new_name = self.generate_filename_hash(original_name)
-        elif self.naming_scheme == "timestamp":
-            new_name = self.generate_timestamp_filename(original_name)
-        elif self.naming_scheme == "uuid":
-            new_name = self.generate_uuid_filename(original_name)
-        elif self.naming_scheme == "friendly":
-            new_name = self.generate_friendly_filename(original_name)
-        else:
-            # 默认使用base64
-            new_name = self.encode_filename_to_base64(original_name)
-        
-        new_filename = f"{new_name}{extension}"
+        # 生成base64文件名
+        base64_name = self.encode_filename_to_base64(original_name)
+        new_filename = f"{base64_name}{extension}"
         new_path = original_path.parent / new_filename
         
-        # 如果新文件名已存在且不是同一个文件，添加计数器
-        counter = 1
-        while new_path.exists() and new_path != original_path:
-            new_filename = f"{new_name}_{counter}{extension}"
-            new_path = original_path.parent / new_filename
-            counter += 1
+        # 如果新文件名已存在且不是同一个文件，跳过重命名
+        if new_path.exists() and new_path != original_path:
+            print(f"  ⚠️  文件已存在，跳过重命名: {new_filename}")
+            return new_filename
         
         # 重命名文件
         try:
             original_path.rename(new_path)
-            print(f"  ✅ 重命名: {original_name} -> {new_filename} ({self.naming_scheme})")
+            print(f"  ✅ 重命名: {original_name} -> {new_filename}")
             return new_filename
         except Exception as e:
             print(f"  ❌ 重命名失败 {original_name}: {e}")
@@ -481,12 +389,12 @@ class VideoLibraryUpdater:
             seconds = estimated_seconds % 60
             return f"{minutes}:{seconds:02d}"
     
-    def generate_video_data(self, video_files, existing_titles=None, original_to_new_map=None):
+    def generate_video_data(self, video_files, existing_titles=None, original_to_base64_map=None):
         """生成视频数据（带缓存优化）"""
         if existing_titles is None:
             existing_titles = {}
-        if original_to_new_map is None:
-            original_to_new_map = {}
+        if original_to_base64_map is None:
+            original_to_base64_map = {}
         
         videos = []
         
@@ -496,28 +404,24 @@ class VideoLibraryUpdater:
             
             name_without_ext = Path(video_filename).stem
             # 如果原有数据中有该视频文件的title，使用原有的值，否则生成新的
-            # 先尝试用新文件名查找，如果找不到，尝试用原始文件名查找
+            # 先尝试用base64文件名查找，如果找不到，尝试用原始文件名查找
             title = None
             if video_filename in existing_titles and existing_titles[video_filename]:
                 title = existing_titles[video_filename]
             else:
                 # 尝试通过原始文件名查找（如果存在映射）
-                for orig_name, new_name in original_to_new_map.items():
-                    if new_name == video_filename and orig_name in existing_titles:
+                for orig_name, base64_name in original_to_base64_map.items():
+                    if base64_name == video_filename and orig_name in existing_titles:
                         title = existing_titles[orig_name]
                         break
             
             if not title:
                 # 尝试从base64文件名解码出原始文件名来生成title
-                if self.naming_scheme == "base64":
-                    decoded = self.decode_base64_filename(video_filename)
-                    if decoded:
-                        title = self.generate_friendly_title(decoded)
-                    else:
-                        # 如果解码失败，使用新文件名本身
-                        title = self.generate_friendly_title(name_without_ext)
+                decoded = self.decode_base64_filename(video_filename)
+                if decoded:
+                    title = self.generate_friendly_title(decoded)
                 else:
-                    # 对于其他命名方案，直接使用新文件名生成标题
+                    # 如果解码失败，使用base64文件名本身
                     title = self.generate_friendly_title(name_without_ext)
             
             description = self.generate_description(title)
@@ -552,10 +456,9 @@ class VideoLibraryUpdater:
                 "codec": "H.264",
                 "resolution": resolution,
                 "createdAt": datetime.now().strftime("%Y-%m-%d"),
-                "thumbnailType": "JPG" if thumbnail_filename and thumbnail_filename.endswith('.jpg') else "SVG",
+                "thumbnailType": "JPG" if thumbnail_filename.endswith('.jpg') else "SVG",
                 "cacheVersion": self.cache_version,  # 添加缓存版本信息
-                "lastUpdated": datetime.now().isoformat(),
-                "namingScheme": self.naming_scheme  # 记录使用的命名方案
+                "lastUpdated": datetime.now().isoformat()
             }
             
             videos.append(video_data)
@@ -678,11 +581,9 @@ class VideoLibraryUpdater:
     
     def update_videos_json(self):
         """更新videos.json文件"""
-        print("🎬 视频库更新脚本 - 缓存优化版本 + 多方案文件名生成")
+        print("🎬 视频库更新脚本 - 缓存优化版本")
         print("=" * 60)
         print(f"🆚 缓存版本: {self.cache_version}")
-        print(f"📝 命名方案: {self.naming_scheme}")
-        print(f"💾 保留原始文件名: {self.preserve_original_names}")
         
         # 显示FFmpeg状态
         if self.ffmpeg_available:
@@ -732,29 +633,37 @@ class VideoLibraryUpdater:
             except Exception as e:
                 print(f"⚠️  读取现有videos.json失败: {e}，将使用新生成的title")
         
-        # 重命名视频文件
-        print(f"\n🔄 开始重命名视频文件 ({self.naming_scheme}方案)...")
-        original_to_new_map = {}
+        # 重命名视频文件为base64格式
+        print("\n🔄 开始重命名视频文件为base64格式...")
+        original_to_base64_map = {}
         renamed_files = []
         
         for video_path in video_files:
             original_name = video_path.name
+            name_without_ext = video_path.stem
             
-            # 重命名文件
-            new_filename = self.rename_video_file(video_path)
-            if new_filename and new_filename != original_name:
-                original_to_new_map[original_name] = new_filename
-                # 更新路径为新文件名
-                renamed_files.append(self.videos_path / new_filename)
-            else:
+            # 检查文件名是否已经是base64格式
+            is_base64 = self.is_base64_filename(original_name)
+            
+            if is_base64:
+                print(f"  ✓ 文件已是base64格式: {original_name}")
                 renamed_files.append(video_path)
+            else:
+                # 需要重命名
+                new_filename = self.rename_video_to_base64(video_path)
+                if new_filename and new_filename != original_name:
+                    original_to_base64_map[original_name] = new_filename
+                    # 更新路径为新文件名
+                    renamed_files.append(self.videos_path / new_filename)
+                else:
+                    renamed_files.append(video_path)
         
-        if original_to_new_map:
-            print(f"✅ 成功重命名 {len(original_to_new_map)} 个文件")
+        if original_to_base64_map:
+            print(f"✅ 成功重命名 {len(original_to_base64_map)} 个文件")
         else:
-            print("✅ 所有文件都已符合命名规范")
+            print("✅ 所有文件都已经是base64格式")
         
-        videos = self.generate_video_data(renamed_files, existing_titles, original_to_new_map)
+        videos = self.generate_video_data(renamed_files, existing_titles, original_to_base64_map)
         
         # 计算分页信息
         total_videos = len(videos)
@@ -775,8 +684,6 @@ class VideoLibraryUpdater:
             "repository": "https://github.com/yezhu9181/my-video-host",
             "ffmpegAvailable": self.ffmpeg_available,
             "cacheVersion": self.cache_version,  # 添加全局缓存版本
-            "namingScheme": self.naming_scheme,  # 记录使用的命名方案
-            "preserveOriginalNames": self.preserve_original_names,  # 记录是否保留原始文件名
             "apiEndpoints": {
                 "allVideos": "/videos.json",
                 "paginated": "/videos.json?page={page}&limit={limit}",
@@ -796,7 +703,6 @@ class VideoLibraryUpdater:
             print(f"   - 每页数量: {self.page_size}")
             print(f"   - 总页数: {total_pages}")
             print(f"   - 缓存版本: {self.cache_version}")
-            print(f"   - 命名方案: {self.naming_scheme}")
             
             # 统计缩略图类型
             jpg_count = sum(1 for v in videos if v.get('thumbnailType') == 'JPG')
@@ -829,22 +735,13 @@ def main():
     import argparse
     parser = argparse.ArgumentParser(description='更新视频库配置并自动Git提交')
     parser.add_argument('--page-size', type=int, default=10, help='每页显示的视频数量')
-    parser.add_argument('--naming-scheme', choices=['base64', 'hash', 'timestamp', 'uuid', 'friendly'], 
-                       default='base64', help='文件名生成方案')
-    parser.add_argument('--preserve-original-names', action='store_true', 
-                       help='保留原始文件名，不进行重命名')
     parser.add_argument('--no-git', action='store_true', help='不执行Git命令')
     parser.add_argument('--no-cache-purge', action='store_true', help='不清除CDN缓存')
     parser.add_argument('--token-file', default='/Users/syh/git_token.txt', help='GitHub Token文件路径')
     
     args = parser.parse_args()
     
-    updater = VideoLibraryUpdater(
-        page_size=args.page_size, 
-        token_file_path=args.token_file,
-        naming_scheme=args.naming_scheme,
-        preserve_original_names=args.preserve_original_names
-    )
+    updater = VideoLibraryUpdater(page_size=args.page_size, token_file_path=args.token_file)
     
     # 如果指定了不执行Git命令，移除Git命令
     if args.no_git:
