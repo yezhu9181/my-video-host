@@ -440,19 +440,19 @@ class VideoLibraryUpdater:
             else:
                 thumbnail_filename = self.create_svg_thumbnail(video_filename, file_size)
             
-            # 使用带缓存破坏的URL
-            video_url = self.generate_url_with_cache_buster(video_filename, "video")
-            thumbnail_url = self.generate_url_with_cache_buster(thumbnail_filename, "thumbnail") if thumbnail_filename else ""
+            # 使用相对路径
+            video_url = f"videos/{video_filename}"
+            thumbnail_url = f"thumbnails/{thumbnail_filename}" if thumbnail_filename else ""
             
             video_data = {
                 "id": i,
                 "title": title,
                 "filename": video_filename,
-                "url": video_url,  # 使用带缓存破坏的完整URL
+                "url": video_url,  # 相对路径：videos/文件名
                 "description": description,
                 "duration": duration,
                 "size": f"{file_size} MB",
-                "thumbnail": thumbnail_url,  # 使用带缓存破坏的完整URL
+                "thumbnail": thumbnail_url,  # 相对路径：thumbnails/文件名
                 "codec": "H.264",
                 "resolution": resolution,
                 "createdAt": datetime.now().strftime("%Y-%m-%d"),
