@@ -597,6 +597,11 @@
             return replaced;
         }
         
+        // 获取当前的 commit SHA（提供给外部调用）
+        function getCommitSha() {
+            return globalCommitSha;
+        }
+        
         // 获取 CDN URL（自动替换 @main 为 commit SHA）
         // 这是所有 CDN URL 的统一入口，确保自动替换
         function getCdnUrl(cdn, path = '') {
@@ -928,11 +933,15 @@
             renderVideos();
         }
 
+        // 将 getCommitSha 函数暴露到全局作用域，方便外部调用
+        window.getCommitSha = getCommitSha;
+        
         // 页面加载时，直接加载视频（commit SHA 已由 update.py 设置）
         document.addEventListener('DOMContentLoaded', async () => {
             // commit SHA 应该已经由 update.py 设置，无需获取
             if (globalCommitSha && globalCommitSha !== null) {
                 console.log(`✅ [index.html] 页面加载：commit SHA 已由 update.py 设置: ${globalCommitSha.substring(0, 7)}...`);
+                console.log(`   💡 可以通过 window.getCommitSha() 获取 commit SHA`);
             } else {
                 console.warn('⚠️  [index.html] 页面加载：commit SHA 未设置，将使用 @main（可能返回缓存数据）');
             }
