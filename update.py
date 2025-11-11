@@ -268,13 +268,13 @@ class VideoLibraryUpdater:
             else:
                 thumbnail_filename = self.create_svg_thumbnail(video_file, file_size)
             
-            thumbnail_url = f"https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/{thumbnail_filename}" if thumbnail_filename else ""
+            thumbnail_url = f"thumbnails/{thumbnail_filename}" if thumbnail_filename else ""
             
             video_data = {
                 "id": i,
                 "title": title,
                 "filename": video_file,
-                "url": f"https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/{video_file}",
+                "url": f"videos/{video_file}",
                 "description": description,
                 "duration": duration,
                 "size": f"{file_size} MB",
