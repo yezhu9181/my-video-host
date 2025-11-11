@@ -56,5 +56,6 @@
     "paginated": "/videos.json?page={page}&limit={limit}",
     "search": "/videos.json?search={keyword}",
     "byId": "/videos.json?id={id}"
-  }
+  },
+  "latestCommitSha": "11994084b64ad5bdd0f32db707552760cd42f012"
 }
