@@ -65,12 +65,17 @@ class VideoLibraryUpdater:
         # 添加缓存破坏参数
         return f"{url}?v={self.cache_version}"
     
-    def purge_cdn_cache(self):
+    def purge_cdn_cache(self, wait_after_push=True):
         """清除CDN缓存（缓存时间设置为0，确保获取最新数据）"""
         if not self.enable_cache_purge:
             print("ℹ️  CDN缓存清除已禁用")
-            return
+            return False
             
+        # 如果刚推送，等待一段时间确保 GitHub 已更新
+        if wait_after_push:
+            print("\n⏳ 等待 5 秒确保 GitHub 已更新...")
+            time.sleep(5)
+        
         print("\n🔄 清除CDN缓存（缓存时间=0）...")
         
         # 需要清除缓存的文件列表
@@ -85,26 +90,83 @@ class VideoLibraryUpdater:
         for file_path in files_to_purge:
             try:
                 purge_url = f"https://purge.jsdelivr.net{file_path}"
-                response = requests.get(purge_url, timeout=10)
+                print(f"   🔄 清除缓存: {file_path}")
+                response = requests.get(purge_url, timeout=15)
                 
                 if response.status_code == 200:
                     data = response.json()
                     if data.get('id'):
-                        print(f"✅ jsDelivr 缓存清除请求已提交: {file_path}")
+                        print(f"   ✅ jsDelivr 缓存清除请求已提交 (ID: {data.get('id')})")
                         success_count += 1
                     else:
-                        print(f"⚠️  jsDelivr 缓存清除可能失败: {file_path}")
+                        print(f"   ⚠️  jsDelivr 缓存清除可能失败: {data}")
                 else:
-                    print(f"❌ jsDelivr 缓存清除失败: {file_path} - HTTP {response.status_code}")
+                    print(f"   ❌ jsDelivr 缓存清除失败: {file_path} - HTTP {response.status_code}")
                     
             except Exception as e:
-                print(f"❌ jsDelivr 缓存清除错误: {e}")
+                print(f"   ❌ jsDelivr 缓存清除错误: {e}")
         
         # 注意：其他 CDN（如 Statically、GitHack 等）可能没有公开的清除 API
         # 主要依赖前端添加缓存破坏参数来解决缓存问题
         print("💡 提示：其他 CDN 的缓存将依赖前端缓存破坏参数自动更新")
+        print("💡 重要：即使清除了缓存，CDN 可能需要几分钟才能完全更新")
+        print("💡 建议：前端应优先使用 GitHub API 获取最新数据（完全绕过 CDN 缓存）")
         
         return success_count > 0
+    
+    def verify_cdn_data(self, max_attempts=3, wait_seconds=3):
+        """验证 CDN 数据是否已更新"""
+        print("\n🔍 验证 CDN 数据是否已更新...")
+        
+        # 读取本地文件
+        if not self.json_path.exists():
+            print("   ⚠️  本地文件不存在，跳过验证")
+            return False
+        
+        with open(self.json_path, 'r', encoding='utf-8') as f:
+            local_data = json.load(f)
+        
+        local_last_updated = local_data.get('lastUpdated', '')
+        local_cache_version = local_data.get('cacheVersion', '')
+        
+        cdn_url = "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json"
+        
+        for attempt in range(1, max_attempts + 1):
+            try:
+                cache_buster = f"?v={int(time.time())}&_t={time.time()}&verify={attempt}"
+                response = requests.get(f"{cdn_url}{cache_buster}", 
+                                      headers={'Cache-Control': 'no-cache'},
+                                      timeout=10)
+                
+                if response.status_code == 200:
+                    cdn_data = response.json()
+                    cdn_last_updated = cdn_data.get('lastUpdated', '')
+                    cdn_cache_version = cdn_data.get('cacheVersion', '')
+                    
+                    if (cdn_last_updated == local_last_updated and 
+                        cdn_cache_version == local_cache_version):
+                        print(f"   ✅ CDN 数据已更新（尝试 {attempt}/{max_attempts}）")
+                        print(f"      - 更新时间: {cdn_last_updated}")
+                        print(f"      - 缓存版本: {cdn_cache_version}")
+                        return True
+                    else:
+                        print(f"   ⚠️  CDN 数据尚未更新（尝试 {attempt}/{max_attempts}）")
+                        print(f"      - 本地: {local_last_updated} / {local_cache_version}")
+                        print(f"      - CDN:  {cdn_last_updated} / {cdn_cache_version}")
+                        if attempt < max_attempts:
+                            print(f"      - 等待 {wait_seconds} 秒后重试...")
+                            time.sleep(wait_seconds)
+                else:
+                    print(f"   ❌ CDN 请求失败: HTTP {response.status_code}")
+                    
+            except Exception as e:
+                print(f"   ❌ 验证失败: {e}")
+                if attempt < max_attempts:
+                    time.sleep(wait_seconds)
+        
+        print(f"   ⚠️  CDN 数据可能尚未完全更新（已尝试 {max_attempts} 次）")
+        print(f"   💡 建议：前端应使用 GitHub API 获取最新数据")
+        return False
     
     def check_ffmpeg(self):
         """检查FFmpeg是否可用"""
@@ -726,16 +788,23 @@ class VideoLibraryUpdater:
             git_success = self.run_git_commands()
             
             if git_success:
-                # 清除CDN缓存
+                # 清除CDN缓存（等待 GitHub 更新）
                 if self.enable_cache_purge:
-                    self.purge_cdn_cache()
+                    purge_success = self.purge_cdn_cache(wait_after_push=True)
+                    
+                    # 验证 CDN 数据是否已更新（可选，可能需要等待）
+                    if purge_success:
+                        print("\n💡 提示：CDN 缓存清除请求已提交，但可能需要几分钟才能完全生效")
+                        print("💡 建议：前端应优先使用 GitHub API 获取最新数据（完全绕过 CDN 缓存）")
                 
                 print(f"\n🎉 所有任务完成！视频库已更新并推送到GitHub")
                 print(f"🌐 访问地址: https://yezhu9181.github.io/my-video-host/")
-                print(f"💡 缓存版本已更新，更改应该很快生效")
+                print(f"💡 缓存版本: {self.cache_version}")
+                print(f"💡 重要提示：前端代码已配置为优先使用 GitHub API，可完全绕过 CDN 缓存")
             else:
                 print(f"\n⚠️  视频数据已更新，但Git推送可能有问题")
                 print(f"💡 请手动执行Git命令")
+                print(f"💡 注意：如果文件未推送到 GitHub，CDN 无法获取最新数据")
             
             return True
             
