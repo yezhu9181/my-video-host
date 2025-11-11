@@ -2,20 +2,6 @@
   "videos": [
     {
       "id": 1,
-      "title": "bajiquan(八极拳)",
-      "filename": "ZGVtbw==.MP4",
-      "url": "videos/ZGVtbw==.MP4",
-      "description": "这是关于bajiquan(八极拳)的详细说明视频",
-      "duration": "0:24",
-      "size": "19.0 MB",
-      "thumbnail": "thumbnails/ZGVtbw==.jpg",
-      "codec": "H.264",
-      "resolution": "0x1",
-      "createdAt": "2025-11-11",
-      "thumbnailType": "JPG"
-    },
-    {
-      "id": 2,
       "title": "产品介绍视频",
       "filename": "aW50cm8=.MP4",
       "url": "videos/aW50cm8=.MP4",
@@ -30,14 +16,14 @@
     }
   ],
   "pagination": {
-    "total": 2,
+    "total": 1,
     "page": 1,
     "pageSize": 10,
     "totalPages": 1,
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-11T16:33:58Z",
+  "lastUpdated": "2025-11-11T16:44:02Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
   "apiEndpoints": {
