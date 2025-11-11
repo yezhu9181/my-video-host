@@ -80,6 +80,8 @@ class VideoLibraryUpdater:
         ]
         
         success_count = 0
+        
+        # 清除 jsDelivr CDN 缓存
         for file_path in files_to_purge:
             try:
                 purge_url = f"https://purge.jsdelivr.net{file_path}"
@@ -88,15 +90,19 @@ class VideoLibraryUpdater:
                 if response.status_code == 200:
                     data = response.json()
                     if data.get('id'):
-                        print(f"✅ 缓存清除请求已提交: {file_path}")
+                        print(f"✅ jsDelivr 缓存清除请求已提交: {file_path}")
                         success_count += 1
                     else:
-                        print(f"⚠️  缓存清除可能失败: {file_path}")
+                        print(f"⚠️  jsDelivr 缓存清除可能失败: {file_path}")
                 else:
-                    print(f"❌ 缓存清除失败: {file_path} - HTTP {response.status_code}")
+                    print(f"❌ jsDelivr 缓存清除失败: {file_path} - HTTP {response.status_code}")
                     
             except Exception as e:
-                print(f"❌ 缓存清除错误: {e}")
+                print(f"❌ jsDelivr 缓存清除错误: {e}")
+        
+        # 注意：其他 CDN（如 Statically、GitHack 等）可能没有公开的清除 API
+        # 主要依赖前端添加缓存破坏参数来解决缓存问题
+        print("💡 提示：其他 CDN 的缓存将依赖前端缓存破坏参数自动更新")
         
         return success_count > 0
     
