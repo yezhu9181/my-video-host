@@ -240,6 +240,7 @@
         let currentSort = 'title';
         let currentCDN = null;
         let cdnSpeeds = {};
+        let globalCommitSha = null;  // 全局 commit SHA，用于自动替换 @main
 
         // 初始化视频播放器
         const player = videojs('my-video');

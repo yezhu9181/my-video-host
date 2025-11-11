@@ -2,10 +2,10 @@
   "videos": [
     {
       "id": 1,
-      "title": "八级拳",
+      "title": "八级拳123",
       "filename": "ZGVtbw==.MP4",
       "url": "videos/ZGVtbw==.MP4",
-      "description": "这是关于八级拳的详细说明视频",
+      "description": "这是关于八级拳123的详细说明视频",
       "duration": "0:24",
       "size": "41.1 MB",
       "thumbnail": "thumbnails/ZGVtbw==.jpg",
@@ -13,8 +13,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-11",
       "thumbnailType": "JPG",
-      "cacheVersion": "46c1911",
-      "lastUpdated": "2025-11-11T20:12:45.868715"
+      "cacheVersion": "e38d9e6",
+      "lastUpdated": "2025-11-11T20:14:18.919381"
     },
     {
       "id": 2,
@@ -29,8 +29,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-11",
       "thumbnailType": "JPG",
-      "cacheVersion": "46c1911",
-      "lastUpdated": "2025-11-11T20:12:45.988501"
+      "cacheVersion": "e38d9e6",
+      "lastUpdated": "2025-11-11T20:14:19.020941"
     }
   ],
   "pagination": {
@@ -41,10 +41,10 @@
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-11T20:12:45Z",
+  "lastUpdated": "2025-11-11T20:14:19Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
-  "cacheVersion": "46c1911",
+  "cacheVersion": "e38d9e6",
   "cachePolicy": {
     "maxAge": 0,
     "mustRevalidate": true,
