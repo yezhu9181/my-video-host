@@ -812,6 +812,51 @@ class VideoLibraryUpdater:
                     with open(self.json_path, 'w', encoding='utf-8') as f:
                         json.dump(updated_data, f, ensure_ascii=False, indent=2)
                     print(f"✅ 已更新 videos.json，包含最新 commit SHA")
+                    
+                    # 重要：再次提交并推送，确保 latestCommitSha 被推送到 GitHub
+                    print(f"\n🔄 再次提交 videos.json（包含 commit SHA）...")
+                    try:
+                        # 切换到仓库目录
+                        original_cwd = os.getcwd()
+                        os.chdir(self.repo_path)
+                        
+                        # 添加文件
+                        result = subprocess.run(
+                            ["git", "add", "videos.json"],
+                            capture_output=True, text=True, timeout=30
+                        )
+                        if result.returncode == 0:
+                            # 提交
+                            commit_msg = f"更新 videos.json 包含 commit SHA - {latest_commit_sha[:7]}"
+                            result = subprocess.run(
+                                ["git", "commit", "-m", commit_msg],
+                                capture_output=True, text=True, timeout=30
+                            )
+                            if result.returncode == 0:
+                                # 推送
+                                token = self.read_github_token()
+                                if token:
+                                    push_url = f"https://{token}@github.com/yezhu9181/my-video-host.git"
+                                    result = subprocess.run(
+                                        ["git", "push", push_url, "main"],
+                                        capture_output=True, text=True, timeout=60
+                                    )
+                                    if result.returncode == 0:
+                                        print(f"✅ 已推送包含 commit SHA 的 videos.json 到 GitHub")
+                                    else:
+                                        print(f"⚠️  推送失败，请手动推送 videos.json")
+                                else:
+                                    print(f"⚠️  无法读取 GitHub Token，请手动推送 videos.json")
+                            else:
+                                print(f"⚠️  提交失败，请手动提交 videos.json")
+                        else:
+                            print(f"⚠️  添加文件失败，请手动提交 videos.json")
+                        
+                        # 切换回原目录
+                        os.chdir(original_cwd)
+                    except Exception as e:
+                        print(f"⚠️  再次提交 videos.json 时出错: {e}")
+                        print(f"💡 请手动执行: git add videos.json && git commit -m '更新 commit SHA' && git push")
             
             if git_success:
                 # 清除CDN缓存（等待 GitHub 更新）

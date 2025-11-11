@@ -13,8 +13,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-11",
       "thumbnailType": "JPG",
-      "cacheVersion": "3eddf95",
-      "lastUpdated": "2025-11-11T20:17:20.855131"
+      "cacheVersion": "d74bc2d",
+      "lastUpdated": "2025-11-11T20:18:15.623216"
     },
     {
       "id": 2,
@@ -29,8 +29,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-11",
       "thumbnailType": "JPG",
-      "cacheVersion": "3eddf95",
-      "lastUpdated": "2025-11-11T20:17:20.968691"
+      "cacheVersion": "d74bc2d",
+      "lastUpdated": "2025-11-11T20:18:15.749483"
     }
   ],
   "pagination": {
@@ -41,10 +41,10 @@
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-11T20:17:20Z",
+  "lastUpdated": "2025-11-11T20:18:15Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
-  "cacheVersion": "3eddf95",
+  "cacheVersion": "d74bc2d",
   "cachePolicy": {
     "maxAge": 0,
     "mustRevalidate": true,
