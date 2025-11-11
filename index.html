@@ -240,6 +240,7 @@
         let currentSort = 'title';
         let currentCDN = null;
         let cdnSpeeds = {};
+        let globalCommitSha = null;  // 全局 commit SHA，用于自动替换 @main
 
         // 初始化视频播放器
         const player = videojs('my-video');
@@ -345,25 +346,28 @@
             }, 3000);
         }
 
-        // 测试CDN速度（支持使用 commit SHA）
-        async function testCDNSpeeds(commitSha = null) {
+        // 测试CDN速度（index.html 内部自动替换 @main 为 commit SHA）
+        async function testCDNSpeeds() {
             const statusText = document.getElementById('cdnStatusText');
             const speedTest = document.getElementById('speedTest');
             const switcher = document.getElementById('cdnSwitcher');
             
             statusText.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> 正在测试CDN速度...';
             
-            // 测试每个CDN的速度（如果提供了 commit SHA，使用它构建 URL）
+            // 确保 commit SHA 已获取
+            if (!globalCommitSha) {
+                await fetchLatestCommitSha();
+            }
+            
+            // 测试每个CDN的速度（index.html 内部自动替换 @main 为 commit SHA）
             const testCacheBuster = generateCacheBuster();
             const speedTests = FREE_CDNS.map(async (cdn) => {
                 const startTime = performance.now();
                 
                 try {
-                    // 如果提供了 commit SHA，使用它替换 URL 中的 @main
-                    let testUrl = cdn.testUrl;
-                    if (commitSha) {
-                        testUrl = replaceMainWithCommitSha(cdn.testUrl, commitSha);
-                    }
+                    // 使用 getCdnUrl 自动替换 @main 为 commit SHA
+                    // 前端代码中依然使用 @main，但实际请求时会自动替换
+                    const testUrl = getCdnUrl(cdn.testUrl);
                     
                     const response = await fetch(`${testUrl}${testCacheBuster}`, {
                         method: 'HEAD',
@@ -464,12 +468,14 @@
 
         // 生成视频URL
         function generateVideoUrl(filename) {
-            return `${currentCDN.url}/videos/${filename}`;
+            // 使用 getCdnUrl 自动替换 @main 为 commit SHA
+            return getCdnUrl(currentCDN, `/videos/${filename}`);
         }
 
         // 生成缩略图URL
         function generateThumbnailUrl(filename) {
-            return `${currentCDN.url}/thumbnails/${filename}`;
+            // 使用 getCdnUrl 自动替换 @main 为 commit SHA
+            return getCdnUrl(currentCDN, `/thumbnails/${filename}`);
         }
 
         // 生成强制的缓存破坏参数
@@ -554,15 +560,89 @@
             }
         }
 
-        // 使用 commit SHA 替换 CDN URL 中的 @main（确保获取最新数据）
-        function replaceMainWithCommitSha(url, commitSha) {
-            if (!commitSha || !url) {
-                if (!commitSha) {
-                    console.warn('⚠️  replaceMainWithCommitSha: commitSha 为空，无法替换 @main');
+        // 从 GitHub API 获取最新的 commit SHA（index.html 内部使用，不对外暴露）
+        async function fetchLatestCommitSha() {
+            if (globalCommitSha) {
+                return globalCommitSha;
+            }
+            
+            console.log('🔄 [index.html 内部] 从 GitHub API 获取最新的 commit SHA...');
+            
+            try {
+                // 方法1: 使用 GitHub API 获取 main 分支的最新 commit SHA
+                const apiUrl = 'https://api.github.com/repos/yezhu9181/my-video-host/commits/main';
+                const timestamp = Date.now();
+                const response = await fetch(`${apiUrl}?t=${timestamp}`, {
+                    method: 'GET',
+                    cache: 'no-store',
+                    credentials: 'omit',
+                    headers: {
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                
+                if (response.ok) {
+                    const commitData = await response.json();
+                    const commitSha = commitData.sha;
+                    
+                    if (commitSha) {
+                        globalCommitSha = commitSha;
+                        console.log(`✅ [index.html 内部] 获取到最新 commit SHA: ${commitSha.substring(0, 7)}...`);
+                        return commitSha;
+                    }
                 }
-                if (!url) {
-                    console.warn('⚠️  replaceMainWithCommitSha: url 为空');
+                
+                // 方法2: 如果 GitHub API 失败，尝试从 GitHub Raw URL 获取（但不获取文件内容）
+                // 通过 HEAD 请求获取 ETag 或其他信息来推断 commit SHA
+                // 或者使用 GitHub 的 refs API
+                console.warn('[index.html 内部] GitHub API 失败，尝试备用方法...');
+                
+                // 备用方法：使用 GitHub refs API
+                const refsUrl = 'https://api.github.com/repos/yezhu9181/my-video-host/git/refs/heads/main';
+                const refsResponse = await fetch(`${refsUrl}?t=${timestamp}`, {
+                    method: 'GET',
+                    cache: 'no-store',
+                    credentials: 'omit',
+                    headers: {
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                
+                if (refsResponse.ok) {
+                    const refsData = await refsResponse.json();
+                    const commitSha = refsData.object?.sha;
+                    
+                    if (commitSha) {
+                        globalCommitSha = commitSha;
+                        console.log(`✅ [index.html 内部] 通过备用方法获取到 commit SHA: ${commitSha.substring(0, 7)}...`);
+                        return commitSha;
+                    }
                 }
+                
+                throw new Error('所有方法都失败');
+            } catch (error) {
+                console.error('[index.html 内部] 获取 commit SHA 失败:', error);
+                console.warn('[index.html 内部] 将使用 @main（可能返回缓存数据）');
+                return null;
+            }
+        }
+
+        // 使用 commit SHA 替换 CDN URL 中的 @main（index.html 内部自动替换）
+        // 如果提供了 commitSha，使用它；否则使用全局的 globalCommitSha
+        function replaceMainWithCommitSha(url, commitSha = null) {
+            if (!url) {
+                return url;
+            }
+            
+            // 优先使用传入的 commitSha，否则使用全局的 globalCommitSha
+            const sha = commitSha || globalCommitSha;
+            
+            if (!sha) {
+                // 如果没有 commit SHA，返回原始 URL（包含 @main）
                 return url;
             }
             
@@ -573,176 +653,102 @@
             let replaced = url;
             
             // 替换 @main 为 @commit_sha（jsDelivr 格式）
-            replaced = replaced.replace(/@main/g, `@${commitSha}`);
+            replaced = replaced.replace(/@main/g, `@${sha}`);
             
             // 替换 /main/ 为 /commit_sha/（其他 CDN 格式）
-            replaced = replaced.replace(/\/main\//g, `/${commitSha}/`);
+            replaced = replaced.replace(/\/main\//g, `/${sha}/`);
             
             // 替换 /main 结尾为 /commit_sha（其他 CDN 格式）
-            replaced = replaced.replace(/\/main$/g, `/${commitSha}`);
+            replaced = replaced.replace(/\/main$/g, `/${sha}`);
             
             if (replaced !== url) {
-                console.log(`   ✅ URL 替换成功: @main -> @${commitSha.substring(0, 7)}...`);
-                console.log(`   📍 原始 URL: ${url}`);
-                console.log(`   📍 替换后 URL: ${replaced}`);
-            } else {
-                console.warn(`   ⚠️  URL 未发生变化，可能不包含 @main 或 /main`);
-                console.warn(`   📍 原始 URL: ${url}`);
+                console.log(`   ✅ [index.html 自动替换] @main -> @${sha.substring(0, 7)}...`);
             }
             
             return replaced;
         }
         
+        // 获取 CDN URL（自动替换 @main 为 commit SHA）
+        // 这是所有 CDN URL 的统一入口，确保自动替换
+        function getCdnUrl(cdn, path = '') {
+            const baseUrl = typeof cdn === 'string' ? cdn : (cdn.url || cdn);
+            const fullUrl = path ? `${baseUrl}${path}` : baseUrl;
+            // 自动使用全局 commit SHA 替换 @main
+            return replaceMainWithCommitSha(fullUrl);
+        }
+        
         // 使用 commit SHA 构建 CDN URL（确保获取最新数据）
         function buildCdnUrlWithCommitSha(cdn, commitSha) {
-            if (!commitSha) {
-                // 如果没有 commit SHA，使用原来的 URL（包含 @main）
-                return cdn.url;
-            }
-            
-            // 替换 CDN URL 中的 @main 为 commit SHA
+            // 使用传入的 commitSha，如果没有则使用全局的
             return replaceMainWithCommitSha(cdn.url, commitSha);
         }
 
-        // 加载视频数据（优先使用 GitHub Raw URL 获取 commit SHA，然后使用 CDN）
+        // 加载视频数据（index.html 内部自动获取 commit SHA 并替换 @main）
         async function loadAllVideos(forceGitHubAPI = false) {
             try {
                 let data = null;
                 let dataSource = '';
-                let commitSha = null;
                 
-                // 步骤1: 先从 GitHub Raw URL 获取数据（获取最新的 commit SHA）
-                try {
-                    console.log('🔄 步骤1: 从 GitHub Raw URL 获取最新数据和 commit SHA...');
-                    data = await fetchFromGitHubAPI();
-                    commitSha = data.latestCommitSha || null;
-                    dataSource = forceGitHubAPI ? 'GitHub Raw URL (强制)' : 'GitHub Raw URL';
-                    
-                    if (commitSha) {
-                        console.log(`   ✅ 获取到 commit SHA: ${commitSha}`);
-                    } else {
-                        console.warn('   ⚠️  未找到 commit SHA，将使用 @main');
+                // 步骤1: index.html 内部自动获取 commit SHA（不获取文件内容）
+                if (!forceGitHubAPI) {
+                    // 确保 commit SHA 已获取
+                    if (!globalCommitSha) {
+                        await fetchLatestCommitSha();
                     }
-                } catch (apiError) {
-                    console.warn('⚠️  GitHub Raw URL 失败，尝试使用 CDN:', apiError);
-                    
-                    // 如果 GitHub Raw URL 失败，尝试使用 CDN（使用 @main）
-                    let cdnToUse = null;
-                    
-                    // 先测试CDN速度（不使用 commit SHA，因为还没有获取到）
-                    const cdnAvailable = await testCDNSpeeds(null);
-                    
-                    if (!cdnAvailable) {
-                        throw new Error('没有可用的 CDN，请检查网络连接');
-                    }
-                    
-                    // 优先使用 GitHub Raw（缓存时间最短）
-                    const githubCDN = FREE_CDNS.find(cdn => cdn.id === 'github');
-                    if (githubCDN) {
-                        cdnToUse = githubCDN;
-                    } else {
-                        cdnToUse = currentCDN;
-                    }
-                    
-                    if (!cdnToUse) {
-                        throw new Error('无法找到可用的 CDN');
-                    }
-                    
-                    // 如果有 commit SHA，替换 URL 中的 @main
-                    let cdnUrl = cdnToUse.url;
-                    if (commitSha) {
-                        cdnUrl = replaceMainWithCommitSha(cdnToUse.url, commitSha);
-                        console.log(`   💡 使用 commit SHA 替换 @main: ${commitSha.substring(0, 7)}`);
-                    }
-                    
-                    // 生成强制的缓存破坏参数
-                    const cacheBuster = generateCacheBuster();
-                    const url = `${cdnUrl}/videos.json${cacheBuster}`;
-                    
-                    console.log('🔄 使用 CDN 加载（备用方案）:', cdnToUse.name);
-                    if (!commitSha) {
-                        console.warn('⚠️  注意：未获取到 commit SHA，CDN 可能返回缓存的数据');
-                    }
-                    
-                    const response = await fetch(url, {
-                        method: 'GET',
-                        cache: 'no-store',
-                        credentials: 'omit',
-                        headers: {
-                            'Cache-Control': 'max-age=0, no-cache, no-store, must-revalidate, proxy-revalidate',
-                            'Pragma': 'no-cache',
-                            'Expires': '0',
-                            'If-Modified-Since': 'Thu, 01 Jan 1970 00:00:00 GMT',
-                            'If-None-Match': '*',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    });
-                    
-                    if (!response || !response.ok) {
-                        throw new Error(`CDN 请求失败: ${response ? response.status : 'unknown'}`);
-                    }
-                    
-                    data = await response.json();
-                    commitSha = data.latestCommitSha || null;
-                    dataSource = `${cdnToUse.name} (备用)`;
-                    currentCDN = cdnToUse;
                 }
                 
-                // 步骤2: 如果获取到了 commit SHA，使用 CDN 重新加载（使用 commit SHA 构建 URL）
-                // 重要：必须使用 commit SHA 替换 @main，否则 CDN 会返回缓存数据
-                if (commitSha && !forceGitHubAPI) {
-                    console.log(`\n🔄 步骤2: 使用 commit SHA (${commitSha.substring(0, 7)}...) 从 CDN 获取数据...`);
-                    console.log(`   💡 关键：使用 commit SHA 替换 @main，确保获取最新数据`);
-                    
-                    // 测试 CDN 速度并选择最快的（使用 commit SHA）
-                    const cdnAvailable = await testCDNSpeeds(commitSha);
-                    if (cdnAvailable && currentCDN) {
-                        try {
-                            // 使用 commit SHA 构建 CDN URL（替换 @main）
-                            const cdnUrlWithSha = buildCdnUrlWithCommitSha(currentCDN, commitSha);
-                            const cdnUrl = `${cdnUrlWithSha}/videos.json`;
-                            
-                            console.log(`   🔄 尝试从 ${currentCDN.name} 获取（使用 commit SHA）`);
-                            console.log(`   📍 URL: ${cdnUrl}`);
-                            
-                            const response = await fetch(cdnUrl, {
-                                method: 'GET',
-                                cache: 'no-store',
-                                credentials: 'omit',
-                                headers: {
-                                    'Cache-Control': 'no-cache, no-store, must-revalidate',
-                                    'Pragma': 'no-cache'
-                                }
-                            });
-                            
-                            if (response && response.ok) {
-                                const cdnData = await response.json();
-                                // 验证数据是否一致
-                                if (cdnData.lastUpdated === data.lastUpdated && 
-                                    cdnData.cacheVersion === data.cacheVersion) {
-                                    console.log(`   ✅ CDN 数据验证通过，使用 ${currentCDN.name} (commit SHA: ${commitSha.substring(0, 7)})`);
-                                    console.log(`   ✅ 数据一致：${cdnData.lastUpdated} / ${cdnData.cacheVersion}`);
-                                    data = cdnData;
-                                    dataSource = `${currentCDN.name} (使用 commit SHA)`;
-                                } else {
-                                    console.warn(`   ⚠️  CDN 数据不一致:`);
-                                    console.warn(`      - GitHub: ${data.lastUpdated} / ${data.cacheVersion}`);
-                                    console.warn(`      - CDN:    ${cdnData.lastUpdated} / ${cdnData.cacheVersion}`);
-                                    console.warn(`   ⚠️  继续使用 GitHub Raw URL 的数据（确保数据最新）`);
-                                }
-                            } else {
-                                console.warn(`   ⚠️  CDN 请求失败: HTTP ${response ? response.status : 'unknown'}`);
-                                console.warn(`   ⚠️  继续使用 GitHub Raw URL 的数据`);
-                            }
-                        } catch (cdnError) {
-                            console.warn(`   ⚠️  CDN 请求失败，继续使用 GitHub Raw URL 的数据:`, cdnError);
+                // 步骤2: 使用 CDN 获取数据（index.html 内部自动替换 @main 为 commit SHA）
+                if (!forceGitHubAPI) {
+                    try {
+                        console.log('🔄 使用 CDN 获取数据（index.html 自动替换 @main）...');
+                        
+                        // 测试 CDN 速度并选择最快的
+                        // 注意：testCDNSpeeds 内部会使用 getCdnUrl 自动替换 @main
+                        const cdnAvailable = await testCDNSpeeds();
+                        
+                        if (!cdnAvailable) {
+                            throw new Error('没有可用的 CDN，请检查网络连接');
                         }
-                    } else {
-                        console.warn(`   ⚠️  CDN 不可用或未选择，继续使用 GitHub Raw URL 的数据`);
+                        
+                        if (!currentCDN) {
+                            throw new Error('无法找到可用的 CDN');
+                        }
+                        
+                        // 使用 getCdnUrl 自动替换 @main 为 commit SHA
+                        // 前端代码中依然使用 @main，但实际请求时会自动替换
+                        const cdnUrl = getCdnUrl(currentCDN, '/videos.json');
+                        
+                        console.log(`   🔄 从 ${currentCDN.name} 获取数据`);
+                        console.log(`   📍 URL: ${cdnUrl}`);
+                        
+                        const response = await fetch(cdnUrl, {
+                            method: 'GET',
+                            cache: 'no-store',
+                            credentials: 'omit',
+                            headers: {
+                                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                                'Pragma': 'no-cache'
+                            }
+                        });
+                        
+                        if (response && response.ok) {
+                            data = await response.json();
+                            dataSource = `${currentCDN.name} (index.html 自动替换 @main)`;
+                            console.log(`   ✅ 从 CDN 获取数据成功`);
+                        } else {
+                            throw new Error(`CDN 请求失败: HTTP ${response ? response.status : 'unknown'}`);
+                        }
+                    } catch (cdnError) {
+                        console.warn('⚠️  CDN 请求失败，尝试使用 GitHub Raw URL:', cdnError);
+                        // 如果 CDN 失败，回退到 GitHub Raw URL
+                        data = await fetchFromGitHubAPI();
+                        dataSource = 'GitHub Raw URL (备用)';
                     }
-                } else if (!commitSha && !forceGitHubAPI) {
-                    console.warn(`\n⚠️  警告：未获取到 commit SHA，无法使用 commit SHA 替换 @main`);
-                    console.warn(`   ⚠️  CDN 可能返回缓存数据，建议检查网络连接或使用强制刷新`);
+                } else {
+                    // 强制使用 GitHub Raw URL
+                    console.log('🔄 强制使用 GitHub Raw URL 获取数据...');
+                    data = await fetchFromGitHubAPI();
+                    dataSource = 'GitHub Raw URL (强制)';
                 }
                 
                 // 验证数据是否是最新的（检查 lastUpdated 时间和 cacheVersion）
@@ -994,8 +1000,14 @@
             renderVideos();
         }
 
-        // 页面加载
-        document.addEventListener('DOMContentLoaded', loadAllVideos);
+        // 页面加载时，先获取 commit SHA，然后加载视频
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 先获取 commit SHA（index.html 内部自动获取）
+            await fetchLatestCommitSha();
+            
+            // 加载视频数据
+            await loadAllVideos();
+        });
         
         document.getElementById('searchInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') searchVideos();
