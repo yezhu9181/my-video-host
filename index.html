@@ -3,164 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>视频资源中心 - 免配置CDN加速</title>
+    <title>视频资源中心 - 实时数据</title>
     <link href="https://cdn.jsdelivr.net/npm/video.js@7.20.3/dist/video-js.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* 保持原有样式，添加CDN状态样式 */
-        .cdn-status-bar {
-            background: #f0f9ff;
-            border: 1px solid #bae6fd;
+        .cache-notice {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
             border-radius: 8px;
-            padding: 12px 16px;
+            padding: 12px;
             margin-bottom: 20px;
             font-size: 14px;
         }
-        
-        .cdn-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            margin: 0 5px;
-        }
-        
-        .cdn-badge.success { background: #dcfce7; color: #166534; }
-        .cdn-badge.warning { background: #fef3c7; color: #92400e; }
-        .cdn-badge.error { background: #fee2e2; color: #991b1b; }
-        
-        .cdn-switcher {
-            margin-top: 8px;
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        
-        .cdn-btn {
-            padding: 4px 8px;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            background: white;
-            font-size: 11px;
-            cursor: pointer;
-        }
-        
-        .cdn-btn.active {
-            background: #3b82f6;
-            color: white;
-            border-color: #3b82f6;
-        }
-        
-        .speed-test {
-            font-size: 12px;
-            color: #6b7280;
-            margin-top: 5px;
-        }
-        
-        /* 刷新按钮样式 */
         .refresh-btn {
-            padding: 6px 12px;
-            background: #10b981;
+            background: #28a745;
             color: white;
             border: none;
+            padding: 8px 16px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
             margin-left: 10px;
-        }
-        
-        .refresh-btn:hover {
-            background: #059669;
-        }
-        
-        .refresh-btn:active {
-            background: #047857;
-        }
-        
-        .refresh-btn.loading {
-            background: #6b7280;
-            cursor: not-allowed;
-        }
-        
-        .cdn-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .cdn-status-info {
-            flex: 1;
-        }
-        
-        /* 多CDN路径状态 */
-        .cdn-paths-status {
-            margin-top: 10px;
-            padding: 8px;
-            background: #f8fafc;
-            border-radius: 4px;
-            font-size: 11px;
-        }
-        
-        .cdn-path-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 4px;
-            padding: 2px 0;
-        }
-        
-        .cdn-path-status {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 6px;
-        }
-        
-        .cdn-path-status.working { background: #10b981; }
-        .cdn-path-status.slow { background: #f59e0b; }
-        .cdn-path-status.failed { background: #ef4444; }
-        
-        .cdn-path-name {
-            flex: 1;
-            font-weight: 500;
-        }
-        
-        .cdn-path-speed {
-            color: #6b7280;
-            font-size: 10px;
-        }
-        
-        /* 高级选项面板 */
-        .advanced-options {
-            margin-top: 10px;
-            padding: 10px;
-            background: #f8fafc;
-            border-radius: 4px;
-            border: 1px solid #e2e8f0;
-        }
-        
-        .advanced-toggle {
-            background: none;
-            border: none;
-            color: #3b82f6;
-            font-size: 11px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        .advanced-content {
-            margin-top: 8px;
-            display: none;
-        }
-        
-        .advanced-content.show {
-            display: block;
         }
     </style>
 </head>
@@ -168,55 +30,17 @@
     <div class="container">
         <div class="header">
             <h1><i class="fas fa-video"></i> 视频资源中心</h1>
-            <p>免配置CDN加速 · 全球访问优化 · 终极解决方案</p>
+            <p>实时数据版本 - 绕过CDN缓存</p>
         </div>
 
-        <!-- CDN状态栏 -->
-        <div class="cdn-status-bar" id="cdnStatusBar">
-            <div class="cdn-header">
-                <div class="cdn-status-info" id="cdnStatusText">
-                    <i class="fas fa-sync-alt fa-spin"></i> 正在测试CDN速度...
-                </div>
-                <button class="refresh-btn" id="refreshBtn" onclick="forceRefresh()">
-                    <i class="fas fa-redo-alt"></i> 强制刷新
-                </button>
-            </div>
-            <div class="cdn-switcher" id="cdnSwitcher"></div>
-            <div class="speed-test" id="speedTest"></div>
-            
-            <!-- 多CDN路径状态 -->
-            <div class="cdn-paths-status" id="cdnPathsStatus" style="display: none;">
-                <div style="margin-bottom: 6px; font-weight: bold;">CDN路径状态:</div>
-                <div id="cdnPathsList"></div>
-            </div>
-            
-            <!-- 高级选项 -->
-            <div class="advanced-options">
-                <button class="advanced-toggle" onclick="toggleAdvancedOptions()">
-                    <i class="fas fa-cog"></i> 高级选项
-                    <i class="fas fa-chevron-down" id="advancedArrow"></i>
-                </button>
-                <div class="advanced-content" id="advancedContent">
-                    <div style="margin-bottom: 8px;">
-                        <label>
-                            <input type="checkbox" id="enableFallback" checked onchange="updateSettings()">
-                            启用自动回退
-                        </label>
-                    </div>
-                    <div style="margin-bottom: 8px;">
-                        <label>
-                            <input type="checkbox" id="enablePreload" onchange="updateSettings()">
-                            启用预加载测试
-                        </label>
-                    </div>
-                    <div>
-                        <label>
-                            <input type="number" id="maxRetries" value="3" min="1" max="10" style="width: 50px;" onchange="updateSettings()">
-                            最大重试次数
-                        </label>
-                    </div>
-                </div>
-            </div>
+        <!-- 缓存通知 -->
+        <div class="cache-notice">
+            <strong>✅ 实时数据模式</strong>
+            <p>直接访问GitHub源文件，确保数据最新</p>
+            <button class="refresh-btn" onclick="forceRefresh()">
+                <i class="fas fa-sync-alt"></i> 立即刷新
+            </button>
+            <span id="dataStatus">正在加载最新数据...</span>
         </div>
 
         <!-- 原有内容保持不变 -->
@@ -273,9 +97,6 @@
                 
                 <div class="video-player-container" id="player-container" style="display: none;">
                     <h3 id="current-video-title">视频播放器</h3>
-                    <div class="cdn-status-bar" style="margin-bottom: 15px; background: #f0fdf4; border-color: #bbf7d0;">
-                        <div id="playerCdnInfo">准备播放...</div>
-                    </div>
                     <video id="my-video" class="video-js vjs-default-skin" controls preload="auto" width="100%" height="400" data-setup="{}">
                         <p class="vjs-no-js">请启用JavaScript以观看视频</p>
                     </video>
@@ -286,440 +107,98 @@
 
     <script src="https://cdn.jsdelivr.net/npm/video.js@7.20.3/dist/video.min.js"></script>
     <script>
-        // 终极解决方案 - 多CDN路径配置
-        const CDN_PATHS = [
-            // 主要CDN路径
-            {
-                id: 'jsdelivr',
-                name: 'jsDelivr',
-                baseUrls: [
-                    'https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main',
-                    'https://fastly.jsdelivr.net/gh/yezhu9181/my-video-host@main'
-                ],
-                testUrls: [
-                    'https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json',
-                    'https://fastly.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json'
-                ],
-                region: 'global',
-                priority: 1
-            },
-            {
-                id: 'statically',
-                name: 'Statically',
-                baseUrls: [
-                    'https://cdn.statically.io/gh/yezhu9181/my-video-host/main',
-                    'https://statically.io/gh/yezhu9181/my-video-host/main'
-                ],
-                testUrls: [
-                    'https://cdn.statically.io/gh/yezhu9181/my-video-host/main/videos.json',
-                    'https://statically.io/gh/yezhu9181/my-video-host/main/videos.json'
-                ],
-                region: 'global',
-                priority: 2
-            },
-            // 备用CDN路径
-            {
-                id: 'githack',
-                name: 'GitHack',
-                baseUrls: [
-                    'https://rawcdn.githack.com/yezhu9181/my-video-host/main',
-                    'https://githack.com/yezhu9181/my-video-host/raw/main'
-                ],
-                testUrls: [
-                    'https://rawcdn.githack.com/yezhu9181/my-video-host/main/videos.json',
-                    'https://githack.com/yezhu9181/my-video-host/raw/main/videos.json'
-                ],
-                region: 'global',
-                priority: 3
-            },
-            {
-                id: 'gitcdn',
-                name: 'GitCDN',
-                baseUrls: [
-                    'https://gitcdn.link/cdn/yezhu9181/my-video-host/main',
-                    'https://gitcdn.link/cdn/yezhu9181/my-video-host/main'
-                ],
-                testUrls: [
-                    'https://gitcdn.link/cdn/yezhu9181/my-video-host/main/videos.json',
-                    'https://gitcdn.link/cdn/yezhu9181/my-video-host/main/videos.json'
-                ],
-                region: 'global',
-                priority: 4
-            },
-            // 最后备选路径
-            {
-                id: 'github',
-                name: 'GitHub Raw',
-                baseUrls: [
-                    'https://raw.githubusercontent.com/yezhu9181/my-video-host/main',
-                    'https://github.com/yezhu9181/my-video-host/raw/main'
-                ],
-                testUrls: [
-                    'https://raw.githubusercontent.com/yezhu9181/my-video-host/main/videos.json',
-                    'https://github.com/yezhu9181/my-video-host/raw/main/videos.json'
-                ],
-                region: 'global',
-                priority: 5
-            },
-            {
-                id: 'combat',
-                name: 'Combat CDN',
-                baseUrls: [
-                    'https://combat.cdn.workers.dev/gh/yezhu9181/my-video-host/main',
-                    'https://combat.cdn.workers.dev/gh/yezhu9181/my-video-host/main'
-                ],
-                testUrls: [
-                    'https://combat.cdn.workers.dev/gh/yezhu9181/my-video-host/main/videos.json',
-                    'https://combat.cdn.workers.dev/gh/yezhu9181/my-video-host/main/videos.json'
-                ],
-                region: 'global',
-                priority: 6
-            }
-        ];
-
         // 全局变量
         let allVideos = [];
         let currentPage = 1;
         let pageSize = 10;
         let currentSearch = '';
         let currentSort = 'title';
-        let currentCDN = null;
-        let currentPathIndex = 0;
-        let cdnSpeeds = {};
-        let cdnPathStatus = {};
-        
-        // 设置
-        let settings = {
-            enableFallback: true,
-            enablePreload: false,
-            maxRetries: 3
-        };
+        let dataSource = 'github'; // 数据源：github 或 jsdelivr
 
         // 初始化视频播放器
         const player = videojs('my-video');
 
-        // 高级选项切换
-        function toggleAdvancedOptions() {
-            const content = document.getElementById('advancedContent');
-            const arrow = document.getElementById('advancedArrow');
-            
-            content.classList.toggle('show');
-            arrow.classList.toggle('fa-chevron-down');
-            arrow.classList.toggle('fa-chevron-up');
-        }
-        
-        // 更新设置
-        function updateSettings() {
-            settings.enableFallback = document.getElementById('enableFallback').checked;
-            settings.enablePreload = document.getElementById('enablePreload').checked;
-            settings.maxRetries = parseInt(document.getElementById('maxRetries').value) || 3;
-            
-            showToast('设置已更新', 'success');
-        }
-
-        // 强制刷新函数
-        async function forceRefresh() {
-            const refreshBtn = document.getElementById('refreshBtn');
-            const originalText = refreshBtn.innerHTML;
-            
-            // 禁用按钮并显示加载状态
-            refreshBtn.disabled = true;
-            refreshBtn.classList.add('loading');
-            refreshBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> 刷新中...';
-            
-            try {
-                // 重置CDN状态
-                currentCDN = null;
-                currentPathIndex = 0;
-                cdnSpeeds = {};
-                cdnPathStatus = {};
-                
-                // 重新加载所有视频
-                await loadAllVideos();
-                
-                // 显示成功消息
-                showToast('刷新成功！', 'success');
-            } catch (error) {
-                console.error('强制刷新失败:', error);
-                showToast('刷新失败，请重试', 'error');
-            } finally {
-                // 恢复按钮状态
-                refreshBtn.disabled = false;
-                refreshBtn.classList.remove('loading');
-                refreshBtn.innerHTML = originalText;
-            }
-        }
-
-        // 显示Toast消息
-        function showToast(message, type = 'info') {
-            // 移除现有的toast
-            const existingToast = document.getElementById('refreshToast');
-            if (existingToast) {
-                existingToast.remove();
-            }
-            
-            // 创建新的toast
-            const toast = document.createElement('div');
-            toast.id = 'refreshToast';
-            toast.innerHTML = `
-                <div style="
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
-                    color: white;
-                    padding: 12px 16px;
-                    border-radius: 8px;
-                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                    z-index: 1000;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    animation: slideIn 0.3s ease-out;
-                ">
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-                    ${message}
-                </div>
-            `;
-            
-            // 添加动画样式
-            if (!document.getElementById('toastStyles')) {
-                const style = document.createElement('style');
-                style.id = 'toastStyles';
-                style.textContent = `
-                    @keyframes slideIn {
-                        from { transform: translateX(100%); opacity: 0; }
-                        to { transform: translateX(0); opacity: 1; }
-                    }
-                    @keyframes slideOut {
-                        from { transform: translateX(0); opacity: 1; }
-                        to { transform: translateX(100%); opacity: 0; }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-            
-            document.body.appendChild(toast);
-            
-            // 3秒后自动移除
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.style.animation = 'slideOut 0.3s ease-in forwards';
-                    setTimeout(() => toast.remove(), 300);
-                }
-            }, 3000);
-        }
-
-        // 测试CDN路径速度
-        async function testCDNPath(cdn, pathIndex) {
-            const testUrl = cdn.testUrls[pathIndex];
-            const startTime = performance.now();
-            
-            try {
-                const response = await fetch(testUrl, {
-                    method: 'HEAD',
-                    mode: 'no-cors',
-                    cache: 'no-cache'
-                });
-                
-                const speed = performance.now() - startTime;
-                return { success: true, speed, pathIndex };
-            } catch (error) {
-                return { success: false, speed: Infinity, pathIndex };
-            }
-        }
-
-        // 测试所有CDN路径速度
-        async function testAllCDNPaths() {
-            const statusText = document.getElementById('cdnStatusText');
-            const speedTest = document.getElementById('speedTest');
-            const switcher = document.getElementById('cdnSwitcher');
-            const pathsStatus = document.getElementById('cdnPathsStatus');
-            const pathsList = document.getElementById('cdnPathsList');
-            
-            statusText.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> 正在测试CDN路径速度...';
-            pathsStatus.style.display = 'block';
-            pathsList.innerHTML = '<div class="cdn-path-item"><i class="fas fa-sync-alt fa-spin"></i> 测试中...</div>';
-            
-            // 测试所有CDN的所有路径
-            const testPromises = [];
-            
-            CDN_PATHS.forEach(cdn => {
-                cdnPathStatus[cdn.id] = [];
-                
-                cdn.baseUrls.forEach((baseUrl, pathIndex) => {
-                    testPromises.push(
-                        testCDNPath(cdn, pathIndex).then(result => {
-                            cdnPathStatus[cdn.id][pathIndex] = result;
-                            return { cdn, pathIndex, ...result };
-                        })
-                    );
-                });
-            });
-            
-            const results = await Promise.all(testPromises);
-            
-            // 更新路径状态显示
-            pathsList.innerHTML = '';
-            CDN_PATHS.forEach(cdn => {
-                cdn.baseUrls.forEach((baseUrl, pathIndex) => {
-                    const status = cdnPathStatus[cdn.id][pathIndex];
-                    const pathItem = document.createElement('div');
-                    pathItem.className = 'cdn-path-item';
-                    
-                    let statusClass = 'failed';
-                    let statusText = '失败';
-                    
-                    if (status && status.success) {
-                        if (status.speed < 1000) {
-                            statusClass = 'working';
-                            statusText = '良好';
-                        } else {
-                            statusClass = 'slow';
-                            statusText = '较慢';
-                        }
-                    }
-                    
-                    pathItem.innerHTML = `
-                        <div class="cdn-path-status ${statusClass}"></div>
-                        <div class="cdn-path-name">${cdn.name} [${pathIndex + 1}]</div>
-                        <div class="cdn-path-speed">${status && status.success ? Math.round(status.speed) + 'ms' : statusText}</div>
-                    `;
-                    
-                    pathsList.appendChild(pathItem);
-                });
-            });
-            
-            // 选择最佳CDN和路径
-            const workingResults = results.filter(r => r.success && r.speed < 3000);
-            workingResults.sort((a, b) => {
-                // 先按优先级排序，再按速度排序
-                if (a.cdn.priority !== b.cdn.priority) {
-                    return a.cdn.priority - b.cdn.priority;
-                }
-                return a.speed - b.speed;
-            });
-            
-            if (workingResults.length > 0) {
-                const bestResult = workingResults[0];
-                currentCDN = bestResult.cdn;
-                currentPathIndex = bestResult.pathIndex;
-                
-                statusText.innerHTML = `
-                    <i class="fas fa-check-circle" style="color: #10b981;"></i>
-                    已选择最佳路径: <span class="cdn-badge success">${currentCDN.name}</span>
-                    <span style="color: #6b7280; font-size: 12px;">(${Math.round(bestResult.speed)}ms)</span>
-                `;
-                
-                // 显示CDN切换器
-                switcher.innerHTML = '切换CDN: ' + CDN_PATHS.map(cdn => {
-                    const bestPath = cdnPathStatus[cdn.id]?.find(p => p?.success);
-                    const isActive = cdn.id === currentCDN.id;
-                    
-                    return `<button class="cdn-btn ${isActive ? 'active' : ''}" 
-                            onclick="switchCDN('${cdn.id}')"
-                            title="${bestPath ? Math.round(bestPath.speed) + 'ms' : '无可用路径'}">
-                        ${cdn.name}
-                    </button>`;
-                }).join('');
-                
-                // 显示速度测试结果
-                const topResults = workingResults.slice(0, 3);
-                speedTest.innerHTML = '最佳路径: ' + topResults.map((result, index) => 
-                    `${result.cdn.name}(${Math.round(result.speed)}ms)${index < 2 ? ' → ' : ''}`
-                ).join('');
-                
+        // 获取数据源URL - 使用GitHub Raw直接访问
+        function getDataUrl() {
+            const timestamp = Date.now();
+            if (dataSource === 'github') {
+                // 直接访问GitHub Raw，绕过CDN缓存
+                return `https://raw.githubusercontent.com/yezhu9181/my-video-host/main/videos.json?t=${timestamp}`;
             } else {
-                // 所有CDN都失败，使用第一个CDN的第一个路径作为备用
-                currentCDN = CDN_PATHS[0];
-                currentPathIndex = 0;
-                
-                statusText.innerHTML = `
-                    <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i>
-                    使用备用路径: <span class="cdn-badge warning">${currentCDN.name}</span>
-                `;
+                // 备用：使用jsDelivr但带时间戳
+                return `https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json?t=${timestamp}`;
             }
-            
-            return workingResults.length > 0;
         }
 
-        // 切换CDN
-        function switchCDN(cdnId) {
-            const newCDN = CDN_PATHS.find(cdn => cdn.id === cdnId);
-            if (!newCDN) return;
-            
-            // 选择该CDN的最佳路径
-            const workingPaths = cdnPathStatus[newCDN.id]?.filter(p => p?.success) || [];
-            if (workingPaths.length === 0) {
-                showToast(`${newCDN.name} 无可用路径`, 'error');
-                return;
-            }
-            
-            // 选择最快的路径
-            workingPaths.sort((a, b) => a.speed - b.speed);
-            currentCDN = newCDN;
-            currentPathIndex = workingPaths[0].pathIndex;
-            
-            // 更新按钮状态
-            document.querySelectorAll('.cdn-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // 更新状态显示
-            document.getElementById('cdnStatusText').innerHTML = `
-                <i class="fas fa-check-circle" style="color: #10b981;"></i>
-                手动选择: <span class="cdn-badge success">${currentCDN.name}</span>
-                <span style="color: #6b7280; font-size: 12px;">(${Math.round(workingPaths[0].speed)}ms)</span>
-            `;
-            
-            // 重新渲染视频
-            if (allVideos.length > 0) {
-                renderVideos();
-                
-                // 重新加载当前视频
-                const currentSrc = player.currentSrc();
-                if (currentSrc) {
-                    const currentVideo = allVideos.find(v => currentSrc.includes(v.filename));
-                    if (currentVideo) {
-                        playVideo(currentVideo.filename, currentVideo.title);
-                    }
-                }
-            }
-            
-            showToast(`已切换到 ${newCDN.name}`, 'success');
-        }
-
-        // 生成视频URL（使用当前CDN和路径）
-        function generateVideoUrl(filename) {
-            return `${currentCDN.baseUrls[currentPathIndex]}/videos/${filename}`;
-        }
-
-        // 生成缩略图URL
-        function generateThumbnailUrl(filename) {
-            return `${currentCDN.baseUrls[currentPathIndex]}/thumbnails/${filename}`;
-        }
-
-        // 加载视频数据
+        // 加载所有视频数据 - 强制绕过缓存
         async function loadAllVideos() {
             try {
-                // 先测试CDN路径速度
-                const cdnAvailable = await testAllCDNPaths();
+                const statusElement = document.getElementById('dataStatus');
+                statusElement.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> 正在获取最新数据...';
                 
-                if (!cdnAvailable) {
-                    throw new Error('没有可用的CDN路径，请检查网络连接');
+                // 尝试多个数据源
+                const dataSources = [
+                    {
+                        name: 'GitHub Raw',
+                        url: `https://raw.githubusercontent.com/yezhu9181/my-video-host/main/videos.json?t=${Date.now()}`,
+                        method: 'github'
+                    },
+                    {
+                        name: 'GitHub Pages',
+                        url: `https://yezhu9181.github.io/my-video-host/videos.json?t=${Date.now()}`,
+                        method: 'github'
+                    },
+                    {
+                        name: 'jsDelivr',
+                        url: `https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json?t=${Date.now()}`,
+                        method: 'jsdelivr'
+                    }
+                ];
+
+                let data = null;
+                let usedSource = '';
+
+                for (const source of dataSources) {
+                    try {
+                        console.log(`🔄 尝试数据源: ${source.name}`);
+                        const response = await fetch(source.url, {
+                            method: 'GET',
+                            headers: {
+                                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                                'Pragma': 'no-cache',
+                                'Expires': '0'
+                            },
+                            cache: 'no-cache'
+                        });
+                        
+                        if (response.ok) {
+                            data = await response.json();
+                            usedSource = source.name;
+                            console.log(`✅ 成功从 ${source.name} 加载数据`);
+                            break;
+                        }
+                    } catch (error) {
+                        console.warn(`❌ ${source.name} 失败:`, error);
+                    }
                 }
-                
-                // 从当前CDN路径加载数据
-                const dataUrl = `${currentCDN.baseUrls[currentPathIndex]}/videos.json`;
-                const response = await fetch(dataUrl);
-                const data = await response.json();
-                
+
+                if (!data) {
+                    throw new Error('所有数据源都失败了');
+                }
+
                 allVideos = data.videos || [];
+                
+                statusElement.innerHTML = `✅ 数据加载成功 (来源: ${usedSource})`;
+                statusElement.style.color = 'green';
+                
                 renderVideos();
                 
             } catch (error) {
                 console.error('加载视频失败:', error);
+                const statusElement = document.getElementById('dataStatus');
+                statusElement.innerHTML = `❌ 加载失败: ${error.message}`;
+                statusElement.style.color = 'red';
+                
                 document.getElementById('loading').innerHTML = 
                     `<div class="error">
                         <i class="fas fa-exclamation-triangle"></i>
@@ -729,108 +208,119 @@
             }
         }
 
-        // 播放视频（带多路径回退）
-        async function playVideo(filename, title) {
+        // 强制刷新
+        function forceRefresh() {
+            const statusElement = document.getElementById('dataStatus');
+            statusElement.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> 强制刷新中...';
+            statusElement.style.color = 'orange';
+            
+            // 清除所有可能的缓存
+            if (window.caches) {
+                caches.keys().then(function(names) {
+                    for (let name of names) {
+                        caches.delete(name);
+                    }
+                });
+            }
+            
+            loadAllVideos();
+        }
+
+        // 播放视频 - 使用GitHub Raw直接访问视频文件
+        function playVideo(filename, title) {
             const playerContainer = document.getElementById('player-container');
             const currentVideoTitle = document.getElementById('current-video-title');
-            const playerCdnInfo = document.getElementById('playerCdnInfo');
             
             playerContainer.style.display = 'block';
             currentVideoTitle.textContent = title;
             
-            let retryCount = 0;
-            const maxRetries = settings.maxRetries;
+            // 使用GitHub Raw直接访问视频文件，绕过CDN缓存
+            const videoUrl = `https://raw.githubusercontent.com/yezhu9181/my-video-host/main/videos/${filename}?t=${Date.now()}`;
+            
+            player.src({
+                src: videoUrl,
+                type: 'video/mp4'
+            });
+            
+            playerContainer.scrollIntoView({ behavior: 'smooth' });
+        }
 
-            const tryPlayWithCDN = async (cdn, pathIndex) => {
-                const videoUrl = `${cdn.baseUrls[pathIndex]}/videos/${filename}`;
+        // 原有的渲染函数保持不变
+        function renderVideos() {
+            const container = document.getElementById('video-container');
+            const loading = document.getElementById('loading');
+            const pagination = document.getElementById('pagination');
+            
+            if (allVideos.length === 0) {
+                loading.innerHTML = '<div class="error">没有找到视频数据</div>';
+                pagination.style.display = 'none';
+                return;
+            }
+            
+            loading.style.display = 'none';
+            
+            // 过滤和排序
+            let filteredVideos = filterVideos(allVideos);
+            filteredVideos = sortVideos(filteredVideos);
+            
+            // 分页计算
+            const totalVideos = filteredVideos.length;
+            const totalPages = Math.ceil(totalVideos / pageSize);
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            const paginatedVideos = filteredVideos.slice(startIndex, endIndex);
+            
+            // 渲染视频卡片
+            let html = '<div class="video-grid">';
+            paginatedVideos.forEach(video => {
+                // 使用GitHub Raw直接访问缩略图
+                const thumbnailUrl = video.thumbnail ? 
+                    video.thumbnail.replace('cdn.jsdelivr.net', 'raw.githubusercontent.com').replace('@main', '/main') + `?t=${Date.now()}` :
+                    '';
                 
-                playerCdnInfo.innerHTML = 
-                    `<i class="fas fa-sync-alt fa-spin"></i> 正在通过 ${cdn.name} [${pathIndex + 1}] 加载视频...`;
-                
-                try {
-                    player.src({
-                        src: videoUrl,
-                        type: 'video/mp4'
-                    });
-                    
-                    return new Promise((resolve, reject) => {
-                        player.one('loadeddata', () => {
-                            playerCdnInfo.innerHTML = 
-                                `<i class="fas fa-check-circle" style="color: #10b981;"></i> 正在通过 ${cdn.name} [${pathIndex + 1}] 播放`;
-                            resolve(true);
-                        });
-                        
-                        player.one('error', () => {
-                            reject(new Error(`CDN ${cdn.name} [${pathIndex + 1}] 加载失败`));
-                        });
-                        
-                        // 设置超时
-                        setTimeout(() => {
-                            reject(new Error('加载超时'));
-                        }, 10000);
-                    });
-                    
-                } catch (error) {
-                    throw error;
-                }
-            };
-
-            const tryAllPaths = async () => {
-                if (!settings.enableFallback) {
-                    // 如果不启用回退，只使用当前路径
-                    await tryPlayWithCDN(currentCDN, currentPathIndex);
-                    return;
-                }
-                
-                // 尝试当前CDN的所有路径
-                for (let i = 0; i < currentCDN.baseUrls.length; i++) {
-                    if (cdnPathStatus[currentCDN.id] && cdnPathStatus[currentCDN.id][i] && cdnPathStatus[currentCDN.id][i].success) {
-                        try {
-                            await tryPlayWithCDN(currentCDN, i);
-                            return;
-                        } catch (error) {
-                            console.warn(`路径 ${i} 失败:`, error);
-                        }
-                    }
-                }
-                
-                // 如果当前CDN所有路径都失败，尝试其他CDN
-                const workingCDNs = CDN_PATHS.filter(cdn => 
-                    cdn.id !== currentCDN.id && 
-                    cdnPathStatus[cdn.id] && 
-                    cdnPathStatus[cdn.id].some(p => p && p.success)
-                ).sort((a, b) => a.priority - b.priority);
-                
-                for (const cdn of workingCDNs) {
-                    for (let i = 0; i < cdn.baseUrls.length; i++) {
-                        if (cdnPathStatus[cdn.id] && cdnPathStatus[cdn.id][i] && cdnPathStatus[cdn.id][i].success) {
-                            try {
-                                await tryPlayWithCDN(cdn, i);
-                                // 更新当前CDN
-                                currentCDN = cdn;
-                                currentPathIndex = i;
-                                return;
-                            } catch (error) {
-                                console.warn(`CDN ${cdn.name} 路径 ${i} 失败:`, error);
+                html += `
+                    <div class="video-card" onclick="playVideo('${video.filename}', '${video.title.replace(/'/g, "\\'")}')">
+                        <div class="video-thumbnail">
+                            ${thumbnailUrl ? 
+                                `<img src="${thumbnailUrl}" alt="${video.title}" onerror="this.style.display='none';" />` :
+                                `<i class="fas fa-play-circle fallback-icon"></i>`
                             }
-                        }
-                    }
-                }
-                
-                throw new Error('所有CDN路径均无法加载视频');
-            };
-
-            try {
-                await tryAllPaths();
-                playerContainer.scrollIntoView({ behavior: 'smooth' });
-            } catch (error) {
-                console.error('播放视频失败:', error);
-                playerCdnInfo.innerHTML = 
-                    `<i class="fas fa-times-circle" style="color: #ef4444;"></i> 所有CDN路径均无法加载视频`;
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">${video.title}</div>
+                            <div class="video-description">${video.description}</div>
+                            <div class="video-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>${video.duration}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-weight-hanging"></i>
+                                    <span>${video.size}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-database"></i>
+                                    <span>实时数据</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            container.innerHTML = html;
+            
+            // 更新分页控件
+            updatePagination(totalVideos, totalPages);
+            
+            // 自动播放第一个视频
+            if (paginatedVideos.length > 0) {
+                playVideo(paginatedVideos[0].filename, paginatedVideos[0].title);
             }
         }
 
-        // 原有的分页、搜索、筛选函数保持不变
+        // 原有的工具函数保持不变
         function filterVideos(videos) {
             if (!currentSearch) return videos;
             const searchLower = currentSearch.toLowerCase();
@@ -861,58 +351,78 @@
             }
         }
         
-        function renderVideos() {
-            const container = document.getElementById('video-container');
-            const loading = document.getElementById('loading');
+        function updatePagination(totalVideos, totalPages) {
             const pagination = document.getElementById('pagination');
+            const pageInfo = document.getElementById('pageInfo');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
             
-            if (allVideos.length === 0) {
-                loading.innerHTML = '<div class="error">没有找到视频数据</div>';
+            if (totalPages <= 1) {
                 pagination.style.display = 'none';
                 return;
             }
             
-            loading.style.display = 'none';
+            pagination.style.display = 'flex';
+            pageInfo.textContent = `第 ${currentPage} 页，共 ${totalPages} 页 (${totalVideos} 个视频)`;
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages;
+        }
+        
+        function changePage(newPage) {
+            const totalPages = Math.ceil(filterVideos(allVideos).length / pageSize);
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                renderVideos();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+        
+        function changePageSize() {
+            pageSize = parseInt(document.getElementById('pageSizeSelect').value);
+            currentPage = 1;
+            renderVideos();
+        }
+        
+        function searchVideos() {
+            currentSearch = document.getElementById('searchInput').value;
+            currentPage = 1;
+            renderVideos();
+        }
+        
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            currentSearch = '';
+            currentPage = 1;
+            renderVideos();
+        }
+
+        // 页面加载
+        document.addEventListener('DOMContentLoaded', function() {
+            // 添加禁用缓存的meta标签
+            const meta1 = document.createElement('meta');
+            meta1.httpEquiv = "Cache-Control";
+            meta1.content = "no-cache, no-store, must-revalidate";
+            document.head.appendChild(meta1);
             
-            // 过滤和排序
-            let filteredVideos = filterVideos(allVideos);
-            filteredVideos = sortVideos(filteredVideos);
+            const meta2 = document.createElement('meta');
+            meta2.httpEquiv = "Pragma";
+            meta2.content = "no-cache";
+            document.head.appendChild(meta2);
             
-            // 分页计算
-            const totalVideos = filteredVideos.length;
-            const totalPages = Math.ceil(totalVideos / pageSize);
-            const startIndex = (currentPage - 1) * pageSize;
-            const endIndex = startIndex + pageSize;
-            const paginatedVideos = filteredVideos.slice(startIndex, endIndex);
+            const meta3 = document.createElement('meta');
+            meta3.httpEquiv = "Expires";
+            meta3.content = "0";
+            document.head.appendChild(meta3);
             
-            // 渲染视频卡片
-            let html = '<div class="video-grid">';
-            paginatedVideos.forEach(video => {
-                const thumbnailFilename = video.thumbnail ? 
-                    video.thumbnail.split('/').pop() : 
-                    video.filename.replace('.mp4', '.jpg').replace('.mov', '.jpg');
-                
-                html += `
-                    <div class="video-card" onclick="playVideo('${video.filename}', '${video.title.replace(/'/g, "\\'")}')">
-                        <div class="video-thumbnail">
-                            <img src="${generateThumbnailUrl(thumbnailFilename)}" 
-                                 alt="${video.title}"
-                                 onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZjNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPua1geafpeeJueauijwvdGV4dD48L3N2Zz4=';" />
-                        </div>
-                        <div class="video-info">
-                            <div class="video-title">${video.title}</div>
-                            <div class="video-description">${video.description}</div>
-                            <div class="video-meta">
-                                <div class="meta-item">
-                                    <i class="fas fa-clock"></i>
-                                    <span>${video.duration}</span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="fas fa-weight-hanging"></i>
-                                    <span>${video.size}</span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="fas fa-wifi"></i>
-                                    <span>${currentCDN.name}</span>
-                                </div>
-                            </div
+            loadAllVideos();
+        });
+
+        // 搜索框回车支持
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchVideos();
+            }
+        });
+    </script>
+</body>
+</html>
