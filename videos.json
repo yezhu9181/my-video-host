@@ -2,10 +2,10 @@
   "videos": [
     {
       "id": 1,
-      "title": "功能演示",
+      "title": "bajiquan(八极拳)",
       "filename": "demo.MP4",
       "url": "videos/demo.MP4",
-      "description": "核心功能的实际使用演示",
+      "description": "这是关于bajiquan(八极拳)的详细说明视频",
       "duration": "0:24",
       "size": "19.0 MB",
       "thumbnail": "thumbnails/demo.jpg",
@@ -37,7 +37,7 @@
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-11T16:06:27Z",
+  "lastUpdated": "2025-11-11T16:24:05Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
   "apiEndpoints": {

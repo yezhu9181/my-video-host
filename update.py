@@ -243,15 +243,22 @@ class VideoLibraryUpdater:
             seconds = estimated_seconds % 60
             return f"{minutes}:{seconds:02d}"
     
-    def generate_video_data(self, video_files):
+    def generate_video_data(self, video_files, existing_titles=None):
         """生成视频数据"""
+        if existing_titles is None:
+            existing_titles = {}
+        
         videos = []
         
         for i, video_file in enumerate(sorted(video_files), 1):
             print(f"📹 处理视频 {i}/{len(video_files)}: {video_file}")
             
             name_without_ext = Path(video_file).stem
-            title = self.generate_friendly_title(name_without_ext)
+            # 如果原有数据中有该视频文件的title，使用原有的值，否则生成新的
+            if video_file in existing_titles and existing_titles[video_file]:
+                title = existing_titles[video_file]
+            else:
+                title = self.generate_friendly_title(name_without_ext)
             description = self.generate_description(title)
             file_size = self.get_file_size(video_file)
             
@@ -439,7 +446,24 @@ class VideoLibraryUpdater:
         
         print(f"📁 找到 {len(video_files)} 个视频文件")
         
-        videos = self.generate_video_data(video_files)
+        # 读取现有的videos.json文件，提取原有的title值
+        existing_titles = {}
+        if self.json_path.exists():
+            try:
+                with open(self.json_path, 'r', encoding='utf-8') as f:
+                    existing_data = json.load(f)
+                    if 'videos' in existing_data:
+                        for video in existing_data['videos']:
+                            filename = video.get('filename')
+                            title = video.get('title')
+                            if filename and title:
+                                existing_titles[filename] = title
+                if existing_titles:
+                    print(f"📋 从现有文件读取到 {len(existing_titles)} 个视频的title")
+            except Exception as e:
+                print(f"⚠️  读取现有videos.json失败: {e}，将使用新生成的title")
+        
+        videos = self.generate_video_data(video_files, existing_titles)
         
         # 计算分页信息
         total_videos = len(videos)
