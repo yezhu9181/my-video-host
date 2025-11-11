@@ -66,12 +66,12 @@ class VideoLibraryUpdater:
         return f"{url}?v={self.cache_version}"
     
     def purge_cdn_cache(self):
-        """清除CDN缓存"""
+        """清除CDN缓存（缓存时间设置为0，确保获取最新数据）"""
         if not self.enable_cache_purge:
             print("ℹ️  CDN缓存清除已禁用")
             return
             
-        print("\n🔄 清除CDN缓存...")
+        print("\n🔄 清除CDN缓存（缓存时间=0）...")
         
         # 需要清除缓存的文件列表
         files_to_purge = [
@@ -81,7 +81,7 @@ class VideoLibraryUpdater:
         
         success_count = 0
         
-        # 清除 jsDelivr CDN 缓存
+        # 清除 jsDelivr CDN 缓存（即使缓存时间设置为0，也主动清除以确保立即生效）
         for file_path in files_to_purge:
             try:
                 purge_url = f"https://purge.jsdelivr.net{file_path}"
@@ -690,6 +690,12 @@ class VideoLibraryUpdater:
             "repository": "https://github.com/yezhu9181/my-video-host",
             "ffmpegAvailable": self.ffmpeg_available,
             "cacheVersion": self.cache_version,  # 添加全局缓存版本
+            "cachePolicy": {
+                "maxAge": 0,  # CDN缓存时间设置为0（不缓存）
+                "mustRevalidate": True,
+                "noCache": True,
+                "noStore": True
+            },
             "apiEndpoints": {
                 "allVideos": "/videos.json",
                 "paginated": "/videos.json?page={page}&limit={limit}",

@@ -348,9 +348,9 @@
                     const response = await fetch(`${cdn.testUrl}${testCacheBuster}`, {
                         method: 'HEAD',
                         mode: 'no-cors',
-                        cache: 'no-cache',
+                        cache: 'no-store',  // 完全不缓存
                         headers: {
-                            'Cache-Control': 'no-cache'
+                            'Cache-Control': 'max-age=0, no-cache, no-store, must-revalidate'
                         }
                     });
                     
@@ -462,14 +462,15 @@
                 // 生成缓存破坏参数（使用时间戳）
                 const cacheBuster = `?v=${Date.now()}&_t=${new Date().getTime()}`;
                 
-                // 从当前CDN加载数据，添加缓存破坏参数和缓存控制
+                // 从当前CDN加载数据，添加缓存破坏参数和缓存控制（缓存时间=0）
                 const response = await fetch(`${currentCDN.url}/videos.json${cacheBuster}`, {
                     method: 'GET',
-                    cache: 'no-cache',
+                    cache: 'no-store',  // 完全不缓存
                     headers: {
-                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Cache-Control': 'max-age=0, no-cache, no-store, must-revalidate, proxy-revalidate',
                         'Pragma': 'no-cache',
-                        'Expires': '0'
+                        'Expires': '0',
+                        'If-Modified-Since': '0'  // 强制重新验证
                     }
                 });
                 
