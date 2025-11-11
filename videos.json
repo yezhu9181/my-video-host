@@ -2,10 +2,10 @@
   "videos": [
     {
       "id": 1,
-      "title": "八级拳123",
+      "title": "八级拳(BaJiQuan)",
       "filename": "ZGVtbw==.MP4",
       "url": "videos/ZGVtbw==.MP4",
-      "description": "这是关于八级拳123的详细说明视频",
+      "description": "这是关于八级拳(BaJiQuan)的详细说明视频",
       "duration": "0:24",
       "size": "41.1 MB",
       "thumbnail": "thumbnails/ZGVtbw==.jpg",
@@ -13,15 +13,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-11",
       "thumbnailType": "JPG",
-      "cacheVersion": "a89156b",
-      "lastUpdated": "2025-11-11T21:25:14.951121"
+      "cacheVersion": "3ea5c37",
+      "lastUpdated": "2025-11-11T22:20:00.717036"
     },
     {
       "id": 2,
-      "title": "街舞",
+      "title": "街舞(Street dance)",
       "filename": "aW50cm8=.MP4",
       "url": "videos/aW50cm8=.MP4",
-      "description": "这是关于街舞的详细说明视频",
+      "description": "这是关于街舞(Street dance)的详细说明视频",
       "duration": "0:35",
       "size": "13.1 MB",
       "thumbnail": "thumbnails/aW50cm8=.jpg",
@@ -29,8 +29,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-11",
       "thumbnailType": "JPG",
-      "cacheVersion": "a89156b",
-      "lastUpdated": "2025-11-11T21:25:15.063251"
+      "cacheVersion": "3ea5c37",
+      "lastUpdated": "2025-11-11T22:20:00.817280"
     }
   ],
   "pagination": {
@@ -41,10 +41,10 @@
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-11T21:25:15Z",
+  "lastUpdated": "2025-11-11T22:20:00Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
-  "cacheVersion": "a89156b",
+  "cacheVersion": "3ea5c37",
   "cachePolicy": {
     "maxAge": 0,
     "mustRevalidate": true,
@@ -56,6 +56,5 @@
     "paginated": "/videos.json?page={page}&limit={limit}",
     "search": "/videos.json?search={keyword}",
     "byId": "/videos.json?id={id}"
-  },
-  "latestCommitSha": "eac567396302ee830d3019c8389ed500641aea9e"
+  }
 }
