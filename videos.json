@@ -2,10 +2,10 @@
   "videos": [
     {
       "id": 1,
-      "title": "八级拳(BaJiQuan)123",
+      "title": "八级拳(BaJiQuan)",
       "filename": "ZGVtbw==.MP4",
       "url": "videos/ZGVtbw==.MP4",
-      "description": "这是关于八级拳(BaJiQuan)123的详细说明视频",
+      "description": "这是关于八级拳(BaJiQuan)的详细说明视频",
       "duration": "0:24",
       "size": "41.1 MB",
       "thumbnail": "thumbnails/ZGVtbw==.jpg",
@@ -13,8 +13,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-11",
       "thumbnailType": "JPG",
-      "cacheVersion": "4c6d0bf",
-      "lastUpdated": "2025-11-11T23:06:44.737922"
+      "cacheVersion": "a2bb8fd",
+      "lastUpdated": "2025-11-11T23:09:06.562505"
     },
     {
       "id": 2,
@@ -29,8 +29,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-11",
       "thumbnailType": "JPG",
-      "cacheVersion": "4c6d0bf",
-      "lastUpdated": "2025-11-11T23:06:44.837270"
+      "cacheVersion": "a2bb8fd",
+      "lastUpdated": "2025-11-11T23:09:06.663047"
     }
   ],
   "pagination": {
@@ -41,10 +41,10 @@
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-11T23:06:44Z",
+  "lastUpdated": "2025-11-11T23:09:06Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
-  "cacheVersion": "4c6d0bf",
+  "cacheVersion": "a2bb8fd",
   "cachePolicy": {
     "maxAge": 0,
     "mustRevalidate": true,
@@ -56,6 +56,5 @@
     "paginated": "/videos.json?page={page}&limit={limit}",
     "search": "/videos.json?search={keyword}",
     "byId": "/videos.json?id={id}"
-  },
-  "latestCommitSha": "d34cb45c5536af8212d04dcd154f4b05a2712893"
+  }
 }
