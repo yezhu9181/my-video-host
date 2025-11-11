@@ -53,6 +53,19 @@ class VideoLibraryUpdater:
         # 备用方案：使用时间戳
         return str(int(time.time()))
     
+    def get_full_commit_sha(self):
+        """获取完整的 Git commit SHA"""
+        try:
+            result = subprocess.run(
+                ["git", "rev-parse", "HEAD"],
+                capture_output=True, text=True, cwd=self.repo_path
+            )
+            if result.returncode == 0:
+                return result.stdout.strip()
+        except:
+            pass
+        return None
+    
     def generate_url_with_cache_buster(self, filename, file_type="video"):
         """生成带缓存破坏参数的URL"""
         base_url = f"https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main"
@@ -787,6 +800,19 @@ class VideoLibraryUpdater:
             # 执行Git命令
             git_success = self.run_git_commands()
             
+            # 获取最新的 commit SHA（在 Git 推送后）
+            latest_commit_sha = None
+            if git_success:
+                latest_commit_sha = self.get_full_commit_sha()
+                if latest_commit_sha:
+                    print(f"📌 最新 commit SHA: {latest_commit_sha}")
+                    # 更新 JSON 数据中的 commit SHA
+                    updated_data["latestCommitSha"] = latest_commit_sha
+                    # 重新写入文件以包含 commit SHA
+                    with open(self.json_path, 'w', encoding='utf-8') as f:
+                        json.dump(updated_data, f, ensure_ascii=False, indent=2)
+                    print(f"✅ 已更新 videos.json，包含最新 commit SHA")
+            
             if git_success:
                 # 清除CDN缓存（等待 GitHub 更新）
                 if self.enable_cache_purge:
@@ -795,12 +821,14 @@ class VideoLibraryUpdater:
                     # 验证 CDN 数据是否已更新（可选，可能需要等待）
                     if purge_success:
                         print("\n💡 提示：CDN 缓存清除请求已提交，但可能需要几分钟才能完全生效")
-                        print("💡 建议：前端应优先使用 GitHub API 获取最新数据（完全绕过 CDN 缓存）")
+                        print("💡 建议：前端应使用 commit SHA 构建 CDN URL 以获取最新数据")
                 
                 print(f"\n🎉 所有任务完成！视频库已更新并推送到GitHub")
                 print(f"🌐 访问地址: https://yezhu9181.github.io/my-video-host/")
                 print(f"💡 缓存版本: {self.cache_version}")
-                print(f"💡 重要提示：前端代码已配置为优先使用 GitHub API，可完全绕过 CDN 缓存")
+                if latest_commit_sha:
+                    print(f"💡 最新 commit SHA: {latest_commit_sha}")
+                    print(f"💡 前端将使用 commit SHA 构建 CDN URL，确保获取最新数据")
             else:
                 print(f"\n⚠️  视频数据已更新，但Git推送可能有问题")
                 print(f"💡 请手动执行Git命令")
