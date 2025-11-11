@@ -673,9 +673,10 @@ class VideoLibraryUpdater:
                 content = f.read()
             
             # 查找并替换 commit SHA
-            # 查找格式: let globalCommitSha = null; 或 let globalCommitSha = "COMMIT_SHA_PLACEHOLDER";
+            # 查找格式: let globalCommitSha = null; 或 let globalCommitSha = "任何字符串";
             import re
-            pattern = r'(let\s+globalCommitSha\s*=\s*)(null|"[^"]*"|COMMIT_SHA_PLACEHOLDER)(\s*;)'
+            # 匹配任何引号内的字符串或 null
+            pattern = r'(let\s+globalCommitSha\s*=\s*)(null|"[^"]*")(\s*;)'
             replacement = f'\\1"{commit_sha}"\\3'
             
             new_content = re.sub(pattern, replacement, content)
