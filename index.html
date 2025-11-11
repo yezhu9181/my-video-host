@@ -273,11 +273,11 @@
                 // 等待一小段时间确保缓存清除生效
                 await new Promise(resolve => setTimeout(resolve, 200));
                 
-                // 强制使用 GitHub Raw 重新加载所有视频（绕过所有 CDN 缓存）
+                // 强制使用 GitHub API 重新加载所有视频（完全绕过所有缓存）
                 await loadAllVideos(true);
                 
                 // 显示成功消息
-                showToast('刷新成功！已从 GitHub Raw 获取最新数据', 'success');
+                showToast('刷新成功！已从 GitHub API 获取最新数据', 'success');
             } catch (error) {
                 console.error('强制刷新失败:', error);
                 showToast('刷新失败: ' + error.message, 'error');
@@ -511,112 +511,159 @@
             });
         }
 
-        // 加载视频数据（优先使用 GitHub Raw 确保获取最新数据）
-        async function loadAllVideos(forceGitHubRaw = false) {
+        // 使用 GitHub API 获取文件内容（完全绕过所有缓存）
+        async function fetchFromGitHubAPI() {
+            // 方法1: 使用 GitHub API 的 raw 端点（直接返回文件内容）
+            const apiRawUrl = 'https://api.github.com/repos/yezhu9181/my-video-host/contents/videos.json?ref=main';
+            const cacheBuster = `&_t=${Date.now()}&_r=${Math.random()}`;
+            
             try {
-                let cdnToUse = null;
+                console.log('🔄 使用 GitHub API 获取最新数据（完全绕过缓存）...');
                 
-                if (forceGitHubRaw) {
-                    // 强制使用 GitHub Raw（绕过所有 CDN 缓存）
-                    cdnToUse = FREE_CDNS.find(cdn => cdn.id === 'github');
-                    console.log('🔄 强制使用 GitHub Raw 获取最新数据...');
+                // 尝试使用 raw 端点（直接返回文件内容，不是 JSON 包装）
+                const rawResponse = await fetch(`${apiRawUrl}${cacheBuster}`, {
+                    method: 'GET',
+                    cache: 'no-store',
+                    headers: {
+                        'Accept': 'application/vnd.github.v3.raw',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                
+                if (rawResponse.ok) {
+                    const data = await rawResponse.json();
+                    console.log('✅ 通过 GitHub API Raw 端点获取成功');
+                    return data;
+                }
+            } catch (rawError) {
+                console.warn('GitHub API Raw 端点失败，尝试标准 API:', rawError);
+            }
+            
+            // 方法2: 使用标准 GitHub API（返回包含 base64 的 JSON）
+            try {
+                const apiResponse = await fetch(`${apiRawUrl}${cacheBuster}`, {
+                    method: 'GET',
+                    cache: 'no-store',
+                    headers: {
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                
+                if (apiResponse.ok) {
+                    const apiData = await apiResponse.json();
+                    if (apiData.content) {
+                        // 解码 base64 内容
+                        const decodedContent = atob(apiData.content.replace(/\s/g, ''));
+                        const data = JSON.parse(decodedContent);
+                        console.log('✅ 通过 GitHub API 标准端点获取成功');
+                        return data;
+                    }
+                }
+            } catch (apiError) {
+                console.warn('GitHub API 标准端点失败，尝试 Raw URL:', apiError);
+            }
+            
+            // 方法3: 使用 Raw URL with 强制缓存破坏（最后的备用方案）
+            const rawUrl = `https://raw.githubusercontent.com/yezhu9181/my-video-host/main/videos.json?t=${Date.now()}&r=${Math.random()}&nocache=1`;
+            const response = await fetch(rawUrl, {
+                method: 'GET',
+                cache: 'no-store',
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`所有方法都失败，最后尝试 Raw URL 也失败: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log('✅ 通过 Raw URL 获取成功（备用方案）');
+            return data;
+        }
+
+        // 加载视频数据（优先使用 GitHub API 确保获取最新数据）
+        async function loadAllVideos(forceGitHubAPI = false) {
+            try {
+                let data = null;
+                let dataSource = '';
+                
+                // 如果强制使用 GitHub API 或者首次加载，优先使用 GitHub API
+                if (forceGitHubAPI) {
+                    data = await fetchFromGitHubAPI();
+                    dataSource = 'GitHub API (强制)';
                 } else {
-                    // 先测试CDN速度
-                    const cdnAvailable = await testCDNSpeeds();
-                    
-                    if (!cdnAvailable) {
-                        throw new Error('没有可用的CDN，请检查网络连接');
-                    }
-                    
-                    // 优先使用 GitHub Raw（缓存时间最短）
-                    const githubCDN = FREE_CDNS.find(cdn => cdn.id === 'github');
-                    if (githubCDN) {
-                        cdnToUse = githubCDN;
-                        console.log('🔄 优先使用 GitHub Raw 获取最新数据...');
-                    } else {
-                        cdnToUse = currentCDN;
-                    }
-                }
-                
-                if (!cdnToUse) {
-                    throw new Error('无法找到可用的 CDN');
-                }
-                
-                // 生成强制的缓存破坏参数（使用时间戳作为路径的一部分，某些 CDN 可能忽略查询参数）
-                const cacheBuster = generateCacheBuster();
-                // 对于 GitHub Raw，直接使用查询参数
-                // 对于其他 CDN，尝试多种方式
-                let url = `${cdnToUse.url}/videos.json${cacheBuster}`;
-                
-                // 方法1: 使用 fetch with 强制缓存控制
-                let response;
-                let lastError = null;
-                
-                // 尝试多种 URL 格式
-                const urlVariants = [
-                    url,  // 原始 URL
-                    `${cdnToUse.url}/videos.json?nocache=${Date.now()}`,  // 简化版本
-                    `${cdnToUse.url}/videos.json?t=${Date.now()}&r=${Math.random()}`,  // 另一种格式
-                ];
-                
-                for (const testUrl of urlVariants) {
+                    // 先尝试使用 GitHub API（完全绕过缓存）
                     try {
-                        console.log('🔄 尝试加载:', testUrl);
-                        response = await fetch(testUrl, {
+                        data = await fetchFromGitHubAPI();
+                        dataSource = 'GitHub API';
+                    } catch (apiError) {
+                        console.warn('GitHub API 失败，尝试使用 CDN:', apiError);
+                        
+                        // 如果 GitHub API 失败，回退到 CDN
+                        let cdnToUse = null;
+                        
+                        // 先测试CDN速度
+                        const cdnAvailable = await testCDNSpeeds();
+                        
+                        if (!cdnAvailable) {
+                            throw new Error('没有可用的 CDN，请检查网络连接');
+                        }
+                        
+                        // 优先使用 GitHub Raw（缓存时间最短）
+                        const githubCDN = FREE_CDNS.find(cdn => cdn.id === 'github');
+                        if (githubCDN) {
+                            cdnToUse = githubCDN;
+                        } else {
+                            cdnToUse = currentCDN;
+                        }
+                        
+                        if (!cdnToUse) {
+                            throw new Error('无法找到可用的 CDN');
+                        }
+                        
+                        // 生成强制的缓存破坏参数
+                        const cacheBuster = generateCacheBuster();
+                        const url = `${cdnToUse.url}/videos.json${cacheBuster}`;
+                        
+                        console.log('🔄 使用 CDN 加载:', cdnToUse.name);
+                        const response = await fetch(url, {
                             method: 'GET',
-                            cache: 'no-store',  // 完全不缓存
-                            credentials: 'omit',  // 不发送凭证，避免某些缓存问题
+                            cache: 'no-store',
+                            credentials: 'omit',
                             headers: {
                                 'Cache-Control': 'max-age=0, no-cache, no-store, must-revalidate, proxy-revalidate',
                                 'Pragma': 'no-cache',
                                 'Expires': '0',
-                                'If-Modified-Since': 'Thu, 01 Jan 1970 00:00:00 GMT',  // 强制重新验证
-                                'If-None-Match': '*',  // 强制重新验证
-                                'X-Requested-With': 'XMLHttpRequest'  // 标识为 AJAX 请求
+                                'If-Modified-Since': 'Thu, 01 Jan 1970 00:00:00 GMT',
+                                'If-None-Match': '*',
+                                'X-Requested-With': 'XMLHttpRequest'
                             }
                         });
                         
-                        if (response && response.ok) {
-                            console.log('✅ 成功使用 URL:', testUrl);
-                            break;
+                        if (!response || !response.ok) {
+                            throw new Error(`CDN 请求失败: ${response ? response.status : 'unknown'}`);
                         }
-                    } catch (fetchError) {
-                        lastError = fetchError;
-                        console.warn('URL 失败:', testUrl, fetchError);
-                        continue;
+                        
+                        data = await response.json();
+                        dataSource = cdnToUse.name;
+                        currentCDN = cdnToUse;
                     }
                 }
-                
-                // 如果所有 fetch 都失败，尝试使用 XMLHttpRequest
-                if (!response || !response.ok) {
-                    console.warn('Fetch 失败，尝试使用 XMLHttpRequest');
-                    try {
-                        response = await fetchWithXHR(url);
-                    } catch (xhrError) {
-                        lastError = xhrError;
-                    }
-                }
-                
-                if (!response || !response.ok) {
-                    // 如果还是失败，尝试强制使用 GitHub Raw
-                    if (!forceGitHubRaw && cdnToUse.id !== 'github') {
-                        console.warn('CDN 加载失败，尝试强制使用 GitHub Raw...');
-                        return await loadAllVideos(true);
-                    }
-                    throw new Error(`HTTP ${response ? response.status : 'unknown'}: ${response ? response.statusText : lastError?.message || 'Request failed'}`);
-                }
-                
-                const data = await response.json();
                 
                 // 验证数据是否是最新的（检查 lastUpdated 时间和 cacheVersion）
-                if (data.lastUpdated) {
+                if (data && data.lastUpdated) {
                     const updateTime = new Date(data.lastUpdated);
                     const now = new Date();
                     const diffMinutes = Math.floor((now - updateTime) / (1000 * 60));
                     const diffSeconds = Math.floor((now - updateTime) / 1000);
                     
                     console.log('✅ 获取到数据');
-                    console.log('   - 数据源:', cdnToUse.name, forceGitHubRaw ? '(强制 GitHub Raw)' : '');
+                    console.log('   - 数据源:', dataSource);
                     console.log('   - 更新时间:', data.lastUpdated, `(${diffMinutes} 分钟前 / ${diffSeconds} 秒前)`);
                     console.log('   - 缓存版本:', data.cacheVersion || 'N/A');
                     console.log('   - 视频数量:', data.videos ? data.videos.length : 0);
@@ -624,16 +671,13 @@
                     // 如果数据超过5分钟，提示用户可能不是最新的
                     if (diffMinutes > 5) {
                         console.warn('⚠️  数据可能不是最新的（超过5分钟），建议使用"强制刷新"按钮获取最新数据');
-                        console.warn('💡 提示：点击"强制刷新"按钮将直接从 GitHub Raw 获取最新数据，绕过所有 CDN 缓存');
+                        console.warn('💡 提示：点击"强制刷新"按钮将直接从 GitHub API 获取最新数据，完全绕过所有缓存');
                     } else if (diffSeconds > 30) {
                         console.info('ℹ️  数据较新，但如果需要最新数据，可以使用"强制刷新"按钮');
                     } else {
                         console.log('✅ 数据非常新，应该是最新的');
                     }
                 }
-                
-                // 更新当前 CDN（用于后续请求）
-                currentCDN = cdnToUse;
                 
                 allVideos = data.videos || [];
                 renderVideos();
