@@ -4,15 +4,17 @@
       "id": 1,
       "title": "产品介绍视频",
       "filename": "aW50cm8=.MP4",
-      "url": "videos/aW50cm8=.MP4",
+      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/aW50cm8=.MP4?v=68a9474",
       "description": "全面介绍产品的功能特性和使用场景",
       "duration": "0:35",
       "size": "13.1 MB",
-      "thumbnail": "thumbnails/aW50cm8=.jpg",
+      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/aW50cm8=.jpg?v=68a9474",
       "codec": "H.264",
       "resolution": "0x1",
       "createdAt": "2025-11-11",
-      "thumbnailType": "JPG"
+      "thumbnailType": "JPG",
+      "cacheVersion": "68a9474",
+      "lastUpdated": "2025-11-11T16:50:05.265039"
     }
   ],
   "pagination": {
@@ -23,9 +25,10 @@
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-11T16:44:17Z",
+  "lastUpdated": "2025-11-11T16:50:05Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
+  "cacheVersion": "68a9474",
   "apiEndpoints": {
     "allVideos": "/videos.json",
     "paginated": "/videos.json?page={page}&limit={limit}",

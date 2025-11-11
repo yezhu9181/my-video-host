@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-视频库自动更新脚本 - 使用FFmpeg提取视频第一帧作为缩略图
+视频库自动更新脚本 - 使用FFmpeg提取视频第一帧作为缩略图 + 缓存优化
 """
 
 import os
@@ -8,6 +8,8 @@ import json
 import glob
 import subprocess
 import base64
+import time
+import requests
 from datetime import datetime
 from pathlib import Path
 
@@ -20,6 +22,10 @@ class VideoLibraryUpdater:
         self.page_size = page_size
         self.token_file_path = Path(token_file_path)
         
+        # 缓存优化配置
+        self.cache_version = self.get_cache_version()
+        self.enable_cache_purge = True  # 是否启用CDN缓存清除
+        
         # 检查FFmpeg是否可用
         self.ffmpeg_available = self.check_ffmpeg()
         
@@ -30,6 +36,69 @@ class VideoLibraryUpdater:
         self.setup_git_commands()
         
         self.thumbnails_path.mkdir(exist_ok=True)
+    
+    def get_cache_version(self):
+        """获取缓存版本号 - 使用Git commit SHA或时间戳"""
+        try:
+            # 使用Git commit SHA作为版本号（推荐）
+            result = subprocess.run(
+                ["git", "rev-parse", "--short", "HEAD"],
+                capture_output=True, text=True, cwd=self.repo_path
+            )
+            if result.returncode == 0:
+                return result.stdout.strip()
+        except:
+            pass
+        
+        # 备用方案：使用时间戳
+        return str(int(time.time()))
+    
+    def generate_url_with_cache_buster(self, filename, file_type="video"):
+        """生成带缓存破坏参数的URL"""
+        base_url = f"https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main"
+        
+        if file_type == "video":
+            url = f"{base_url}/videos/{filename}"
+        else:
+            url = f"{base_url}/thumbnails/{filename}"
+        
+        # 添加缓存破坏参数
+        return f"{url}?v={self.cache_version}"
+    
+    def purge_cdn_cache(self):
+        """清除CDN缓存"""
+        if not self.enable_cache_purge:
+            print("ℹ️  CDN缓存清除已禁用")
+            return
+            
+        print("\n🔄 清除CDN缓存...")
+        
+        # 需要清除缓存的文件列表
+        files_to_purge = [
+            "/gh/yezhu9181/my-video-host@main/videos.json",
+            # 可以根据需要添加其他关键文件
+        ]
+        
+        success_count = 0
+        for file_path in files_to_purge:
+            try:
+                purge_url = f"https://purge.jsdelivr.net{file_path}"
+                response = requests.get(purge_url, timeout=10)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    if data.get('id'):
+                        print(f"✅ 缓存清除请求已提交: {file_path}")
+                        success_count += 1
+                    else:
+                        print(f"⚠️  缓存清除可能失败: {file_path}")
+                else:
+                    print(f"❌ 缓存清除失败: {file_path} - HTTP {response.status_code}")
+                    
+            except Exception as e:
+                print(f"❌ 缓存清除错误: {e}")
+        
+        return success_count > 0
     
     def check_ffmpeg(self):
         """检查FFmpeg是否可用"""
@@ -321,7 +390,7 @@ class VideoLibraryUpdater:
             return f"{minutes}:{seconds:02d}"
     
     def generate_video_data(self, video_files, existing_titles=None, original_to_base64_map=None):
-        """生成视频数据"""
+        """生成视频数据（带缓存优化）"""
         if existing_titles is None:
             existing_titles = {}
         if original_to_base64_map is None:
@@ -371,21 +440,25 @@ class VideoLibraryUpdater:
             else:
                 thumbnail_filename = self.create_svg_thumbnail(video_filename, file_size)
             
-            thumbnail_url = f"thumbnails/{thumbnail_filename}" if thumbnail_filename else ""
+            # 使用带缓存破坏的URL
+            video_url = self.generate_url_with_cache_buster(video_filename, "video")
+            thumbnail_url = self.generate_url_with_cache_buster(thumbnail_filename, "thumbnail") if thumbnail_filename else ""
             
             video_data = {
                 "id": i,
                 "title": title,
                 "filename": video_filename,
-                "url": f"videos/{video_filename}",
+                "url": video_url,  # 使用带缓存破坏的完整URL
                 "description": description,
                 "duration": duration,
                 "size": f"{file_size} MB",
-                "thumbnail": thumbnail_url,
+                "thumbnail": thumbnail_url,  # 使用带缓存破坏的完整URL
                 "codec": "H.264",
                 "resolution": resolution,
                 "createdAt": datetime.now().strftime("%Y-%m-%d"),
-                "thumbnailType": "JPG" if thumbnail_filename.endswith('.jpg') else "SVG"
+                "thumbnailType": "JPG" if thumbnail_filename.endswith('.jpg') else "SVG",
+                "cacheVersion": self.cache_version,  # 添加缓存版本信息
+                "lastUpdated": datetime.now().isoformat()
             }
             
             videos.append(video_data)
@@ -508,8 +581,9 @@ class VideoLibraryUpdater:
     
     def update_videos_json(self):
         """更新videos.json文件"""
-        print("🎬 视频库更新脚本 - 使用FFmpeg提取缩略图")
+        print("🎬 视频库更新脚本 - 缓存优化版本")
         print("=" * 60)
+        print(f"🆚 缓存版本: {self.cache_version}")
         
         # 显示FFmpeg状态
         if self.ffmpeg_available:
@@ -609,6 +683,7 @@ class VideoLibraryUpdater:
             "lastUpdated": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
             "repository": "https://github.com/yezhu9181/my-video-host",
             "ffmpegAvailable": self.ffmpeg_available,
+            "cacheVersion": self.cache_version,  # 添加全局缓存版本
             "apiEndpoints": {
                 "allVideos": "/videos.json",
                 "paginated": "/videos.json?page={page}&limit={limit}",
@@ -627,6 +702,7 @@ class VideoLibraryUpdater:
             print(f"   - 总视频数: {total_videos}")
             print(f"   - 每页数量: {self.page_size}")
             print(f"   - 总页数: {total_pages}")
+            print(f"   - 缓存版本: {self.cache_version}")
             
             # 统计缩略图类型
             jpg_count = sum(1 for v in videos if v.get('thumbnailType') == 'JPG')
@@ -638,8 +714,13 @@ class VideoLibraryUpdater:
             git_success = self.run_git_commands()
             
             if git_success:
+                # 清除CDN缓存
+                if self.enable_cache_purge:
+                    self.purge_cdn_cache()
+                
                 print(f"\n🎉 所有任务完成！视频库已更新并推送到GitHub")
                 print(f"🌐 访问地址: https://yezhu9181.github.io/my-video-host/")
+                print(f"💡 缓存版本已更新，更改应该很快生效")
             else:
                 print(f"\n⚠️  视频数据已更新，但Git推送可能有问题")
                 print(f"💡 请手动执行Git命令")
@@ -655,6 +736,7 @@ def main():
     parser = argparse.ArgumentParser(description='更新视频库配置并自动Git提交')
     parser.add_argument('--page-size', type=int, default=10, help='每页显示的视频数量')
     parser.add_argument('--no-git', action='store_true', help='不执行Git命令')
+    parser.add_argument('--no-cache-purge', action='store_true', help='不清除CDN缓存')
     parser.add_argument('--token-file', default='/Users/syh/git_token.txt', help='GitHub Token文件路径')
     
     args = parser.parse_args()
@@ -665,6 +747,11 @@ def main():
     if args.no_git:
         updater.git_commands = []
         print("⚠️  Git命令已禁用")
+    
+    # 如果指定了不清除CDN缓存，禁用缓存清除
+    if args.no_cache_purge:
+        updater.enable_cache_purge = False
+        print("⚠️  CDN缓存清除已禁用")
     
     success = updater.update_videos_json()
     
