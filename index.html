@@ -359,11 +359,10 @@
                 const startTime = performance.now();
                 
                 try {
-                    // 如果提供了 commit SHA，使用它构建 URL
+                    // 如果提供了 commit SHA，使用它替换 URL 中的 @main
                     let testUrl = cdn.testUrl;
                     if (commitSha) {
-                        const cdnUrlWithSha = buildCdnUrlWithCommitSha(cdn, commitSha);
-                        testUrl = `${cdnUrlWithSha}/videos.json`;
+                        testUrl = replaceMainWithCommitSha(cdn.testUrl, commitSha);
                     }
                     
                     const response = await fetch(`${testUrl}${testCacheBuster}`, {
@@ -555,31 +554,27 @@
             }
         }
 
+        // 使用 commit SHA 替换 CDN URL 中的 @main（确保获取最新数据）
+        function replaceMainWithCommitSha(url, commitSha) {
+            if (!commitSha || !url) {
+                return url;
+            }
+            
+            // 将 URL 中的 @main 替换为 @commit_sha
+            // 例如: https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json
+            // 替换为: https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@3df26ac3782c75a9ce26b060bcc213c455518cbc/videos.json
+            return url.replace(/@main/g, `@${commitSha}`).replace(/\/main\//g, `/${commitSha}/`).replace(/\/main$/g, `/${commitSha}`);
+        }
+        
         // 使用 commit SHA 构建 CDN URL（确保获取最新数据）
         function buildCdnUrlWithCommitSha(cdn, commitSha) {
             if (!commitSha) {
-                // 如果没有 commit SHA，使用原来的 URL
+                // 如果没有 commit SHA，使用原来的 URL（包含 @main）
                 return cdn.url;
             }
             
-            // 使用 commit SHA 替换 @main，这样每次 commit 后 URL 都会改变，绕过缓存
-            // jsDelivr 格式: https://cdn.jsdelivr.net/gh/owner/repo@commit_sha/path
-            if (cdn.id === 'jsdelivr') {
-                return `https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@${commitSha}`;
-            } else if (cdn.id === 'statically') {
-                return `https://cdn.statically.io/gh/yezhu9181/my-video-host/${commitSha}`;
-            } else if (cdn.id === 'githack') {
-                return `https://rawcdn.githack.com/yezhu9181/my-video-host/${commitSha}`;
-            } else if (cdn.id === 'gitcdn') {
-                return `https://gitcdn.link/cdn/yezhu9181/my-video-host/${commitSha}`;
-            } else if (cdn.id === 'github') {
-                return `https://raw.githubusercontent.com/yezhu9181/my-video-host/${commitSha}`;
-            } else if (cdn.id === 'combat') {
-                return `https://combat.cdn.workers.dev/gh/yezhu9181/my-video-host/${commitSha}`;
-            }
-            
-            // 默认返回原 URL
-            return cdn.url;
+            // 替换 CDN URL 中的 @main 为 commit SHA
+            return replaceMainWithCommitSha(cdn.url, commitSha);
         }
 
         // 加载视频数据（优先使用 GitHub Raw URL 获取 commit SHA，然后使用 CDN）
@@ -626,12 +621,21 @@
                         throw new Error('无法找到可用的 CDN');
                     }
                     
+                    // 如果有 commit SHA，替换 URL 中的 @main
+                    let cdnUrl = cdnToUse.url;
+                    if (commitSha) {
+                        cdnUrl = replaceMainWithCommitSha(cdnToUse.url, commitSha);
+                        console.log(`   💡 使用 commit SHA 替换 @main: ${commitSha.substring(0, 7)}`);
+                    }
+                    
                     // 生成强制的缓存破坏参数
                     const cacheBuster = generateCacheBuster();
-                    const url = `${cdnToUse.url}/videos.json${cacheBuster}`;
+                    const url = `${cdnUrl}/videos.json${cacheBuster}`;
                     
                     console.log('🔄 使用 CDN 加载（备用方案）:', cdnToUse.name);
-                    console.warn('⚠️  注意：CDN 可能返回缓存的数据，建议检查数据是否最新');
+                    if (!commitSha) {
+                        console.warn('⚠️  注意：未获取到 commit SHA，CDN 可能返回缓存的数据');
+                    }
                     
                     const response = await fetch(url, {
                         method: 'GET',
