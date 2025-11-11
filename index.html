@@ -244,7 +244,7 @@
         // 初始化视频播放器
         const player = videojs('my-video');
 
-        // 强制刷新函数
+        // 强制刷新函数（清除所有缓存并重新加载）
         async function forceRefresh() {
             const refreshBtn = document.getElementById('refreshBtn');
             const originalText = refreshBtn.innerHTML;
@@ -255,15 +255,29 @@
             refreshBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> 刷新中...';
             
             try {
+                // 清除浏览器缓存（如果支持）
+                if ('caches' in window) {
+                    try {
+                        const cacheNames = await caches.keys();
+                        await Promise.all(cacheNames.map(name => caches.delete(name)));
+                        console.log('✅ 已清除 Service Worker 缓存');
+                    } catch (e) {
+                        console.warn('清除缓存失败:', e);
+                    }
+                }
+                
                 // 重置CDN状态
                 currentCDN = null;
                 cdnSpeeds = {};
+                
+                // 等待一小段时间确保缓存清除生效
+                await new Promise(resolve => setTimeout(resolve, 100));
                 
                 // 重新加载所有视频
                 await loadAllVideos();
                 
                 // 显示成功消息
-                showToast('刷新成功！', 'success');
+                showToast('刷新成功！已获取最新数据', 'success');
             } catch (error) {
                 console.error('强制刷新失败:', error);
                 showToast('刷新失败，请重试', 'error');
@@ -339,8 +353,8 @@
             
             statusText.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> 正在测试CDN速度...';
             
-            // 测试每个CDN的速度（添加缓存破坏参数）
-            const testCacheBuster = `?v=${Date.now()}`;
+            // 测试每个CDN的速度（添加强制的缓存破坏参数）
+            const testCacheBuster = generateCacheBuster();
             const speedTests = FREE_CDNS.map(async (cdn) => {
                 const startTime = performance.now();
                 
@@ -349,8 +363,11 @@
                         method: 'HEAD',
                         mode: 'no-cors',
                         cache: 'no-store',  // 完全不缓存
+                        credentials: 'omit',
                         headers: {
-                            'Cache-Control': 'max-age=0, no-cache, no-store, must-revalidate'
+                            'Cache-Control': 'max-age=0, no-cache, no-store, must-revalidate, proxy-revalidate',
+                            'Pragma': 'no-cache',
+                            'Expires': '0'
                         }
                     });
                     
@@ -449,7 +466,52 @@
             return `${currentCDN.url}/thumbnails/${filename}`;
         }
 
-        // 加载视频数据
+        // 生成强制的缓存破坏参数
+        function generateCacheBuster() {
+            // 使用时间戳 + 随机数 + 页面加载时间，确保每次都是唯一的
+            const timestamp = Date.now();
+            const random = Math.random().toString(36).substring(2, 15);
+            const pageLoadTime = performance.now();
+            return `?_cb=${timestamp}_${random}_${pageLoadTime}&v=${timestamp}&_t=${new Date().getTime()}&nocache=1`;
+        }
+
+        // 使用 XMLHttpRequest 作为备用方案（某些情况下更可靠）
+        function fetchWithXHR(url) {
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.setRequestHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+                xhr.setRequestHeader('Pragma', 'no-cache');
+                xhr.setRequestHeader('Expires', '0');
+                xhr.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
+                
+                xhr.onload = function() {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        try {
+                            const data = JSON.parse(xhr.responseText);
+                            resolve({
+                                ok: true,
+                                status: xhr.status,
+                                statusText: xhr.statusText,
+                                json: () => Promise.resolve(data)
+                            });
+                        } catch (e) {
+                            reject(new Error('Failed to parse JSON: ' + e.message));
+                        }
+                    } else {
+                        reject(new Error(`HTTP ${xhr.status}: ${xhr.statusText}`));
+                    }
+                };
+                
+                xhr.onerror = function() {
+                    reject(new Error('Network error'));
+                };
+                
+                xhr.send();
+            });
+        }
+
+        // 加载视频数据（使用多种方法确保获取最新数据）
         async function loadAllVideos() {
             try {
                 // 先测试CDN速度
@@ -459,26 +521,53 @@
                     throw new Error('没有可用的CDN，请检查网络连接');
                 }
                 
-                // 生成缓存破坏参数（使用时间戳）
-                const cacheBuster = `?v=${Date.now()}&_t=${new Date().getTime()}`;
+                // 生成强制的缓存破坏参数
+                const cacheBuster = generateCacheBuster();
+                const url = `${currentCDN.url}/videos.json${cacheBuster}`;
                 
-                // 从当前CDN加载数据，添加缓存破坏参数和缓存控制（缓存时间=0）
-                const response = await fetch(`${currentCDN.url}/videos.json${cacheBuster}`, {
-                    method: 'GET',
-                    cache: 'no-store',  // 完全不缓存
-                    headers: {
-                        'Cache-Control': 'max-age=0, no-cache, no-store, must-revalidate, proxy-revalidate',
-                        'Pragma': 'no-cache',
-                        'Expires': '0',
-                        'If-Modified-Since': '0'  // 强制重新验证
-                    }
-                });
+                // 方法1: 使用 fetch with 强制缓存控制
+                let response;
+                try {
+                    response = await fetch(url, {
+                        method: 'GET',
+                        cache: 'no-store',  // 完全不缓存
+                        credentials: 'omit',  // 不发送凭证，避免某些缓存问题
+                        headers: {
+                            'Cache-Control': 'max-age=0, no-cache, no-store, must-revalidate, proxy-revalidate',
+                            'Pragma': 'no-cache',
+                            'Expires': '0',
+                            'If-Modified-Since': 'Thu, 01 Jan 1970 00:00:00 GMT',  // 强制重新验证
+                            'If-None-Match': '*',  // 强制重新验证
+                            'X-Requested-With': 'XMLHttpRequest'  // 标识为 AJAX 请求
+                        }
+                    });
+                } catch (fetchError) {
+                    // 如果 fetch 失败，尝试使用 XMLHttpRequest
+                    console.warn('Fetch 失败，尝试使用 XMLHttpRequest:', fetchError);
+                    response = await fetchWithXHR(url);
+                }
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                if (!response || !response.ok) {
+                    throw new Error(`HTTP ${response ? response.status : 'unknown'}: ${response ? response.statusText : 'Request failed'}`);
                 }
                 
                 const data = await response.json();
+                
+                // 验证数据是否是最新的（检查 lastUpdated 时间和 cacheVersion）
+                if (data.lastUpdated) {
+                    const updateTime = new Date(data.lastUpdated);
+                    const now = new Date();
+                    const diffMinutes = Math.floor((now - updateTime) / (1000 * 60));
+                    console.log('✅ 获取到数据');
+                    console.log('   - 更新时间:', data.lastUpdated, `(${diffMinutes} 分钟前)`);
+                    console.log('   - 缓存版本:', data.cacheVersion || 'N/A');
+                    console.log('   - 视频数量:', data.videos ? data.videos.length : 0);
+                    
+                    // 如果数据超过1小时，提示用户可能不是最新的
+                    if (diffMinutes > 60) {
+                        console.warn('⚠️  数据可能不是最新的，建议使用"强制刷新"按钮');
+                    }
+                }
                 
                 allVideos = data.videos || [];
                 renderVideos();
