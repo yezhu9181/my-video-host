@@ -660,6 +660,39 @@ class VideoLibraryUpdater:
         except:
             return False
     
+    def update_index_html_commit_sha(self, commit_sha):
+        """更新 index.html 中的 commit SHA"""
+        try:
+            index_html_path = Path(self.repo_path) / "index.html"
+            if not index_html_path.exists():
+                print(f"⚠️  index.html 不存在，跳过更新 commit SHA")
+                return False
+            
+            # 读取 index.html
+            with open(index_html_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            # 查找并替换 commit SHA
+            # 查找格式: let globalCommitSha = null; 或 let globalCommitSha = "COMMIT_SHA_PLACEHOLDER";
+            import re
+            pattern = r'(let\s+globalCommitSha\s*=\s*)(null|"[^"]*"|COMMIT_SHA_PLACEHOLDER)(\s*;)'
+            replacement = f'\\1"{commit_sha}"\\3'
+            
+            new_content = re.sub(pattern, replacement, content)
+            
+            if new_content != content:
+                # 写入更新后的内容
+                with open(index_html_path, 'w', encoding='utf-8') as f:
+                    f.write(new_content)
+                print(f"✅ 已更新 index.html 中的 commit SHA: {commit_sha[:7]}...")
+                return True
+            else:
+                print(f"⚠️  未找到需要替换的 commit SHA 占位符")
+                return False
+        except Exception as e:
+            print(f"⚠️  更新 index.html 中的 commit SHA 失败: {e}")
+            return False
+    
     def update_videos_json(self):
         """更新videos.json文件"""
         print("🎬 视频库更新脚本 - 缓存优化版本")
@@ -812,6 +845,9 @@ class VideoLibraryUpdater:
                     with open(self.json_path, 'w', encoding='utf-8') as f:
                         json.dump(updated_data, f, ensure_ascii=False, indent=2)
                     print(f"✅ 已更新 videos.json，包含最新 commit SHA")
+                    
+                    # 更新 index.html 中的 commit SHA
+                    self.update_index_html_commit_sha(latest_commit_sha)
                     
                     # 重要：再次提交并推送，确保 latestCommitSha 被推送到 GitHub
                     print(f"\n🔄 再次提交 videos.json（包含 commit SHA）...")

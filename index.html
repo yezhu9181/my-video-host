@@ -240,7 +240,9 @@
         let currentSort = 'title';
         let currentCDN = null;
         let cdnSpeeds = {};
-        let globalCommitSha = null;  // 全局 commit SHA，用于自动替换 @main
+        // 全局 commit SHA，由 update.py 自动更新，用于自动替换 @main
+        // 格式: let globalCommitSha = "COMMIT_SHA_PLACEHOLDER";
+        let globalCommitSha = null;
 
         // 初始化视频播放器
         const player = videojs('my-video');
@@ -354,10 +356,7 @@
             
             statusText.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> 正在测试CDN速度...';
             
-            // 确保 commit SHA 已获取
-            if (!globalCommitSha) {
-                await fetchLatestCommitSha();
-            }
+            // commit SHA 应该已经由 update.py 设置，无需获取
             
             // 测试每个CDN的速度（index.html 内部自动替换 @main 为 commit SHA）
             const testCacheBuster = generateCacheBuster();
@@ -689,12 +688,11 @@
                 let data = null;
                 let dataSource = '';
                 
-                // 步骤1: index.html 内部自动获取 commit SHA（不获取文件内容）
-                if (!forceGitHubAPI) {
-                    // 确保 commit SHA 已获取
-                    if (!globalCommitSha) {
-                        await fetchLatestCommitSha();
-                    }
+                // commit SHA 应该已经由 update.py 设置，无需获取
+                if (globalCommitSha && globalCommitSha !== null) {
+                    console.log(`✅ [index.html] 使用 update.py 设置的 commit SHA: ${globalCommitSha.substring(0, 7)}...`);
+                } else {
+                    console.warn('⚠️  [index.html] commit SHA 未设置，将使用 @main（可能返回缓存数据）');
                 }
                 
                 // 步骤2: 使用 CDN 获取数据（index.html 内部自动替换 @main 为 commit SHA）
@@ -1000,10 +998,14 @@
             renderVideos();
         }
 
-        // 页面加载时，先获取 commit SHA，然后加载视频
+        // 页面加载时，直接加载视频（commit SHA 已由 update.py 设置）
         document.addEventListener('DOMContentLoaded', async () => {
-            // 先获取 commit SHA（index.html 内部自动获取）
-            await fetchLatestCommitSha();
+            // commit SHA 应该已经由 update.py 设置，无需获取
+            if (globalCommitSha && globalCommitSha !== null) {
+                console.log(`✅ [index.html] 页面加载：commit SHA 已由 update.py 设置: ${globalCommitSha.substring(0, 7)}...`);
+            } else {
+                console.warn('⚠️  [index.html] 页面加载：commit SHA 未设置，将使用 @main（可能返回缓存数据）');
+            }
             
             // 加载视频数据
             await loadAllVideos();
