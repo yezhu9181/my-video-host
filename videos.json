@@ -4,33 +4,33 @@
       "id": 1,
       "title": "功能演示",
       "filename": "ZGVtbw==.MP4",
-      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/ZGVtbw==.MP4?v=d42152d",
+      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/ZGVtbw==.MP4?v=223b1ce",
       "description": "核心功能的实际使用演示",
       "duration": "0:24",
       "size": "41.1 MB",
-      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/ZGVtbw==.jpg?v=d42152d",
+      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/ZGVtbw==.jpg?v=223b1ce",
       "codec": "H.264",
       "resolution": "0x1",
       "createdAt": "2025-11-11",
       "thumbnailType": "JPG",
-      "cacheVersion": "d42152d",
-      "lastUpdated": "2025-11-11T17:19:17.028591"
+      "cacheVersion": "223b1ce",
+      "lastUpdated": "2025-11-11T17:40:00.070001"
     },
     {
       "id": 2,
       "title": "产品介绍视频",
       "filename": "aW50cm8=.MP4",
-      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/aW50cm8=.MP4?v=d42152d",
+      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/aW50cm8=.MP4?v=223b1ce",
       "description": "全面介绍产品的功能特性和使用场景",
       "duration": "0:35",
       "size": "13.1 MB",
-      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/aW50cm8=.jpg?v=d42152d",
+      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/aW50cm8=.jpg?v=223b1ce",
       "codec": "H.264",
       "resolution": "0x1",
       "createdAt": "2025-11-11",
       "thumbnailType": "JPG",
-      "cacheVersion": "d42152d",
-      "lastUpdated": "2025-11-11T17:19:17.125371"
+      "cacheVersion": "223b1ce",
+      "lastUpdated": "2025-11-11T17:40:00.188305"
     }
   ],
   "pagination": {
@@ -41,10 +41,10 @@
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-11T17:19:17Z",
+  "lastUpdated": "2025-11-11T17:40:00Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
-  "cacheVersion": "d42152d",
+  "cacheVersion": "223b1ce",
   "apiEndpoints": {
     "allVideos": "/videos.json",
     "paginated": "/videos.json?page={page}&limit={limit}",

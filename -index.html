@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频资源中心 - 免配置CDN加速</title>
+    <link href="https://cdn.jsdelivr.net/npm/video.js@7.20.3/dist/video-js.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 保持原有样式，添加CDN状态样式 */
+        .cdn-status-bar {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .cdn-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 0 5px;
+        }
+        
+        .cdn-badge.success { background: #dcfce7; color: #166534; }
+        .cdn-badge.warning { background: #fef3c7; color: #92400e; }
+        .cdn-badge.error { background: #fee2e2; color: #991b1b; }
+        
+        .cdn-switcher {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .cdn-btn {
+            padding: 4px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            background: white;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        
+        .cdn-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        .speed-test {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+        
+        /* 刷新按钮样式 */
+        .refresh-btn {
+            padding: 6px 12px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 10px;
+        }
+        
+        .refresh-btn:hover {
+            background: #059669;
+        }
+        
+        .refresh-btn:active {
+            background: #047857;
+        }
+        
+        .refresh-btn.loading {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+        
+        .cdn-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .cdn-status-info {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-video"></i> 视频资源中心</h1>
+            <p>免配置CDN加速 · 全球访问优化</p>
+        </div>
+
+        <!-- CDN状态栏 -->
+        <div class="cdn-status-bar" id="cdnStatusBar">
+            <div class="cdn-header">
+                <div class="cdn-status-info" id="cdnStatusText">
+                    <i class="fas fa-sync-alt fa-spin"></i> 正在测试CDN速度...
+                </div>
+                <button class="refresh-btn" id="refreshBtn" onclick="forceRefresh()">
+                    <i class="fas fa-redo-alt"></i> 强制刷新
+                </button>
+            </div>
+            <div class="cdn-switcher" id="cdnSwitcher"></div>
+            <div class="speed-test" id="speedTest"></div>
+        </div>
+
+        <!-- 原有内容保持不变 -->
+        <div class="main-content">
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-play-circle"></i> 视频列表</h2>
+                
+                <!-- 搜索和筛选 -->
+                <div class="search-box">
+                    <input type="text" id="searchInput" class="search-input" placeholder="搜索视频标题或描述...">
+                    <button onclick="searchVideos()" class="search-btn">
+                        <i class="fas fa-search"></i> 搜索
+                    </button>
+                    <button onclick="clearSearch()" class="search-btn" style="background: #64748b;">
+                        <i class="fas fa-times"></i> 清除
+                    </button>
+                </div>
+                
+                <div class="filters">
+                    <select id="sortSelect" class="filter-select" onchange="loadVideos()">
+                        <option value="title">按标题排序</option>
+                        <option value="duration">按时长排序</option>
+                        <option value="size">按大小排序</option>
+                        <option value="created">按创建时间排序</option>
+                    </select>
+                    
+                    <select id="pageSizeSelect" class="filter-select" onchange="changePageSize()">
+                        <option value="5">每页5个</option>
+                        <option value="10" selected>每页10个</option>
+                        <option value="20">每页20个</option>
+                        <option value="50">每页50个</option>
+                    </select>
+                </div>
+                
+                <div id="video-container">
+                    <div class="loading" id="loading">
+                        <div class="loading-spinner"></div>
+                        <p>正在加载视频列表...</p>
+                    </div>
+                </div>
+                
+                <!-- 分页控件 -->
+                <div class="pagination" id="pagination" style="display: none;">
+                    <button onclick="changePage(currentPage - 1)" id="prevBtn" class="page-btn" disabled>
+                        <i class="fas fa-chevron-left"></i> 上一页
+                    </button>
+                    
+                    <span class="page-info" id="pageInfo">第 1 页，共 1 页</span>
+                    
+                    <button onclick="changePage(currentPage + 1)" id="nextBtn" class="page-btn" disabled>
+                        下一页 <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <div class="video-player-container" id="player-container" style="display: none;">
+                    <h3 id="current-video-title">视频播放器</h3>
+                    <div class="cdn-status-bar" style="margin-bottom: 15px; background: #f0fdf4; border-color: #bbf7d0;">
+                        <div id="playerCdnInfo">准备播放...</div>
+                    </div>
+                    <video id="my-video" class="video-js vjs-default-skin" controls preload="auto" width="100%" height="400" data-setup="{}">
+                        <p class="vjs-no-js">请启用JavaScript以观看视频</p>
+                    </video>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/video.js@7.20.3/dist/video.min.js"></script>
+    <script>
+        // 免配置CDN列表 - 全部基于GitHub
+        const FREE_CDNS = [
+            {
+                id: 'jsdelivr',
+                name: 'jsDelivr',
+                url: 'https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main',
+                testUrl: 'https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json',
+                region: 'global'
+            },
+            {
+                id: 'statically',
+                name: 'Statically',
+                url: 'https://cdn.statically.io/gh/yezhu9181/my-video-host/main',
+                testUrl: 'https://cdn.statically.io/gh/yezhu9181/my-video-host/main/videos.json',
+                region: 'global'
+            },
+            {
+                id: 'githack',
+                name: 'GitHack',
+                url: 'https://rawcdn.githack.com/yezhu9181/my-video-host/main',
+                testUrl: 'https://rawcdn.githack.com/yezhu9181/my-video-host/main/videos.json',
+                region: 'global'
+            },
+            {
+                id: 'gitcdn',
+                name: 'GitCDN',
+                url: 'https://gitcdn.link/cdn/yezhu9181/my-video-host/main',
+                testUrl: 'https://gitcdn.link/cdn/yezhu9181/my-video-host/main/videos.json',
+                region: 'global'
+            },
+            {
+                id: 'github',
+                name: 'GitHub Raw',
+                url: 'https://raw.githubusercontent.com/yezhu9181/my-video-host/main',
+                testUrl: 'https://raw.githubusercontent.com/yezhu9181/my-video-host/main/videos.json',
+                region: 'global'
+            },
+            {
+                id: 'combat',
+                name: 'Combat CDN',
+                url: 'https://combat.cdn.workers.dev/gh/yezhu9181/my-video-host/main',
+                testUrl: 'https://combat.cdn.workers.dev/gh/yezhu9181/my-video-host/main/videos.json',
+                region: 'global'
+            }
+        ];
+
+        // 全局变量
+        let allVideos = [];
+        let currentPage = 1;
+        let pageSize = 10;
+        let currentSearch = '';
+        let currentSort = 'title';
+        let currentCDN = null;
+        let cdnSpeeds = {};
+
+        // 初始化视频播放器
+        const player = videojs('my-video');
+
+        // 强制刷新函数
+        async function forceRefresh() {
+            const refreshBtn = document.getElementById('refreshBtn');
+            const originalText = refreshBtn.innerHTML;
+            
+            // 禁用按钮并显示加载状态
+            refreshBtn.disabled = true;
+            refreshBtn.classList.add('loading');
+            refreshBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> 刷新中...';
+            
+            try {
+                // 重置CDN状态
+                currentCDN = null;
+                cdnSpeeds = {};
+                
+                // 重新加载所有视频
+                await loadAllVideos();
+                
+                // 显示成功消息
+                showToast('刷新成功！', 'success');
+            } catch (error) {
+                console.error('强制刷新失败:', error);
+                showToast('刷新失败，请重试', 'error');
+            } finally {
+                // 恢复按钮状态
+                refreshBtn.disabled = false;
+                refreshBtn.classList.remove('loading');
+                refreshBtn.innerHTML = originalText;
+            }
+        }
+
+        // 显示Toast消息
+        function showToast(message, type = 'info') {
+            // 移除现有的toast
+            const existingToast = document.getElementById('refreshToast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            // 创建新的toast
+            const toast = document.createElement('div');
+            toast.id = 'refreshToast';
+            toast.innerHTML = `
+                <div style="
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+                    color: white;
+                    padding: 12px 16px;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                    z-index: 1000;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    animation: slideIn 0.3s ease-out;
+                ">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    ${message}
+                </div>
+            `;
+            
+            // 添加动画样式
+            if (!document.getElementById('toastStyles')) {
+                const style = document.createElement('style');
+                style.id = 'toastStyles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(toast);
+            
+            // 3秒后自动移除
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.style.animation = 'slideOut 0.3s ease-in forwards';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 3000);
+        }
+
+        // 测试CDN速度
+        async function testCDNSpeeds() {
+            const statusText = document.getElementById('cdnStatusText');
+            const speedTest = document.getElementById('speedTest');
+            const switcher = document.getElementById('cdnSwitcher');
+            
+            statusText.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> 正在测试CDN速度...';
+            
+            // 测试每个CDN的速度
+            const speedTests = FREE_CDNS.map(async (cdn) => {
+                const startTime = performance.now();
+                
+                try {
+                    const response = await fetch(cdn.testUrl, {
+                        method: 'HEAD',
+                        mode: 'no-cors',
+                        cache: 'no-cache'
+                    });
+                    
+                    const speed = performance.now() - startTime;
+                    cdnSpeeds[cdn.id] = speed;
+                    
+                    return { cdn, speed, success: true };
+                } catch (error) {
+                    cdnSpeeds[cdn.id] = Infinity;
+                    return { cdn, speed: Infinity, success: false };
+                }
+            });
+
+            const results = await Promise.all(speedTests);
+            
+            // 排序并选择最快的CDN
+            const workingCDNs = results.filter(r => r.success && r.speed < 2000);
+            workingCDNs.sort((a, b) => a.speed - b.speed);
+            
+            if (workingCDNs.length > 0) {
+                currentCDN = workingCDNs[0].cdn;
+                
+                statusText.innerHTML = `
+                    <i class="fas fa-check-circle" style="color: #10b981;"></i>
+                    已选择最快CDN: <span class="cdn-badge success">${currentCDN.name}</span>
+                    <span style="color: #6b7280; font-size: 12px;">(${Math.round(workingCDNs[0].speed)}ms)</span>
+                `;
+                
+                // 显示CDN切换器
+                switcher.innerHTML = '切换CDN: ' + FREE_CDNS.map(cdn => 
+                    `<button class="cdn-btn ${cdn.id === currentCDN.id ? 'active' : ''}" 
+                            onclick="switchCDN('${cdn.id}')"
+                            title="${cdnSpeeds[cdn.id] ? Math.round(cdnSpeeds[cdn.id]) + 'ms' : '测试失败'}">
+                        ${cdn.name}
+                    </button>`
+                ).join('');
+                
+                // 显示速度测试结果
+                speedTest.innerHTML = '速度测试: ' + workingCDNs.slice(0, 3).map((result, index) => 
+                    `${result.cdn.name}(${Math.round(result.speed)}ms)${index < 2 ? ' → ' : ''}`
+                ).join('');
+                
+            } else {
+                // 所有CDN都失败，使用jsDelivr作为备用
+                currentCDN = FREE_CDNS[0];
+                statusText.innerHTML = `
+                    <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i>
+                    使用备用CDN: <span class="cdn-badge warning">${currentCDN.name}</span>
+                `;
+            }
+            
+            return workingCDNs.length > 0;
+        }
+
+        // 切换CDN
+        function switchCDN(cdnId) {
+            const newCDN = FREE_CDNS.find(cdn => cdn.id === cdnId);
+            if (!newCDN) return;
+            
+            currentCDN = newCDN;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.cdn-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 更新状态显示
+            document.getElementById('cdnStatusText').innerHTML = `
+                <i class="fas fa-check-circle" style="color: #10b981;"></i>
+                手动选择: <span class="cdn-badge success">${currentCDN.name}</span>
+            `;
+            
+            // 重新渲染视频
+            if (allVideos.length > 0) {
+                renderVideos();
+                
+                // 重新加载当前视频
+                const currentSrc = player.currentSrc();
+                if (currentSrc) {
+                    const currentVideo = allVideos.find(v => currentSrc.includes(v.filename));
+                    if (currentVideo) {
+                        playVideo(currentVideo.filename, currentVideo.title);
+                    }
+                }
+            }
+        }
+
+        // 生成视频URL
+        function generateVideoUrl(filename) {
+            return `${currentCDN.url}/videos/${filename}`;
+        }
+
+        // 生成缩略图URL
+        function generateThumbnailUrl(filename) {
+            return `${currentCDN.url}/thumbnails/${filename}`;
+        }
+
+        // 加载视频数据
+        async function loadAllVideos() {
+            try {
+                // 先测试CDN速度
+                const cdnAvailable = await testCDNSpeeds();
+                
+                if (!cdnAvailable) {
+                    throw new Error('没有可用的CDN，请检查网络连接');
+                }
+                
+                // 从当前CDN加载数据
+                const response = await fetch(`${currentCDN.url}/videos.json`);
+                const data = await response.json();
+                
+                allVideos = data.videos || [];
+                renderVideos();
+                
+            } catch (error) {
+                console.error('加载视频失败:', error);
+                document.getElementById('loading').innerHTML = 
+                    `<div class="error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        加载视频列表失败: ${error.message}
+                        <button onclick="loadAllVideos()" style="margin-left: 10px; padding: 5px 10px; background: #3b82f6; color: white; border: none; border-radius: 4px;">重试</button>
+                    </div>`;
+            }
+        }
+
+        // 渲染视频列表
+        function renderVideos() {
+            const container = document.getElementById('video-container');
+            const loading = document.getElementById('loading');
+            const pagination = document.getElementById('pagination');
+            
+            if (allVideos.length === 0) {
+                loading.innerHTML = '<div class="error">没有找到视频数据</div>';
+                pagination.style.display = 'none';
+                return;
+            }
+            
+            loading.style.display = 'none';
+            
+            // 过滤和排序
+            let filteredVideos = filterVideos(allVideos);
+            filteredVideos = sortVideos(filteredVideos);
+            
+            // 分页计算
+            const totalVideos = filteredVideos.length;
+            const totalPages = Math.ceil(totalVideos / pageSize);
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            const paginatedVideos = filteredVideos.slice(startIndex, endIndex);
+            
+            // 渲染视频卡片
+            let html = '<div class="video-grid">';
+            paginatedVideos.forEach(video => {
+                const thumbnailFilename = video.thumbnail ? 
+                    video.thumbnail.split('/').pop() : 
+                    video.filename.replace('.mp4', '.jpg').replace('.mov', '.jpg');
+                
+                html += `
+                    <div class="video-card" onclick="playVideo('${video.filename}', '${video.title.replace(/'/g, "\\'")}')">
+                        <div class="video-thumbnail">
+                            <img src="${generateThumbnailUrl(thumbnailFilename)}" 
+                                 alt="${video.title}"
+                                 onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZjNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPua1geafpeeJueauijwvdGV4dD48L3N2Zz4=';" />
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">${video.title}</div>
+                            <div class="video-description">${video.description}</div>
+                            <div class="video-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>${video.duration}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-weight-hanging"></i>
+                                    <span>${video.size}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-wifi"></i>
+                                    <span>${currentCDN.name}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            container.innerHTML = html;
+            updatePagination(totalVideos, totalPages);
+            
+            // 自动播放第一个视频
+            if (paginatedVideos.length > 0) {
+                playVideo(paginatedVideos[0].filename, paginatedVideos[0].title);
+            }
+        }
+
+        // 播放视频（带CDN回退）
+        async function playVideo(filename, title) {
+            const playerContainer = document.getElementById('player-container');
+            const currentVideoTitle = document.getElementById('current-video-title');
+            const playerCdnInfo = document.getElementById('playerCdnInfo');
+            
+            playerContainer.style.display = 'block';
+            currentVideoTitle.textContent = title;
+            playerCdnInfo.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i> 正在通过 ${currentCDN.name} 加载视频...`;
+
+            let videoUrl = generateVideoUrl(filename);
+            let retryCount = 0;
+            const maxRetries = 3;
+
+            const tryPlay = async () => {
+                try {
+                    player.src({
+                        src: videoUrl,
+                        type: 'video/mp4'
+                    });
+                    
+                    player.one('loadeddata', () => {
+                        playerCdnInfo.innerHTML = 
+                            `<i class="fas fa-check-circle" style="color: #10b981;"></i> 正在通过 ${currentCDN.name} 播放`;
+                    });
+                    
+                    player.one('error', async () => {
+                        retryCount++;
+                        if (retryCount < maxRetries) {
+                            // 切换到下一个CDN
+                            const currentIndex = FREE_CDNS.findIndex(cdn => cdn.id === currentCDN.id);
+                            const nextCDN = FREE_CDNS[(currentIndex + 1) % FREE_CDNS.length];
+                            
+                            playerCdnInfo.innerHTML = 
+                                `<i class="fas fa-sync-alt fa-spin"></i> ${currentCDN.name} 加载失败，尝试 ${nextCDN.name}...`;
+                            
+                            currentCDN = nextCDN;
+                            videoUrl = generateVideoUrl(filename);
+                            await tryPlay();
+                        } else {
+                            playerCdnInfo.innerHTML = 
+                                `<i class="fas fa-times-circle" style="color: #ef4444;"></i> 所有CDN均无法加载视频`;
+                        }
+                    });
+                    
+                } catch (error) {
+                    console.error('播放视频失败:', error);
+                }
+            };
+
+            await tryPlay();
+            playerContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 原有的分页、搜索、筛选函数保持不变
+        function filterVideos(videos) {
+            if (!currentSearch) return videos;
+            const searchLower = currentSearch.toLowerCase();
+            return videos.filter(video => 
+                video.title.toLowerCase().includes(searchLower) ||
+                video.description.toLowerCase().includes(searchLower)
+            );
+        }
+        
+        function sortVideos(videos) {
+            switch (currentSort) {
+                case 'duration':
+                    return videos.sort((a, b) => {
+                        const timeA = a.duration.split(':').reduce((acc, time) => (60 * acc) + +time);
+                        const timeB = b.duration.split(':').reduce((acc, time) => (60 * acc) + +time);
+                        return timeB - timeA;
+                    });
+                case 'size':
+                    return videos.sort((a, b) => {
+                        const sizeA = parseFloat(a.size);
+                        const sizeB = parseFloat(b.size);
+                        return sizeB - sizeA;
+                    });
+                case 'created':
+                    return videos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                default:
+                    return videos.sort((a, b) => a.title.localeCompare(b.title));
+            }
+        }
+        
+        function updatePagination(totalVideos, totalPages) {
+            const pagination = document.getElementById('pagination');
+            const pageInfo = document.getElementById('pageInfo');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            if (totalPages <= 1) {
+                pagination.style.display = 'none';
+                return;
+            }
+            
+            pagination.style.display = 'flex';
+            pageInfo.textContent = `第 ${currentPage} 页，共 ${totalPages} 页 (${totalVideos} 个视频)`;
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages;
+        }
+        
+        function changePage(newPage) {
+            const totalPages = Math.ceil(filterVideos(allVideos).length / pageSize);
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                renderVideos();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+        
+        function changePageSize() {
+            pageSize = parseInt(document.getElementById('pageSizeSelect').value);
+            currentPage = 1;
+            renderVideos();
+        }
+        
+        function searchVideos() {
+            currentSearch = document.getElementById('searchInput').value;
+            currentPage = 1;
+            renderVideos();
+        }
+        
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            currentSearch = '';
+            currentPage = 1;
+            renderVideos();
+        }
+
+        // 页面加载
+        document.addEventListener('DOMContentLoaded', loadAllVideos);
+        
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchVideos();
+        });
+    </script>
+</body>
+</html>
