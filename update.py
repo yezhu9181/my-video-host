@@ -7,6 +7,7 @@ import os
 import json
 import glob
 import subprocess
+import base64
 from datetime import datetime
 from pathlib import Path
 
@@ -83,14 +84,90 @@ class VideoLibraryUpdater:
             print("⚠️  Git命令已配置（使用默认认证，可能需要手动输入凭据）")
     
     def get_video_files(self):
-        """获取所有视频文件"""
+        """获取所有视频文件（返回完整路径）"""
         video_extensions = ['*.mp4', '*.MP4', '*.mov', '*.MOV', '*.avi', '*.AVI', '*.mkv', '*.MKV', '*.webm', '*.WEBM']
         video_files = []
         
         for ext in video_extensions:
             video_files.extend(glob.glob(str(self.videos_path / ext)))
         
-        return [Path(f).name for f in video_files]
+        return [Path(f) for f in video_files]
+    
+    def encode_filename_to_base64(self, filename):
+        """将文件名（不含扩展名）编码为base64"""
+        name_without_ext = Path(filename).stem
+        # 将文件名编码为base64
+        encoded = base64.b64encode(name_without_ext.encode('utf-8')).decode('utf-8')
+        # 将base64中的/替换为-，避免文件系统路径问题
+        encoded = encoded.replace('/', '-')
+        return encoded
+    
+    def is_base64_filename(self, filename):
+        """检查文件名是否是base64格式"""
+        name_without_ext = Path(filename).stem
+        # base64字符串只包含A-Z, a-z, 0-9, +, -, =字符（/被替换为-）
+        base64_chars = set('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-=')
+        if not all(c in base64_chars for c in name_without_ext):
+            return False
+        
+        # 尝试解码
+        try:
+            # 将-替换回/用于解码
+            test_str = name_without_ext.replace('-', '/')
+            # 补齐等号
+            padding = 4 - (len(test_str) % 4)
+            if padding == 4:
+                padding = 0
+            test_str = test_str + '=' * padding
+            decoded = base64.b64decode(test_str).decode('utf-8')
+            # 如果解码成功且结果是可打印字符，认为是base64
+            return decoded and all(ord(c) < 128 for c in decoded)
+        except:
+            return False
+    
+    def decode_base64_filename(self, filename):
+        """从base64文件名解码出原始文件名"""
+        name_without_ext = Path(filename).stem
+        try:
+            # 将-替换回/用于解码
+            test_str = name_without_ext.replace('-', '/')
+            # 补齐等号
+            padding = 4 - (len(test_str) % 4)
+            if padding == 4:
+                padding = 0
+            test_str = test_str + '=' * padding
+            return base64.b64decode(test_str).decode('utf-8')
+        except:
+            return None
+    
+    def rename_video_to_base64(self, video_path):
+        """将视频文件重命名为base64编码的名称"""
+        original_path = Path(video_path)
+        if not original_path.exists():
+            return None
+        
+        # 获取原始文件名和扩展名
+        original_name = original_path.name
+        extension = original_path.suffix
+        
+        # 生成base64文件名
+        base64_name = self.encode_filename_to_base64(original_name)
+        new_filename = f"{base64_name}{extension}"
+        new_path = original_path.parent / new_filename
+        
+        # 如果新文件名已存在且不是同一个文件，跳过重命名
+        if new_path.exists() and new_path != original_path:
+            print(f"  ⚠️  文件已存在，跳过重命名: {new_filename}")
+            return new_filename
+        
+        # 重命名文件
+        try:
+            original_path.rename(new_path)
+            print(f"  ✅ 重命名: {original_name} -> {new_filename}")
+            return new_filename
+        except Exception as e:
+            print(f"  ❌ 重命名失败 {original_name}: {e}")
+            return original_name
     
     def extract_video_thumbnail(self, video_filename):
         """使用FFmpeg提取视频第一帧作为缩略图"""
@@ -243,45 +320,64 @@ class VideoLibraryUpdater:
             seconds = estimated_seconds % 60
             return f"{minutes}:{seconds:02d}"
     
-    def generate_video_data(self, video_files, existing_titles=None):
+    def generate_video_data(self, video_files, existing_titles=None, original_to_base64_map=None):
         """生成视频数据"""
         if existing_titles is None:
             existing_titles = {}
+        if original_to_base64_map is None:
+            original_to_base64_map = {}
         
         videos = []
         
         for i, video_file in enumerate(sorted(video_files), 1):
-            print(f"📹 处理视频 {i}/{len(video_files)}: {video_file}")
+            video_filename = video_file.name if isinstance(video_file, Path) else video_file
+            print(f"📹 处理视频 {i}/{len(video_files)}: {video_filename}")
             
-            name_without_ext = Path(video_file).stem
+            name_without_ext = Path(video_filename).stem
             # 如果原有数据中有该视频文件的title，使用原有的值，否则生成新的
-            if video_file in existing_titles and existing_titles[video_file]:
-                title = existing_titles[video_file]
+            # 先尝试用base64文件名查找，如果找不到，尝试用原始文件名查找
+            title = None
+            if video_filename in existing_titles and existing_titles[video_filename]:
+                title = existing_titles[video_filename]
             else:
-                title = self.generate_friendly_title(name_without_ext)
+                # 尝试通过原始文件名查找（如果存在映射）
+                for orig_name, base64_name in original_to_base64_map.items():
+                    if base64_name == video_filename and orig_name in existing_titles:
+                        title = existing_titles[orig_name]
+                        break
+            
+            if not title:
+                # 尝试从base64文件名解码出原始文件名来生成title
+                decoded = self.decode_base64_filename(video_filename)
+                if decoded:
+                    title = self.generate_friendly_title(decoded)
+                else:
+                    # 如果解码失败，使用base64文件名本身
+                    title = self.generate_friendly_title(name_without_ext)
+            
             description = self.generate_description(title)
-            file_size = self.get_file_size(video_file)
+            file_size = self.get_file_size(video_filename)
             
             # 获取视频详细信息
             if self.ffmpeg_available:
-                duration, resolution = self.get_video_info(video_file)
+                duration, resolution = self.get_video_info(video_filename)
             else:
-                duration = self.estimate_duration(video_file)
-                resolution = self.get_video_dimensions_from_filename(video_file)
+                duration = self.estimate_duration(video_filename)
+                resolution = self.get_video_dimensions_from_filename(video_filename)
             
             # 生成缩略图
             if self.ffmpeg_available:
-                thumbnail_filename = self.extract_video_thumbnail(video_file)
+                thumbnail_filename = self.extract_video_thumbnail(video_filename)
             else:
-                thumbnail_filename = self.create_svg_thumbnail(video_file, file_size)
+                thumbnail_filename = self.create_svg_thumbnail(video_filename, file_size)
             
             thumbnail_url = f"thumbnails/{thumbnail_filename}" if thumbnail_filename else ""
             
             video_data = {
                 "id": i,
                 "title": title,
-                "filename": video_file,
-                "url": f"videos/{video_file}",
+                "filename": video_filename,
+                "url": f"videos/{video_filename}",
                 "description": description,
                 "duration": duration,
                 "size": f"{file_size} MB",
@@ -463,7 +559,37 @@ class VideoLibraryUpdater:
             except Exception as e:
                 print(f"⚠️  读取现有videos.json失败: {e}，将使用新生成的title")
         
-        videos = self.generate_video_data(video_files, existing_titles)
+        # 重命名视频文件为base64格式
+        print("\n🔄 开始重命名视频文件为base64格式...")
+        original_to_base64_map = {}
+        renamed_files = []
+        
+        for video_path in video_files:
+            original_name = video_path.name
+            name_without_ext = video_path.stem
+            
+            # 检查文件名是否已经是base64格式
+            is_base64 = self.is_base64_filename(original_name)
+            
+            if is_base64:
+                print(f"  ✓ 文件已是base64格式: {original_name}")
+                renamed_files.append(video_path)
+            else:
+                # 需要重命名
+                new_filename = self.rename_video_to_base64(video_path)
+                if new_filename and new_filename != original_name:
+                    original_to_base64_map[original_name] = new_filename
+                    # 更新路径为新文件名
+                    renamed_files.append(self.videos_path / new_filename)
+                else:
+                    renamed_files.append(video_path)
+        
+        if original_to_base64_map:
+            print(f"✅ 成功重命名 {len(original_to_base64_map)} 个文件")
+        else:
+            print("✅ 所有文件都已经是base64格式")
+        
+        videos = self.generate_video_data(renamed_files, existing_titles, original_to_base64_map)
         
         # 计算分页信息
         total_videos = len(videos)
