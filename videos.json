@@ -4,35 +4,33 @@
       "id": 1,
       "title": "八级拳",
       "filename": "ZGVtbw==.MP4",
-      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/ZGVtbw==.MP4?v=80fad81",
+      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/ZGVtbw==.MP4?v=3c4d15a",
       "description": "这是关于八级拳的详细说明视频",
       "duration": "0:24",
       "size": "41.1 MB",
-      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/ZGVtbw==.jpg?v=80fad81",
+      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/ZGVtbw==.jpg?v=3c4d15a",
       "codec": "H.264",
       "resolution": "0x1",
       "createdAt": "2025-11-11",
       "thumbnailType": "JPG",
-      "cacheVersion": "80fad81",
-      "lastUpdated": "2025-11-11T19:10:55.139934",
-      "namingScheme": "base64"
+      "cacheVersion": "3c4d15a",
+      "lastUpdated": "2025-11-11T19:14:10.606042"
     },
     {
       "id": 2,
       "title": "街舞",
       "filename": "aW50cm8=.MP4",
-      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/aW50cm8=.MP4?v=80fad81",
+      "url": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos/aW50cm8=.MP4?v=3c4d15a",
       "description": "这是关于街舞的详细说明视频",
       "duration": "0:35",
       "size": "13.1 MB",
-      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/aW50cm8=.jpg?v=80fad81",
+      "thumbnail": "https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/thumbnails/aW50cm8=.jpg?v=3c4d15a",
       "codec": "H.264",
       "resolution": "0x1",
       "createdAt": "2025-11-11",
       "thumbnailType": "JPG",
-      "cacheVersion": "80fad81",
-      "lastUpdated": "2025-11-11T19:10:55.241058",
-      "namingScheme": "base64"
+      "cacheVersion": "3c4d15a",
+      "lastUpdated": "2025-11-11T19:14:10.702762"
     }
   ],
   "pagination": {
@@ -43,12 +41,10 @@
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-11T19:10:55Z",
+  "lastUpdated": "2025-11-11T19:14:10Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
-  "cacheVersion": "80fad81",
-  "namingScheme": "base64",
-  "preserveOriginalNames": false,
+  "cacheVersion": "3c4d15a",
   "apiEndpoints": {
     "allVideos": "/videos.json",
     "paginated": "/videos.json?page={page}&limit={limit}",
