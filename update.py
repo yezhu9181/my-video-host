@@ -661,11 +661,13 @@ class VideoLibraryUpdater:
             return False
     
     def update_index_html_commit_sha(self, commit_sha):
-        """更新 index.html 中的 commit SHA"""
+        """更新 index.html 中的 commit SHA，同时更新 api_commit_sha.json"""
         try:
             index_html_path = Path(self.repo_path) / "index.html"
             if not index_html_path.exists():
                 print(f"⚠️  index.html 不存在，跳过更新 commit SHA")
+                # 即使 index.html 不存在，也尝试更新 api_commit_sha.json
+                self.update_api_commit_sha(commit_sha)
                 return False
             
             # 读取 index.html
@@ -681,23 +683,46 @@ class VideoLibraryUpdater:
             
             new_content = re.sub(pattern, replacement, content)
             
+            updated = False
             if new_content != content:
                 # 写入更新后的内容
                 with open(index_html_path, 'w', encoding='utf-8') as f:
                     f.write(new_content)
                 print(f"✅ 已更新 index.html 中的 commit SHA: {commit_sha[:7]}...")
-                return True
+                updated = True
             else:
                 print(f"⚠️  未找到需要替换的 commit SHA 占位符")
-                return False
+            
+            # 无论 index.html 是否更新，都更新 api_commit_sha.json
+            self.update_api_commit_sha(commit_sha)
+            
+            return updated
         except Exception as e:
             print(f"⚠️  更新 index.html 中的 commit SHA 失败: {e}")
+            # 即使出错，也尝试更新 api_commit_sha.json
+            try:
+                self.update_api_commit_sha(commit_sha)
+            except:
+                pass
             return False
     
-    def update_api_commit_sha(self, commit_sha, videos_data):
+    def update_api_commit_sha(self, commit_sha, videos_data=None):
         """更新 API 接口文件（供移动端调用）"""
         try:
             api_file_path = Path(self.repo_path) / "api_commit_sha.json"
+            
+            # 如果没有提供 videos_data，尝试从 videos.json 读取
+            if videos_data is None:
+                json_path = Path(self.repo_path) / "videos.json"
+                if json_path.exists():
+                    try:
+                        with open(json_path, 'r', encoding='utf-8') as f:
+                            videos_data = json.load(f)
+                    except Exception as e:
+                        print(f"⚠️  读取 videos.json 失败: {e}")
+                        videos_data = {}
+                else:
+                    videos_data = {}
             
             api_data = {
                 "commitSha": commit_sha,
