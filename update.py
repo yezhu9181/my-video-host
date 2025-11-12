@@ -24,7 +24,6 @@ class VideoLibraryUpdater:
         
         # 缓存优化配置
         self.cache_version = self.get_cache_version()
-        self.enable_cache_purge = True  # 是否启用CDN缓存清除
         
         # 检查FFmpeg是否可用
         self.ffmpeg_available = self.check_ffmpeg()
@@ -956,15 +955,6 @@ class VideoLibraryUpdater:
                         print(f"💡 请手动执行: git add videos.json index.html api_commit_sha.json && git commit -m '更新 commit SHA' && git push")
             
             if git_success:
-                # 清除CDN缓存（等待 GitHub 更新）
-                if self.enable_cache_purge:
-                    purge_success = self.purge_cdn_cache(wait_after_push=True)
-                    
-                    # 验证 CDN 数据是否已更新（可选，可能需要等待）
-                    if purge_success:
-                        print("\n💡 提示：CDN 缓存清除请求已提交，但可能需要几分钟才能完全生效")
-                        print("💡 建议：前端应使用 commit SHA 构建 CDN URL 以获取最新数据")
-                
                 print(f"\n🎉 所有任务完成！视频库已更新并推送到GitHub")
                 print(f"🌐 访问地址: https://yezhu9181.github.io/my-video-host/")
                 print(f"💡 缓存版本: {self.cache_version}")
@@ -987,7 +977,6 @@ def main():
     parser = argparse.ArgumentParser(description='更新视频库配置并自动Git提交')
     parser.add_argument('--page-size', type=int, default=10, help='每页显示的视频数量')
     parser.add_argument('--no-git', action='store_true', help='不执行Git命令')
-    parser.add_argument('--no-cache-purge', action='store_true', help='不清除CDN缓存')
     parser.add_argument('--token-file', default='/Users/syh/git_token.txt', help='GitHub Token文件路径')
     
     args = parser.parse_args()
@@ -998,11 +987,6 @@ def main():
     if args.no_git:
         updater.git_commands = []
         print("⚠️  Git命令已禁用")
-    
-    # 如果指定了不清除CDN缓存，禁用缓存清除
-    if args.no_cache_purge:
-        updater.enable_cache_purge = False
-        print("⚠️  CDN缓存清除已禁用")
     
     success = updater.update_videos_json()
     

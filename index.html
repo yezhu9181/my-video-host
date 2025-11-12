@@ -57,34 +57,6 @@
             margin-top: 5px;
         }
         
-        /* 刷新按钮样式 */
-        .refresh-btn {
-            padding: 6px 12px;
-            background: #10b981;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            margin-left: 10px;
-        }
-        
-        .refresh-btn:hover {
-            background: #059669;
-        }
-        
-        .refresh-btn:active {
-            background: #047857;
-        }
-        
-        .refresh-btn.loading {
-            background: #6b7280;
-            cursor: not-allowed;
-        }
-        
         .cdn-header {
             display: flex;
             justify-content: space-between;
@@ -111,9 +83,6 @@
                 <div class="cdn-status-info" id="cdnStatusText">
                     <i class="fas fa-sync-alt fa-spin"></i> 正在测试CDN速度...
                 </div>
-                <button class="refresh-btn" id="refreshBtn" onclick="forceRefresh()">
-                    <i class="fas fa-redo-alt"></i> 强制刷新
-                </button>
             </div>
             <div class="cdn-switcher" id="cdnSwitcher"></div>
             <div class="speed-test" id="speedTest"></div>
@@ -247,106 +216,6 @@
         // 初始化视频播放器
         const player = videojs('my-video');
 
-        // 强制刷新函数（清除所有缓存并强制使用 GitHub Raw）
-        async function forceRefresh() {
-            const refreshBtn = document.getElementById('refreshBtn');
-            const originalText = refreshBtn.innerHTML;
-            
-            // 禁用按钮并显示加载状态
-            refreshBtn.disabled = true;
-            refreshBtn.classList.add('loading');
-            refreshBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> 刷新中...';
-            
-            try {
-                // 清除浏览器缓存（如果支持）
-                if ('caches' in window) {
-                    try {
-                        const cacheNames = await caches.keys();
-                        await Promise.all(cacheNames.map(name => caches.delete(name)));
-                        console.log('✅ 已清除 Service Worker 缓存');
-                    } catch (e) {
-                        console.warn('清除缓存失败:', e);
-                    }
-                }
-                
-                // 重置CDN状态
-                currentCDN = null;
-                cdnSpeeds = {};
-                
-                // 等待一小段时间确保缓存清除生效
-                await new Promise(resolve => setTimeout(resolve, 200));
-                
-                // 强制使用 GitHub API 重新加载所有视频（完全绕过所有缓存）
-                await loadAllVideos(true);
-                
-                // 显示成功消息
-                showToast('刷新成功！已从 GitHub API 获取最新数据', 'success');
-            } catch (error) {
-                console.error('强制刷新失败:', error);
-                showToast('刷新失败: ' + error.message, 'error');
-            } finally {
-                // 恢复按钮状态
-                refreshBtn.disabled = false;
-                refreshBtn.classList.remove('loading');
-                refreshBtn.innerHTML = originalText;
-            }
-        }
-
-        // 显示Toast消息
-        function showToast(message, type = 'info') {
-            // 移除现有的toast
-            const existingToast = document.getElementById('refreshToast');
-            if (existingToast) {
-                existingToast.remove();
-            }
-            
-            // 创建新的toast
-            const toast = document.createElement('div');
-            toast.id = 'refreshToast';
-            toast.innerHTML = `
-                <div style="
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
-                    color: white;
-                    padding: 12px 16px;
-                    border-radius: 8px;
-                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                    z-index: 1000;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    animation: slideIn 0.3s ease-out;
-                ">
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-                    ${message}
-                </div>
-            `;
-            
-            // 添加动画样式
-            if (!document.getElementById('toastStyles')) {
-                const style = document.createElement('style');
-                style.id = 'toastStyles';
-                style.textContent = `
-                    @keyframes slideIn {
-                        from { transform: translateX(100%); opacity: 0; }
-                        to { transform: translateX(0); opacity: 1; }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-            
-            document.body.appendChild(toast);
-            
-            // 3秒后自动移除
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.style.animation = 'slideOut 0.3s ease-in forwards';
-                    setTimeout(() => toast.remove(), 300);
-                }
-            }, 3000);
-        }
 
         // 测试CDN速度（index.html 内部自动替换 @main 为 commit SHA）
         async function testCDNSpeeds() {
@@ -522,42 +391,6 @@
             });
         }
 
-        // 使用 GitHub Raw URL 获取文件内容（完全绕过所有缓存）
-        async function fetchFromGitHubAPI() {
-            // 直接使用 Raw URL，这是最可靠的方法（GitHub API 可能有频率限制）
-            // 使用多个时间戳和随机数确保每次请求都是唯一的
-            const timestamp = Date.now();
-            const random = Math.random().toString(36).substring(2, 15);
-            const rawUrl = `https://raw.githubusercontent.com/yezhu9181/my-video-host/main/videos.json?t=${timestamp}&r=${random}&_cb=${timestamp}_${random}&nocache=1`;
-            
-            console.log('🔄 使用 GitHub Raw URL 获取最新数据（完全绕过 CDN 缓存）...');
-            
-            try {
-                const response = await fetch(rawUrl, {
-                    method: 'GET',
-                    cache: 'no-store',  // 完全不缓存
-                    credentials: 'omit',
-                    headers: {
-                        'Cache-Control': 'no-cache, no-store, must-revalidate, proxy-revalidate',
-                        'Pragma': 'no-cache',
-                        'Expires': '0',
-                        'If-Modified-Since': 'Thu, 01 Jan 1970 00:00:00 GMT',
-                        'If-None-Match': '*'
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`GitHub Raw URL 请求失败: HTTP ${response.status}`);
-                }
-                
-                const data = await response.json();
-                console.log('✅ 通过 GitHub Raw URL 获取成功（完全绕过 CDN 缓存）');
-                return data;
-            } catch (error) {
-                console.error('GitHub Raw URL 获取失败:', error);
-                throw error;
-            }
-        }
 
         // 使用 commit SHA 替换 CDN URL 中的 @main（index.html 内部自动替换）
         // 如果提供了 commitSha，使用它；否则使用全局的 globalCommitSha
@@ -616,8 +449,8 @@
             return replaceMainWithCommitSha(cdn.url, commitSha);
         }
 
-        // 加载视频数据（index.html 内部自动获取 commit SHA 并替换 @main）
-        async function loadAllVideos(forceGitHubAPI = false) {
+        // 加载视频数据（使用 commit SHA 替换 @main 获取最新数据）
+        async function loadAllVideos() {
             try {
                 let data = null;
                 let dataSource = '';
@@ -629,58 +462,49 @@
                     console.warn('⚠️  [index.html] commit SHA 未设置，将使用 @main（可能返回缓存数据）');
                 }
                 
-                // 步骤2: 使用 CDN 获取数据（index.html 内部自动替换 @main 为 commit SHA）
-                if (!forceGitHubAPI) {
-                    try {
-                        console.log('🔄 使用 CDN 获取数据（index.html 自动替换 @main）...');
-                        
-                        // 测试 CDN 速度并选择最快的
-                        // 注意：testCDNSpeeds 内部会使用 getCdnUrl 自动替换 @main
-                        const cdnAvailable = await testCDNSpeeds();
-                        
-                        if (!cdnAvailable) {
-                            throw new Error('没有可用的 CDN，请检查网络连接');
-                        }
-                        
-                        if (!currentCDN) {
-                            throw new Error('无法找到可用的 CDN');
-                        }
-                        
-                        // 使用 getCdnUrl 自动替换 @main 为 commit SHA
-                        // 前端代码中依然使用 @main，但实际请求时会自动替换
-                        const cdnUrl = getCdnUrl(currentCDN, '/videos.json');
-                        
-                        console.log(`   🔄 从 ${currentCDN.name} 获取数据`);
-                        console.log(`   📍 URL: ${cdnUrl}`);
-                        
-                        const response = await fetch(cdnUrl, {
-                            method: 'GET',
-                            cache: 'no-store',
-                            credentials: 'omit',
-                            headers: {
-                                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                                'Pragma': 'no-cache'
-                            }
-                        });
-                        
-                        if (response && response.ok) {
-                            data = await response.json();
-                            dataSource = `${currentCDN.name} (index.html 自动替换 @main)`;
-                            console.log(`   ✅ 从 CDN 获取数据成功`);
-                        } else {
-                            throw new Error(`CDN 请求失败: HTTP ${response ? response.status : 'unknown'}`);
-                        }
-                    } catch (cdnError) {
-                        console.warn('⚠️  CDN 请求失败，尝试使用 GitHub Raw URL:', cdnError);
-                        // 如果 CDN 失败，回退到 GitHub Raw URL
-                        data = await fetchFromGitHubAPI();
-                        dataSource = 'GitHub Raw URL (备用)';
+                // 使用 CDN 获取数据（index.html 内部自动替换 @main 为 commit SHA）
+                try {
+                    console.log('🔄 使用 CDN 获取数据（index.html 自动替换 @main 为 commit SHA）...');
+                    
+                    // 测试 CDN 速度并选择最快的
+                    // 注意：testCDNSpeeds 内部会使用 getCdnUrl 自动替换 @main
+                    const cdnAvailable = await testCDNSpeeds();
+                    
+                    if (!cdnAvailable) {
+                        throw new Error('没有可用的 CDN，请检查网络连接');
                     }
-                } else {
-                    // 强制使用 GitHub Raw URL
-                    console.log('🔄 强制使用 GitHub Raw URL 获取数据...');
-                    data = await fetchFromGitHubAPI();
-                    dataSource = 'GitHub Raw URL (强制)';
+                    
+                    if (!currentCDN) {
+                        throw new Error('无法找到可用的 CDN');
+                    }
+                    
+                    // 使用 getCdnUrl 自动替换 @main 为 commit SHA
+                    // 前端代码中依然使用 @main，但实际请求时会自动替换为 commit SHA
+                    const cdnUrl = getCdnUrl(currentCDN, '/videos.json');
+                    
+                    console.log(`   🔄 从 ${currentCDN.name} 获取数据`);
+                    console.log(`   📍 URL: ${cdnUrl}`);
+                    
+                    const response = await fetch(cdnUrl, {
+                        method: 'GET',
+                        cache: 'no-store',
+                        credentials: 'omit',
+                        headers: {
+                            'Cache-Control': 'no-cache, no-store, must-revalidate',
+                            'Pragma': 'no-cache'
+                        }
+                    });
+                    
+                    if (response && response.ok) {
+                        data = await response.json();
+                        dataSource = `${currentCDN.name} (使用 commit SHA)`;
+                        console.log(`   ✅ 从 CDN 获取数据成功`);
+                    } else {
+                        throw new Error(`CDN 请求失败: HTTP ${response ? response.status : 'unknown'}`);
+                    }
+                } catch (cdnError) {
+                    console.error('❌ CDN 请求失败:', cdnError);
+                    throw cdnError;
                 }
                 
                 // 验证数据是否是最新的（检查 lastUpdated 时间和 cacheVersion）
@@ -699,21 +523,11 @@
                     // 如果数据超过5分钟，提示用户可能不是最新的
                     if (diffMinutes > 5) {
                         console.warn('⚠️  数据可能不是最新的（超过5分钟）');
-                        if (dataSource.includes('CDN') || dataSource.includes('备用')) {
-                            console.warn('💡 提示：当前使用 CDN，可能返回缓存数据。点击"强制刷新"按钮将直接从 GitHub Raw URL 获取最新数据');
-                        } else {
-                            console.warn('💡 提示：点击"强制刷新"按钮将重新从 GitHub Raw URL 获取最新数据');
-                        }
+                        console.warn('💡 提示：当前使用 commit SHA 构建的 CDN URL，应该获取最新数据');
                     } else if (diffSeconds > 30) {
-                        console.info('ℹ️  数据较新，但如果需要最新数据，可以使用"强制刷新"按钮');
+                        console.info('ℹ️  数据较新');
                     } else {
                         console.log('✅ 数据非常新，应该是最新的');
-                    }
-                    
-                    // 如果使用 CDN，特别提示
-                    if (dataSource.includes('CDN') || dataSource.includes('备用')) {
-                        console.warn('⚠️  当前使用 CDN 作为备用方案，数据可能不是最新的');
-                        console.warn('💡 建议：如果数据不是最新的，请点击"强制刷新"按钮使用 GitHub Raw URL');
                     }
                 }
                 
