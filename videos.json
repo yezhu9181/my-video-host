@@ -2,10 +2,10 @@
   "videos": [
     {
       "id": 1,
-      "title": "1",
+      "title": "芭蕾舞(ballet)",
       "filename": "MQ==.mp4",
       "url": "videos/MQ==.mp4",
-      "description": "这是关于1的详细说明视频",
+      "description": "这是关于芭蕾舞(ballet)的详细说明视频",
       "duration": "0:27",
       "size": "5.1 MB",
       "thumbnail": "thumbnails/MQ==.jpg",
@@ -13,15 +13,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "b669e7a",
-      "lastUpdated": "2025-11-12T15:45:30.286116"
+      "cacheVersion": "3a49be2",
+      "lastUpdated": "2025-11-12T15:56:28.225946"
     },
     {
       "id": 2,
-      "title": "10",
+      "title": "蛙泳(breaststroke)",
       "filename": "MTA=.mp4",
       "url": "videos/MTA=.mp4",
-      "description": "这是关于10的详细说明视频",
+      "description": "这是关于蛙泳(breaststroke)的详细说明视频",
       "duration": "1:28",
       "size": "29.8 MB",
       "thumbnail": "thumbnails/MTA=.jpg",
@@ -29,15 +29,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "b669e7a",
-      "lastUpdated": "2025-11-12T15:45:30.381272"
+      "cacheVersion": "3a49be2",
+      "lastUpdated": "2025-11-12T15:56:28.321398"
     },
     {
       "id": 3,
-      "title": "11",
+      "title": "自由泳(freestyle)",
       "filename": "MTE=.mp4",
       "url": "videos/MTE=.mp4",
-      "description": "这是关于11的详细说明视频",
+      "description": "这是关于自由泳(freestyle)的详细说明视频",
       "duration": "0:10",
       "size": "4.1 MB",
       "thumbnail": "thumbnails/MTE=.jpg",
@@ -45,15 +45,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "b669e7a",
-      "lastUpdated": "2025-11-12T15:45:30.489576"
+      "cacheVersion": "3a49be2",
+      "lastUpdated": "2025-11-12T15:56:28.466210"
     },
     {
       "id": 4,
-      "title": "2",
+      "title": "街舞(street dance)",
       "filename": "Mg==.mp4",
       "url": "videos/Mg==.mp4",
-      "description": "这是关于2的详细说明视频",
+      "description": "这是关于街舞(street dance)的详细说明视频",
       "duration": "0:28",
       "size": "9.2 MB",
       "thumbnail": "thumbnails/Mg==.jpg",
@@ -61,15 +61,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "b669e7a",
-      "lastUpdated": "2025-11-12T15:45:30.587429"
+      "cacheVersion": "3a49be2",
+      "lastUpdated": "2025-11-12T15:56:28.573283"
     },
     {
       "id": 5,
-      "title": "3",
+      "title": "天鹅舞(Swan Dance)",
       "filename": "Mw==.mp4",
       "url": "videos/Mw==.mp4",
-      "description": "这是关于3的详细说明视频",
+      "description": "这是关于天鹅舞(Swan Dance)的详细说明视频",
       "duration": "1:03",
       "size": "9.0 MB",
       "thumbnail": "thumbnails/Mw==.jpg",
@@ -77,15 +77,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "b669e7a",
-      "lastUpdated": "2025-11-12T15:45:30.694748"
+      "cacheVersion": "3a49be2",
+      "lastUpdated": "2025-11-12T15:56:28.659282"
     },
     {
       "id": 6,
-      "title": "4",
+      "title": "街舞(street-dance)",
       "filename": "NA==.mp4",
       "url": "videos/NA==.mp4",
-      "description": "这是关于4的详细说明视频",
+      "description": "这是关于街舞(street-dance)的详细说明视频",
       "duration": "0:19",
       "size": "4.8 MB",
       "thumbnail": "thumbnails/NA==.jpg",
@@ -93,15 +93,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "b669e7a",
-      "lastUpdated": "2025-11-12T15:45:30.794244"
+      "cacheVersion": "3a49be2",
+      "lastUpdated": "2025-11-12T15:56:28.764521"
     },
     {
       "id": 7,
-      "title": "5",
+      "title": "太极(Tai Chi)",
       "filename": "NQ==.mp4",
       "url": "videos/NQ==.mp4",
-      "description": "这是关于5的详细说明视频",
+      "description": "这是关于太极(Tai Chi)的详细说明视频",
       "duration": "0:29",
       "size": "5.8 MB",
       "thumbnail": "thumbnails/NQ==.jpg",
@@ -109,15 +109,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "b669e7a",
-      "lastUpdated": "2025-11-12T15:45:30.891446"
+      "cacheVersion": "3a49be2",
+      "lastUpdated": "2025-11-12T15:56:28.870555"
     },
     {
       "id": 8,
-      "title": "6",
+      "title": "太极(Tai Chi)",
       "filename": "Ng==.mp4",
       "url": "videos/Ng==.mp4",
-      "description": "这是关于6的详细说明视频",
+      "description": "这是关于太极(Tai Chi)的详细说明视频",
       "duration": "0:19",
       "size": "4.5 MB",
       "thumbnail": "thumbnails/Ng==.jpg",
@@ -125,15 +125,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "b669e7a",
-      "lastUpdated": "2025-11-12T15:45:30.981541"
+      "cacheVersion": "3a49be2",
+      "lastUpdated": "2025-11-12T15:56:28.974985"
     },
     {
       "id": 9,
-      "title": "7",
+      "title": "自由泳(freestyle-)",
       "filename": "Nw==.mp4",
       "url": "videos/Nw==.mp4",
-      "description": "这是关于7的详细说明视频",
+      "description": "这是关于自由泳(freestyle-)的详细说明视频",
       "duration": "0:18",
       "size": "6.1 MB",
       "thumbnail": "thumbnails/Nw==.jpg",
@@ -141,15 +141,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "b669e7a",
-      "lastUpdated": "2025-11-12T15:45:31.077944"
+      "cacheVersion": "3a49be2",
+      "lastUpdated": "2025-11-12T15:56:29.078345"
     },
     {
       "id": 10,
-      "title": "8",
+      "title": "太极(Tai-Chi-)",
       "filename": "OA==.mp4",
       "url": "videos/OA==.mp4",
-      "description": "这是关于8的详细说明视频",
+      "description": "这是关于太极(Tai-Chi-)的详细说明视频",
       "duration": "0:29",
       "size": "7.5 MB",
       "thumbnail": "thumbnails/OA==.jpg",
@@ -157,8 +157,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "b669e7a",
-      "lastUpdated": "2025-11-12T15:45:31.172838"
+      "cacheVersion": "3a49be2",
+      "lastUpdated": "2025-11-12T15:56:29.170532"
     },
     {
       "id": 11,
@@ -173,8 +173,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "b669e7a",
-      "lastUpdated": "2025-11-12T15:45:31.328153"
+      "cacheVersion": "3a49be2",
+      "lastUpdated": "2025-11-12T15:56:29.283773"
     }
   ],
   "pagination": {
@@ -185,10 +185,10 @@
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-12T15:45:31Z",
+  "lastUpdated": "2025-11-12T15:56:29Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
-  "cacheVersion": "b669e7a",
+  "cacheVersion": "3a49be2",
   "cachePolicy": {
     "maxAge": 0,
     "mustRevalidate": true,
