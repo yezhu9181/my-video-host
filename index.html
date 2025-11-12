@@ -229,17 +229,25 @@
                 try {
                     const testUrl = getCdnUrl(cdn.testUrl);
                     
-                    const response = await fetch(`${testUrl}`, {
+                    // 使用 Promise.race 添加超时控制
+                    const fetchPromise = fetch(`${testUrl}`, {
                         method: 'HEAD',
                         mode: 'no-cors',
                         credentials: 'omit'
                     });
+                    
+                    const timeoutPromise = new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Timeout')), 10000)
+                    );
+                    
+                    await Promise.race([fetchPromise, timeoutPromise]);
                     
                     const speed = performance.now() - startTime;
                     cdnSpeeds[cdn.id] = speed;
                     
                     return { cdn, speed, success: true };
                 } catch (error) {
+                    // 静默处理错误，不输出到控制台，避免污染日志
                     cdnSpeeds[cdn.id] = Infinity;
                     return { cdn, speed: Infinity, success: false };
                 }
@@ -396,10 +404,17 @@
                     console.log(`   🔄 从 ${currentCDN.name} 获取数据`);
                     console.log(`   📍 URL: ${cdnUrl}`);
                     
-                    const response = await fetch(cdnUrl, {
+                    // 使用 Promise.race 添加超时控制
+                    const fetchPromise = fetch(cdnUrl, {
                         method: 'GET',
                         credentials: 'omit'
                     });
+                    
+                    const timeoutPromise = new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('请求超时，请检查网络连接')), 15000)
+                    );
+                    
+                    const response = await Promise.race([fetchPromise, timeoutPromise]);
                     
                     if (response && response.ok) {
                         data = await response.json();
@@ -409,8 +424,44 @@
                         throw new Error(`CDN 请求失败: HTTP ${response ? response.status : 'unknown'}`);
                     }
                 } catch (cdnError) {
-                    console.error('❌ CDN 请求失败:', cdnError);
-                    throw cdnError;
+                    // 只记录错误，不抛出，尝试使用备用方案
+                    console.warn('⚠️ CDN 请求失败:', cdnError.message || cdnError);
+                    
+                    // 如果当前 CDN 失败，尝试其他 CDN
+                    const otherCDNs = FREE_CDNS.filter(cdn => !currentCDN || cdn.id !== currentCDN.id);
+                    for (const cdn of otherCDNs) {
+                        try {
+                            const cdnUrl = getCdnUrl(cdn, '/videos.json');
+                            console.log(`   🔄 尝试备用 CDN: ${cdn.name}`);
+                            
+                            const fetchPromise = fetch(cdnUrl, {
+                                method: 'GET',
+                                credentials: 'omit'
+                            });
+                            
+                            const timeoutPromise = new Promise((_, reject) => 
+                                setTimeout(() => reject(new Error('请求超时')), 15000)
+                            );
+                            
+                            const response = await Promise.race([fetchPromise, timeoutPromise]);
+                            
+                            if (response && response.ok) {
+                                data = await response.json();
+                                dataSource = `${cdn.name} (备用)`;
+                                currentCDN = cdn; // 更新当前 CDN
+                                console.log(`   ✅ 从备用 CDN ${cdn.name} 获取数据成功`);
+                                break;
+                            }
+                        } catch (backupError) {
+                            console.warn(`   ⚠️ 备用 CDN ${cdn.name} 也失败:`, backupError.message || backupError);
+                            continue;
+                        }
+                    }
+                    
+                    // 如果所有 CDN 都失败，抛出错误
+                    if (!data) {
+                        throw new Error('所有 CDN 都无法访问，请检查网络连接');
+                    }
                 }
                 
                 // 验证数据是否是最新的（检查 lastUpdated 时间和 cacheVersion）
