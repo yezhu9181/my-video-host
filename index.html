@@ -156,6 +156,7 @@
     <script src="https://cdn.jsdelivr.net/npm/video.js@7.20.3/dist/video.min.js"></script>
     <script>
         // 免配置CDN列表 - 全部基于GitHub
+        // 顺序已优化：在中国网络环境下更稳定的 CDN 排在前面
         const FREE_CDNS = [
             {
                 id: 'jsdelivr',
@@ -169,6 +170,13 @@
                 name: 'Statically',
                 url: 'https://cdn.statically.io/gh/yezhu9181/my-video-host/main',
                 testUrl: 'https://cdn.statically.io/gh/yezhu9181/my-video-host/main/videos.json',
+                region: 'global'
+            },
+            {
+                id: 'combat',
+                name: 'Combat CDN',
+                url: 'https://combat.cdn.workers.dev/gh/yezhu9181/my-video-host/main',
+                testUrl: 'https://combat.cdn.workers.dev/gh/yezhu9181/my-video-host/main/videos.json',
                 region: 'global'
             },
             {
@@ -190,13 +198,6 @@
                 name: 'GitHub Raw',
                 url: 'https://raw.githubusercontent.com/yezhu9181/my-video-host/main',
                 testUrl: 'https://raw.githubusercontent.com/yezhu9181/my-video-host/main/videos.json',
-                region: 'global'
-            },
-            {
-                id: 'combat',
-                name: 'Combat CDN',
-                url: 'https://combat.cdn.workers.dev/gh/yezhu9181/my-video-host/main',
-                testUrl: 'https://combat.cdn.workers.dev/gh/yezhu9181/my-video-host/main/videos.json',
                 region: 'global'
             }
         ];
@@ -256,8 +257,16 @@
             const results = await Promise.all(speedTests);
             
             // 排序并选择最快的CDN
+            // 优先选择非 GitHub Raw 的 CDN（在中国更稳定）
             const workingCDNs = results.filter(r => r.success && r.speed < 2000);
-            workingCDNs.sort((a, b) => a.speed - b.speed);
+            workingCDNs.sort((a, b) => {
+                // 如果速度相近（差异小于 500ms），优先选择非 GitHub Raw
+                if (Math.abs(a.speed - b.speed) < 500) {
+                    if (a.cdn.id === 'github' && b.cdn.id !== 'github') return 1;
+                    if (b.cdn.id === 'github' && a.cdn.id !== 'github') return -1;
+                }
+                return a.speed - b.speed;
+            });
             
             if (workingCDNs.length > 0) {
                 currentCDN = workingCDNs[0].cdn;
