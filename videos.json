@@ -13,27 +13,11 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "64b881f",
-      "lastUpdated": "2025-11-12T17:00:53.801579"
+      "cacheVersion": "68275a4",
+      "lastUpdated": "2025-11-12T17:01:27.006428"
     },
     {
       "id": 2,
-      "title": "芭蕾舞(ballet)",
-      "filename": "MQ==.mp4",
-      "url": "videos/MQ==.mp4",
-      "description": "这是关于芭蕾舞(ballet)的详细说明视频",
-      "duration": "0:27",
-      "size": "5.1 MB",
-      "thumbnail": "thumbnails/MQ==.jpg",
-      "codec": "H.264",
-      "resolution": "0x1",
-      "createdAt": "2025-11-12",
-      "thumbnailType": "JPG",
-      "cacheVersion": "64b881f",
-      "lastUpdated": "2025-11-12T17:00:53.889815"
-    },
-    {
-      "id": 3,
       "title": "蛙泳(breaststroke)",
       "filename": "MTA=.mp4",
       "url": "videos/MTA=.mp4",
@@ -45,11 +29,11 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "64b881f",
-      "lastUpdated": "2025-11-12T17:00:54.021338"
+      "cacheVersion": "68275a4",
+      "lastUpdated": "2025-11-12T17:01:27.107253"
     },
     {
-      "id": 4,
+      "id": 3,
       "title": "自由泳(freestyle)",
       "filename": "MTE=.mp4",
       "url": "videos/MTE=.mp4",
@@ -61,8 +45,24 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "64b881f",
-      "lastUpdated": "2025-11-12T17:00:54.132249"
+      "cacheVersion": "68275a4",
+      "lastUpdated": "2025-11-12T17:01:27.215139"
+    },
+    {
+      "id": 4,
+      "title": "14",
+      "filename": "MTQ=.mp4",
+      "url": "videos/MTQ=.mp4",
+      "description": "这是关于14的详细说明视频",
+      "duration": "0:32",
+      "size": "6.2 MB",
+      "thumbnail": "thumbnails/MTQ=.jpg",
+      "codec": "H.264",
+      "resolution": "0x1",
+      "createdAt": "2025-11-12",
+      "thumbnailType": "JPG",
+      "cacheVersion": "68275a4",
+      "lastUpdated": "2025-11-12T17:01:27.331471"
     },
     {
       "id": 5,
@@ -77,8 +77,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "64b881f",
-      "lastUpdated": "2025-11-12T17:00:54.241564"
+      "cacheVersion": "68275a4",
+      "lastUpdated": "2025-11-12T17:01:27.446902"
     },
     {
       "id": 6,
@@ -93,8 +93,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "64b881f",
-      "lastUpdated": "2025-11-12T17:00:54.331473"
+      "cacheVersion": "68275a4",
+      "lastUpdated": "2025-11-12T17:01:27.542876"
     },
     {
       "id": 7,
@@ -109,8 +109,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "64b881f",
-      "lastUpdated": "2025-11-12T17:00:54.449051"
+      "cacheVersion": "68275a4",
+      "lastUpdated": "2025-11-12T17:01:27.656089"
     },
     {
       "id": 8,
@@ -125,8 +125,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "64b881f",
-      "lastUpdated": "2025-11-12T17:00:54.558460"
+      "cacheVersion": "68275a4",
+      "lastUpdated": "2025-11-12T17:01:27.763415"
     },
     {
       "id": 9,
@@ -141,8 +141,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "64b881f",
-      "lastUpdated": "2025-11-12T17:00:54.653841"
+      "cacheVersion": "68275a4",
+      "lastUpdated": "2025-11-12T17:01:27.854190"
     },
     {
       "id": 10,
@@ -157,8 +157,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "64b881f",
-      "lastUpdated": "2025-11-12T17:00:54.757618"
+      "cacheVersion": "68275a4",
+      "lastUpdated": "2025-11-12T17:01:27.955056"
     },
     {
       "id": 11,
@@ -173,8 +173,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "64b881f",
-      "lastUpdated": "2025-11-12T17:00:54.861657"
+      "cacheVersion": "68275a4",
+      "lastUpdated": "2025-11-12T17:01:28.087832"
     },
     {
       "id": 12,
@@ -189,8 +189,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "64b881f",
-      "lastUpdated": "2025-11-12T17:00:54.969684"
+      "cacheVersion": "68275a4",
+      "lastUpdated": "2025-11-12T17:01:28.202350"
     }
   ],
   "pagination": {
@@ -201,10 +201,10 @@
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-12T17:00:54Z",
+  "lastUpdated": "2025-11-12T17:01:28Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
-  "cacheVersion": "64b881f",
+  "cacheVersion": "68275a4",
   "cachePolicy": {
     "maxAge": 0,
     "mustRevalidate": true,
@@ -216,6 +216,5 @@
     "paginated": "/videos.json?page={page}&limit={limit}",
     "search": "/videos.json?search={keyword}",
     "byId": "/videos.json?id={id}"
-  },
-  "latestCommitSha": "f2a71db272cfa357cb841576f339f9d29cbc11aa"
+  }
 }
