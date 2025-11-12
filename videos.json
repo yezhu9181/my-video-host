@@ -13,8 +13,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "68275a4",
-      "lastUpdated": "2025-11-12T17:01:27.006428"
+      "cacheVersion": "d14a3c3",
+      "lastUpdated": "2025-11-12T17:03:38.220354"
     },
     {
       "id": 2,
@@ -29,8 +29,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "68275a4",
-      "lastUpdated": "2025-11-12T17:01:27.107253"
+      "cacheVersion": "d14a3c3",
+      "lastUpdated": "2025-11-12T17:03:38.323701"
     },
     {
       "id": 3,
@@ -45,15 +45,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "68275a4",
-      "lastUpdated": "2025-11-12T17:01:27.215139"
+      "cacheVersion": "d14a3c3",
+      "lastUpdated": "2025-11-12T17:03:38.459251"
     },
     {
       "id": 4,
-      "title": "14",
+      "title": "八极拳(Baji Quan)",
       "filename": "MTQ=.mp4",
       "url": "videos/MTQ=.mp4",
-      "description": "这是关于14的详细说明视频",
+      "description": "这是关于八极拳(Baji Quan)的详细说明视频",
       "duration": "0:32",
       "size": "6.2 MB",
       "thumbnail": "thumbnails/MTQ=.jpg",
@@ -61,8 +61,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "68275a4",
-      "lastUpdated": "2025-11-12T17:01:27.331471"
+      "cacheVersion": "d14a3c3",
+      "lastUpdated": "2025-11-12T17:03:38.553497"
     },
     {
       "id": 5,
@@ -77,8 +77,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "68275a4",
-      "lastUpdated": "2025-11-12T17:01:27.446902"
+      "cacheVersion": "d14a3c3",
+      "lastUpdated": "2025-11-12T17:03:38.658982"
     },
     {
       "id": 6,
@@ -93,8 +93,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "68275a4",
-      "lastUpdated": "2025-11-12T17:01:27.542876"
+      "cacheVersion": "d14a3c3",
+      "lastUpdated": "2025-11-12T17:03:38.796770"
     },
     {
       "id": 7,
@@ -109,8 +109,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "68275a4",
-      "lastUpdated": "2025-11-12T17:01:27.656089"
+      "cacheVersion": "d14a3c3",
+      "lastUpdated": "2025-11-12T17:03:38.897129"
     },
     {
       "id": 8,
@@ -125,8 +125,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "68275a4",
-      "lastUpdated": "2025-11-12T17:01:27.763415"
+      "cacheVersion": "d14a3c3",
+      "lastUpdated": "2025-11-12T17:03:39.010431"
     },
     {
       "id": 9,
@@ -141,8 +141,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "68275a4",
-      "lastUpdated": "2025-11-12T17:01:27.854190"
+      "cacheVersion": "d14a3c3",
+      "lastUpdated": "2025-11-12T17:03:39.104758"
     },
     {
       "id": 10,
@@ -157,8 +157,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "68275a4",
-      "lastUpdated": "2025-11-12T17:01:27.955056"
+      "cacheVersion": "d14a3c3",
+      "lastUpdated": "2025-11-12T17:03:39.223295"
     },
     {
       "id": 11,
@@ -173,8 +173,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "68275a4",
-      "lastUpdated": "2025-11-12T17:01:28.087832"
+      "cacheVersion": "d14a3c3",
+      "lastUpdated": "2025-11-12T17:03:39.336618"
     },
     {
       "id": 12,
@@ -189,8 +189,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "68275a4",
-      "lastUpdated": "2025-11-12T17:01:28.202350"
+      "cacheVersion": "d14a3c3",
+      "lastUpdated": "2025-11-12T17:03:39.457174"
     }
   ],
   "pagination": {
@@ -201,10 +201,10 @@
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-12T17:01:28Z",
+  "lastUpdated": "2025-11-12T17:03:39Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
-  "cacheVersion": "68275a4",
+  "cacheVersion": "d14a3c3",
   "cachePolicy": {
     "maxAge": 0,
     "mustRevalidate": true,
@@ -216,6 +216,5 @@
     "paginated": "/videos.json?page={page}&limit={limit}",
     "search": "/videos.json?search={keyword}",
     "byId": "/videos.json?id={id}"
-  },
-  "latestCommitSha": "116f01e19b52915f91ded79d3d068ded605ba9a3"
+  }
 }
