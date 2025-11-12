@@ -13,8 +13,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "441273e",
-      "lastUpdated": "2025-11-12T20:36:58.113607"
+      "cacheVersion": "33f497d",
+      "lastUpdated": "2025-11-12T21:49:47.393668"
     },
     {
       "id": 2,
@@ -29,8 +29,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "441273e",
-      "lastUpdated": "2025-11-12T20:36:58.201806"
+      "cacheVersion": "33f497d",
+      "lastUpdated": "2025-11-12T21:49:47.521239"
     },
     {
       "id": 3,
@@ -45,8 +45,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "441273e",
-      "lastUpdated": "2025-11-12T20:36:58.320313"
+      "cacheVersion": "33f497d",
+      "lastUpdated": "2025-11-12T21:49:47.630283"
     },
     {
       "id": 4,
@@ -61,8 +61,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "441273e",
-      "lastUpdated": "2025-11-12T20:36:58.424336"
+      "cacheVersion": "33f497d",
+      "lastUpdated": "2025-11-12T21:49:47.742157"
     },
     {
       "id": 5,
@@ -77,8 +77,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "441273e",
-      "lastUpdated": "2025-11-12T20:36:58.551480"
+      "cacheVersion": "33f497d",
+      "lastUpdated": "2025-11-12T21:49:47.866286"
     },
     {
       "id": 6,
@@ -93,8 +93,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "441273e",
-      "lastUpdated": "2025-11-12T20:36:58.655140"
+      "cacheVersion": "33f497d",
+      "lastUpdated": "2025-11-12T21:49:47.964680"
     },
     {
       "id": 7,
@@ -109,8 +109,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "441273e",
-      "lastUpdated": "2025-11-12T20:36:58.748744"
+      "cacheVersion": "33f497d",
+      "lastUpdated": "2025-11-12T21:49:48.075600"
     },
     {
       "id": 8,
@@ -125,8 +125,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "441273e",
-      "lastUpdated": "2025-11-12T20:36:58.867627"
+      "cacheVersion": "33f497d",
+      "lastUpdated": "2025-11-12T21:49:48.167393"
     },
     {
       "id": 9,
@@ -141,8 +141,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "441273e",
-      "lastUpdated": "2025-11-12T20:36:58.964253"
+      "cacheVersion": "33f497d",
+      "lastUpdated": "2025-11-12T21:49:48.289943"
     },
     {
       "id": 10,
@@ -157,8 +157,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "441273e",
-      "lastUpdated": "2025-11-12T20:36:59.080921"
+      "cacheVersion": "33f497d",
+      "lastUpdated": "2025-11-12T21:49:48.403507"
     },
     {
       "id": 11,
@@ -173,8 +173,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "441273e",
-      "lastUpdated": "2025-11-12T20:36:59.198130"
+      "cacheVersion": "33f497d",
+      "lastUpdated": "2025-11-12T21:49:48.523116"
     }
   ],
   "pagination": {
@@ -185,10 +185,10 @@
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-12T20:36:59Z",
+  "lastUpdated": "2025-11-12T21:49:48Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
-  "cacheVersion": "441273e",
+  "cacheVersion": "33f497d",
   "cachePolicy": {
     "maxAge": 0,
     "mustRevalidate": true,
@@ -200,6 +200,5 @@
     "paginated": "/videos.json?page={page}&limit={limit}",
     "search": "/videos.json?search={keyword}",
     "byId": "/videos.json?id={id}"
-  },
-  "latestCommitSha": "35d83be45c0f385d5dc5ca8d1f54a0c8c2f00509"
+  }
 }

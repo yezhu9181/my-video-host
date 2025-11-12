@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>技术支持 - 您的应用名称</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #e5e5e7;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #007AFF;
+        }
+        
+        .language-switcher {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .lang-btn {
+            padding: 8px 16px;
+            background: none;
+            border: 1px solid #007AFF;
+            border-radius: 20px;
+            color: #007AFF;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .lang-btn.active {
+            background-color: #007AFF;
+            color: white;
+        }
+        
+        .lang-btn:hover {
+            background-color: #007AFF;
+            color: white;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            color: #6e6e73;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .section {
+            background-color: white;
+            border-radius: 12px;
+            padding: 40px;
+            margin: 40px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .section-title {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #1d1d1f;
+        }
+        
+        .faq-item {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #e5e5e7;
+            padding-bottom: 20px;
+        }
+        
+        .faq-question {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .faq-answer {
+            color: #6e6e73;
+            display: none;
+            padding-top: 10px;
+        }
+        
+        .faq-answer.show {
+            display: block;
+        }
+        
+        .contact-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .contact-card {
+            background-color: #f5f5f7;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .contact-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: #007AFF;
+        }
+        
+        .contact-card h3 {
+            margin-bottom: 10px;
+        }
+        
+        .contact-card p {
+            color: #6e6e73;
+            margin-bottom: 15px;
+        }
+        
+        .contact-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007AFF;
+            color: white;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .contact-link:hover {
+            background-color: #0056CC;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: #6e6e73;
+            border-top: 1px solid #e5e5e7;
+            margin-top: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .section {
+                padding: 25px;
+            }
+            
+            .contact-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">AppName</div>
+            <div class="language-switcher">
+                <button class="lang-btn active" data-lang="zh">中文</button>
+                <button class="lang-btn" data-lang="en">English</button>
+            </div>
+        </header>
+        
+        <section class="hero">
+            <h1 data-zh="技术支持" data-en="Technical Support">技术支持</h1>
+            <p data-zh="我们随时为您提供帮助，解决您在使用我们应用时遇到的任何问题。" 
+               data-en="We're here to help with any issues you encounter while using our app.">
+                我们随时为您提供帮助，解决您在使用我们应用时遇到的任何问题。
+            </p>
+        </section>
+        
+        <section class="section">
+            <h2 class="section-title" data-zh="常见问题" data-en="Frequently Asked Questions">常见问题</h2>
+            
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span data-zh="如何创建账户？" data-en="How do I create an account?">如何创建账户？</span>
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p data-zh="打开应用后，点击'注册'按钮，输入您的电子邮件地址和密码，然后按照屏幕上的说明完成注册过程。" 
+                           data-en="After opening the app, tap the 'Sign Up' button, enter your email address and password, then follow the on-screen instructions to complete the registration process.">
+                            打开应用后，点击'注册'按钮，输入您的电子邮件地址和密码，然后按照屏幕上的说明完成注册过程。
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span data-zh="如何重置密码？" data-en="How do I reset my password?">如何重置密码？</span>
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p data-zh="在登录页面点击'忘记密码'链接，输入您的注册邮箱，我们将发送密码重置说明到您的邮箱。" 
+                           data-en="On the login screen, tap 'Forgot Password', enter your registered email address, and we'll send password reset instructions to your inbox.">
+                            在登录页面点击'忘记密码'链接，输入您的注册邮箱，我们将发送密码重置说明到您的邮箱。
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span data-zh="应用崩溃了怎么办？" data-en="What should I do if the app crashes?">应用崩溃了怎么办？</span>
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p data-zh="请尝试重启应用。如果问题仍然存在，请确保您的设备操作系统是最新版本，或者尝试卸载并重新安装应用。" 
+                           data-en="Please try restarting the app. If the problem persists, make sure your device's operating system is up to date, or try uninstalling and reinstalling the app.">
+                            请尝试重启应用。如果问题仍然存在，请确保您的设备操作系统是最新版本，或者尝试卸载并重新安装应用。
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span data-zh="如何取消订阅？" data-en="How do I cancel my subscription?">如何取消订阅？</span>
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p data-zh="要取消订阅，请打开App Store，点击您的个人资料图标，选择'订阅'，找到我们的应用并按照说明取消订阅。" 
+                           data-en="To cancel your subscription, open the App Store, tap your profile icon, select 'Subscriptions', find our app and follow the instructions to cancel.">
+                            要取消订阅，请打开App Store，点击您的个人资料图标，选择'订阅'，找到我们的应用并按照说明取消订阅。
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span data-zh="我的数据安全吗？" data-en="Is my data secure?">我的数据安全吗？</span>
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p data-zh="是的，我们非常重视您的隐私和数据安全。我们使用行业标准加密技术保护您的数据，并且不会与第三方共享您的个人信息。" 
+                           data-en="Yes, we take your privacy and data security very seriously. We use industry-standard encryption to protect your data and do not share your personal information with third parties.">
+                            是的，我们非常重视您的隐私和数据安全。我们使用行业标准加密技术保护您的数据，并且不会与第三方共享您的个人信息。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2 class="section-title" data-zh="联系我们" data-en="Contact Us">联系我们</h2>
+            <p data-zh="如果常见问题无法解决您的问题，请通过以下方式联系我们。" 
+               data-en="If the FAQs don't resolve your issue, please contact us through one of the following methods.">
+                如果常见问题无法解决您的问题，请通过以下方式联系我们。
+            </p>
+            
+            <div class="contact-options">
+                <div class="contact-card">
+                    <div class="contact-icon">📧</div>
+                    <h3 data-zh="电子邮件" data-en="Email">1091167364@qq.com</h3>
+                    <p data-zh="我们会在24小时内回复您的邮件" data-en="We'll respond within 24 hours">我们会在24小时内回复您的邮件</p>
+                    <a href="mailto:support@yourapp.com" class="contact-link" data-zh="发送邮件" data-en="Send Email">发送邮件</a>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="contact-icon">🌐</div>
+                    <h3 data-zh="在线表单" data-en="Online Form">在线表单</h3>
+                    <p data-zh="填写我们的支持表单，详细描述您的问题" data-en="Fill out our support form with details about your issue">填写我们的支持表单，详细描述您的问题</p>
+                    <a href="#" class="contact-link" data-zh="访问表单" data-en="Access Form">访问表单</a>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="contact-icon">📱</div>
+                    <h3 data-zh="应用内支持" data-en="In-App Support">应用内支持</h3>
+                    <p data-zh="在应用的'设置'或'帮助'部分找到支持选项" data-en="Find support options in the 'Settings' or 'Help' section of the app">在应用的'设置'或'帮助'部分找到支持选项</p>
+                    <a href="#" class="contact-link" data-zh="打开应用" data-en="Open App">打开应用</a>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <p data-zh="&copy; 2023 动作大师。保留所有权利。"
+               data-en="&copy; 2023 Action Master. All rights reserved.">
+                &copy; 2023 您的公司名称。保留所有权利。
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // 语言切换功能
+        document.querySelectorAll('.lang-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // 移除所有按钮的active类
+                document.querySelectorAll('.lang-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // 为当前点击的按钮添加active类
+                this.classList.add('active');
+                
+                // 获取选中的语言
+                const lang = this.getAttribute('data-lang');
+                
+                // 切换所有元素的语言
+                document.querySelectorAll('[data-zh]').forEach(element => {
+                    if (lang === 'zh') {
+                        element.textContent = element.getAttribute('data-zh');
+                    } else if (lang === 'en') {
+                        element.textContent = element.getAttribute('data-en');
+                    }
+                });
+            });
+        });
+        
+        // FAQ展开/收起功能
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', function() {
+                const answer = this.nextElementSibling;
+                const icon = this.querySelector('span:last-child');
+                
+                if (answer.classList.contains('show')) {
+                    answer.classList.remove('show');
+                    icon.textContent = '+';
+                } else {
+                    // 关闭其他打开的答案
+                    document.querySelectorAll('.faq-answer').forEach(ans => {
+                        ans.classList.remove('show');
+                    });
+                    document.querySelectorAll('.faq-question span:last-child').forEach(ic => {
+                        ic.textContent = '+';
+                    });
+                    
+                    // 打开当前答案
+                    answer.classList.add('show');
+                    icon.textContent = '-';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
