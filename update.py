@@ -243,11 +243,17 @@ class VideoLibraryUpdater:
         
         return [Path(f) for f in video_files]
     
-    def encode_filename_to_base64(self, filename):
-        """将文件名（不含扩展名）编码为base64"""
+    def encode_filename_to_base64(self, filename, timestamp=None):
+        """将文件名（不含扩展名）+ 时间戳编码为base64，确保唯一性"""
         name_without_ext = Path(filename).stem
-        # 将文件名编码为base64
-        encoded = base64.b64encode(name_without_ext.encode('utf-8')).decode('utf-8')
+        # 如果提供了时间戳，将文件名+时间戳一起编码
+        if timestamp is not None:
+            # 将文件名和时间戳组合：文件名_时间戳
+            combined_name = f"{name_without_ext}_{timestamp}"
+        else:
+            combined_name = name_without_ext
+        # 将组合后的字符串编码为base64
+        encoded = base64.b64encode(combined_name.encode('utf-8')).decode('utf-8')
         # 将base64中的/替换为-，避免文件系统路径问题
         encoded = encoded.replace('/', '-')
         return encoded
@@ -276,7 +282,7 @@ class VideoLibraryUpdater:
             return False
     
     def decode_base64_filename(self, filename):
-        """从base64文件名解码出原始文件名"""
+        """从base64文件名解码出原始文件名（去掉时间戳部分）"""
         name_without_ext = Path(filename).stem
         try:
             # 将-替换回/用于解码
@@ -286,12 +292,27 @@ class VideoLibraryUpdater:
             if padding == 4:
                 padding = 0
             test_str = test_str + '=' * padding
-            return base64.b64decode(test_str).decode('utf-8')
+            decoded = base64.b64decode(test_str).decode('utf-8')
+            # 如果解码结果包含时间戳（格式：文件名_时间戳），提取原始文件名
+            if '_' in decoded:
+                # 检查最后一部分是否是数字（时间戳）
+                parts = decoded.rsplit('_', 1)
+                if len(parts) == 2 and parts[1].isdigit():
+                    return parts[0]  # 返回原始文件名（去掉时间戳）
+            return decoded  # 如果没有时间戳，直接返回解码结果
         except:
             return None
     
-    def rename_video_to_base64(self, video_path):
-        """将视频文件重命名为base64编码的名称"""
+    def rename_video_to_base64(self, video_path, timestamp=None):
+        """将视频文件重命名为base64编码的名称（文件名+时间戳）
+        
+        Args:
+            video_path: 视频文件路径
+            timestamp: 时间戳，如果为None则使用当前时间戳
+        
+        Returns:
+            新文件名，如果文件已经是base64格式（已命名过）或重命名失败，返回原文件名
+        """
         original_path = Path(video_path)
         if not original_path.exists():
             return None
@@ -300,8 +321,17 @@ class VideoLibraryUpdater:
         original_name = original_path.name
         extension = original_path.suffix
         
-        # 生成base64文件名
-        base64_name = self.encode_filename_to_base64(original_name)
+        # 检查文件名是否已经是base64格式（已命名过）
+        if self.is_base64_filename(original_name):
+            print(f"  ✓ 文件已命名过（base64格式），跳过重命名: {original_name}")
+            return original_name
+        
+        # 如果没有提供时间戳，使用当前时间戳
+        if timestamp is None:
+            timestamp = int(time.time())
+        
+        # 生成base64文件名（文件名+时间戳）
+        base64_name = self.encode_filename_to_base64(original_name, timestamp)
         new_filename = f"{base64_name}{extension}"
         new_path = original_path.parent / new_filename
         
@@ -313,7 +343,7 @@ class VideoLibraryUpdater:
         # 重命名文件
         try:
             original_path.rename(new_path)
-            print(f"  ✅ 重命名: {original_name} -> {new_filename}")
+            print(f"  ✅ 重命名: {original_name} -> {new_filename} (时间戳: {timestamp})")
             return new_filename
         except Exception as e:
             print(f"  ❌ 重命名失败 {original_name}: {e}")
@@ -773,24 +803,26 @@ class VideoLibraryUpdater:
             except Exception as e:
                 print(f"⚠️  读取现有videos.json失败: {e}，将使用新生成的title")
         
-        # 重命名视频文件为base64格式
-        print("\n🔄 开始重命名视频文件为base64格式...")
+        # 重命名视频文件为base64格式（文件名+时间戳）
+        print("\n🔄 开始重命名视频文件为base64格式（文件名+时间戳）...")
         original_to_base64_map = {}
         renamed_files = []
+        # 使用当前时间戳，确保同一批次的文件使用相同的时间戳
+        current_timestamp = int(time.time())
         
         for video_path in video_files:
             original_name = video_path.name
             name_without_ext = video_path.stem
             
-            # 检查文件名是否已经是base64格式
+            # 检查文件名是否已经是base64格式（已命名过）
             is_base64 = self.is_base64_filename(original_name)
             
             if is_base64:
-                print(f"  ✓ 文件已是base64格式: {original_name}")
+                print(f"  ✓ 文件已命名过（base64格式），跳过重命名: {original_name}")
                 renamed_files.append(video_path)
             else:
-                # 需要重命名
-                new_filename = self.rename_video_to_base64(video_path)
+                # 需要重命名，使用当前时间戳
+                new_filename = self.rename_video_to_base64(video_path, current_timestamp)
                 if new_filename and new_filename != original_name:
                     original_to_base64_map[original_name] = new_filename
                     # 更新路径为新文件名
