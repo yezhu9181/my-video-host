@@ -13,8 +13,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "c3cf8c4",
-      "lastUpdated": "2025-11-12T15:15:48.523953"
+      "cacheVersion": "b669e7a",
+      "lastUpdated": "2025-11-12T15:45:30.286116"
     },
     {
       "id": 2,
@@ -29,8 +29,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "c3cf8c4",
-      "lastUpdated": "2025-11-12T15:15:48.630206"
+      "cacheVersion": "b669e7a",
+      "lastUpdated": "2025-11-12T15:45:30.381272"
     },
     {
       "id": 3,
@@ -45,8 +45,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "c3cf8c4",
-      "lastUpdated": "2025-11-12T15:15:48.736972"
+      "cacheVersion": "b669e7a",
+      "lastUpdated": "2025-11-12T15:45:30.489576"
     },
     {
       "id": 4,
@@ -61,8 +61,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "c3cf8c4",
-      "lastUpdated": "2025-11-12T15:15:48.825057"
+      "cacheVersion": "b669e7a",
+      "lastUpdated": "2025-11-12T15:45:30.587429"
     },
     {
       "id": 5,
@@ -77,8 +77,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "c3cf8c4",
-      "lastUpdated": "2025-11-12T15:15:48.906560"
+      "cacheVersion": "b669e7a",
+      "lastUpdated": "2025-11-12T15:45:30.694748"
     },
     {
       "id": 6,
@@ -93,8 +93,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "c3cf8c4",
-      "lastUpdated": "2025-11-12T15:15:48.996024"
+      "cacheVersion": "b669e7a",
+      "lastUpdated": "2025-11-12T15:45:30.794244"
     },
     {
       "id": 7,
@@ -109,8 +109,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "c3cf8c4",
-      "lastUpdated": "2025-11-12T15:15:49.102545"
+      "cacheVersion": "b669e7a",
+      "lastUpdated": "2025-11-12T15:45:30.891446"
     },
     {
       "id": 8,
@@ -125,8 +125,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "c3cf8c4",
-      "lastUpdated": "2025-11-12T15:15:49.190984"
+      "cacheVersion": "b669e7a",
+      "lastUpdated": "2025-11-12T15:45:30.981541"
     },
     {
       "id": 9,
@@ -141,8 +141,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "c3cf8c4",
-      "lastUpdated": "2025-11-12T15:15:49.285726"
+      "cacheVersion": "b669e7a",
+      "lastUpdated": "2025-11-12T15:45:31.077944"
     },
     {
       "id": 10,
@@ -157,8 +157,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "c3cf8c4",
-      "lastUpdated": "2025-11-12T15:15:49.369376"
+      "cacheVersion": "b669e7a",
+      "lastUpdated": "2025-11-12T15:45:31.172838"
     },
     {
       "id": 11,
@@ -173,54 +173,22 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "c3cf8c4",
-      "lastUpdated": "2025-11-12T15:15:49.470355"
-    },
-    {
-      "id": 12,
-      "title": "八级拳(BaJiQuan)",
-      "filename": "ZGVtbw==.MP4",
-      "url": "videos/ZGVtbw==.MP4",
-      "description": "这是关于八级拳(BaJiQuan)的详细说明视频",
-      "duration": "0:24",
-      "size": "41.1 MB",
-      "thumbnail": "thumbnails/ZGVtbw==.jpg",
-      "codec": "H.264",
-      "resolution": "0x1",
-      "createdAt": "2025-11-12",
-      "thumbnailType": "JPG",
-      "cacheVersion": "c3cf8c4",
-      "lastUpdated": "2025-11-12T15:15:49.649483"
-    },
-    {
-      "id": 13,
-      "title": "街舞(Street dance)",
-      "filename": "aW50cm8=.MP4",
-      "url": "videos/aW50cm8=.MP4",
-      "description": "这是关于街舞(Street dance)的详细说明视频",
-      "duration": "0:35",
-      "size": "13.1 MB",
-      "thumbnail": "thumbnails/aW50cm8=.jpg",
-      "codec": "H.264",
-      "resolution": "0x1",
-      "createdAt": "2025-11-12",
-      "thumbnailType": "JPG",
-      "cacheVersion": "c3cf8c4",
-      "lastUpdated": "2025-11-12T15:15:49.745090"
+      "cacheVersion": "b669e7a",
+      "lastUpdated": "2025-11-12T15:45:31.328153"
     }
   ],
   "pagination": {
-    "total": 13,
+    "total": 11,
     "page": 1,
     "pageSize": 10,
     "totalPages": 2,
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-12T15:15:49Z",
+  "lastUpdated": "2025-11-12T15:45:31Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
-  "cacheVersion": "c3cf8c4",
+  "cacheVersion": "b669e7a",
   "cachePolicy": {
     "maxAge": 0,
     "mustRevalidate": true,
@@ -232,6 +200,5 @@
     "paginated": "/videos.json?page={page}&limit={limit}",
     "search": "/videos.json?search={keyword}",
     "byId": "/videos.json?id={id}"
-  },
-  "latestCommitSha": "58a865c744c8e9068d0f6b53587cda08cd719fc5"
+  }
 }
