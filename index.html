@@ -210,14 +210,11 @@
         let currentCDN = null;
         let cdnSpeeds = {};
 
-        // 全局 commit SHA，由 update.py 自动更新，用于自动替换 @main
-        let globalCommitSha = "134d622b8b59fca2ed5efde8ecc9a163d7a19b84";
-
         // 初始化视频播放器
         const player = videojs('my-video');
 
 
-        // 测试CDN速度（index.html 内部自动替换 @main 为 commit SHA）
+        // 测试CDN速度
         async function testCDNSpeeds() {
             const statusText = document.getElementById('cdnStatusText');
             const speedTest = document.getElementById('speedTest');
@@ -225,28 +222,17 @@
             
             statusText.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> 正在测试CDN速度...';
             
-            // commit SHA 应该已经由 update.py 设置，无需获取
-            
-            // 测试每个CDN的速度（index.html 内部自动替换 @main 为 commit SHA）
-            const testCacheBuster = generateCacheBuster();
+            // 测试每个CDN的速度
             const speedTests = FREE_CDNS.map(async (cdn) => {
                 const startTime = performance.now();
                 
                 try {
-                    // 使用 getCdnUrl 自动替换 @main 为 commit SHA
-                    // 前端代码中依然使用 @main，但实际请求时会自动替换
                     const testUrl = getCdnUrl(cdn.testUrl);
                     
-                    const response = await fetch(`${testUrl}${testCacheBuster}`, {
+                    const response = await fetch(`${testUrl}`, {
                         method: 'HEAD',
                         mode: 'no-cors',
-                        cache: 'no-store',  // 完全不缓存
-                        credentials: 'omit',
-                        headers: {
-                            'Cache-Control': 'max-age=0, no-cache, no-store, must-revalidate, proxy-revalidate',
-                            'Pragma': 'no-cache',
-                            'Expires': '0'
-                        }
+                        credentials: 'omit'
                     });
                     
                     const speed = performance.now() - startTime;
@@ -336,23 +322,12 @@
 
         // 生成视频URL
         function generateVideoUrl(filename) {
-            // 使用 getCdnUrl 自动替换 @main 为 commit SHA
             return getCdnUrl(currentCDN, `/videos/${filename}`);
         }
 
         // 生成缩略图URL
         function generateThumbnailUrl(filename) {
-            // 使用 getCdnUrl 自动替换 @main 为 commit SHA
             return getCdnUrl(currentCDN, `/thumbnails/${filename}`);
-        }
-
-        // 生成强制的缓存破坏参数
-        function generateCacheBuster() {
-            // 使用时间戳 + 随机数 + 页面加载时间，确保每次都是唯一的
-            const timestamp = Date.now();
-            const random = Math.random().toString(36).substring(2, 15);
-            const pageLoadTime = performance.now();
-            return `?_cb=${timestamp}_${random}_${pageLoadTime}&v=${timestamp}&_t=${new Date().getTime()}&nocache=1`;
         }
 
         // 使用 XMLHttpRequest 作为备用方案（某些情况下更可靠）
@@ -360,10 +335,6 @@
             return new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
                 xhr.open('GET', url, true);
-                xhr.setRequestHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-                xhr.setRequestHeader('Pragma', 'no-cache');
-                xhr.setRequestHeader('Expires', '0');
-                xhr.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
                 
                 xhr.onload = function() {
                     if (xhr.status >= 200 && xhr.status < 300) {
@@ -392,82 +363,24 @@
         }
 
 
-        // 使用 commit SHA 替换 CDN URL 中的 @main（index.html 内部自动替换）
-        // 如果提供了 commitSha，使用它；否则使用全局的 globalCommitSha
-        function replaceMainWithCommitSha(url, commitSha = null) {
-            if (!url) {
-                return url;
-            }
-            
-            // 优先使用传入的 commitSha，否则使用全局的 globalCommitSha
-            const sha = commitSha || globalCommitSha;
-            
-            if (!sha) {
-                // 如果没有 commit SHA，返回原始 URL（包含 @main）
-                return url;
-            }
-            
-            // 将 URL 中的 @main 替换为 @commit_sha
-            // 例如: https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json
-            // 替换为: https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@3df26ac3782c75a9ce26b060bcc213c455518cbc/videos.json
-            
-            let replaced = url;
-            
-            // 替换 @main 为 @commit_sha（jsDelivr 格式）
-            replaced = replaced.replace(/@main/g, `@${sha}`);
-            
-            // 替换 /main/ 为 /commit_sha/（其他 CDN 格式）
-            replaced = replaced.replace(/\/main\//g, `/${sha}/`);
-            
-            // 替换 /main 结尾为 /commit_sha（其他 CDN 格式）
-            replaced = replaced.replace(/\/main$/g, `/${sha}`);
-            
-            if (replaced !== url) {
-                console.log(`   ✅ [index.html 自动替换] @main -> @${sha.substring(0, 7)}...`);
-            }
-            
-            return replaced;
-        }
-        
-        // 获取当前的 commit SHA（提供给外部调用）
-        function getCommitSha() {
-            return globalCommitSha;
-        }
-        
-        // 获取 CDN URL（自动替换 @main 为 commit SHA）
-        // 这是所有 CDN URL 的统一入口，确保自动替换
+        // 获取 CDN URL
         function getCdnUrl(cdn, path = '') {
             const baseUrl = typeof cdn === 'string' ? cdn : (cdn.url || cdn);
             const fullUrl = path ? `${baseUrl}${path}` : baseUrl;
-            // 自动使用全局 commit SHA 替换 @main
-            return replaceMainWithCommitSha(fullUrl);
-        }
-        
-        // 使用 commit SHA 构建 CDN URL（确保获取最新数据）
-        function buildCdnUrlWithCommitSha(cdn, commitSha) {
-            // 使用传入的 commitSha，如果没有则使用全局的
-            return replaceMainWithCommitSha(cdn.url, commitSha);
+            return fullUrl;
         }
 
-        // 加载视频数据（使用 commit SHA 替换 @main 获取最新数据）
+        // 加载视频数据
         async function loadAllVideos() {
             try {
                 let data = null;
                 let dataSource = '';
                 
-                // commit SHA 应该已经由 update.py 设置，无需获取
-                if (globalCommitSha && globalCommitSha !== null) {
-                    console.log(`✅ [index.html] 使用 update.py 设置的 commit SHA: ${globalCommitSha.substring(0, 7)}...`);
-                } else {
-                    console.warn('⚠️  [index.html] commit SHA 未设置，将使用 @main（可能返回缓存数据）');
-                }
-                
-                // 使用 CDN 获取数据（index.html 内部自动替换 @main 为 commit SHA）
+                // 使用 CDN 获取数据
                 try {
-                    console.log('🔄 使用 CDN 获取数据（index.html 自动替换 @main 为 commit SHA）...');
+                    console.log('🔄 使用 CDN 获取数据...');
                     
                     // 测试 CDN 速度并选择最快的
-                    // 注意：testCDNSpeeds 内部会使用 getCdnUrl 自动替换 @main
                     const cdnAvailable = await testCDNSpeeds();
                     
                     if (!cdnAvailable) {
@@ -478,8 +391,6 @@
                         throw new Error('无法找到可用的 CDN');
                     }
                     
-                    // 使用 getCdnUrl 自动替换 @main 为 commit SHA
-                    // 前端代码中依然使用 @main，但实际请求时会自动替换为 commit SHA
                     const cdnUrl = getCdnUrl(currentCDN, '/videos.json');
                     
                     console.log(`   🔄 从 ${currentCDN.name} 获取数据`);
@@ -487,17 +398,12 @@
                     
                     const response = await fetch(cdnUrl, {
                         method: 'GET',
-                        cache: 'no-store',
-                        credentials: 'omit',
-                        headers: {
-                            'Cache-Control': 'no-cache, no-store, must-revalidate',
-                            'Pragma': 'no-cache'
-                        }
+                        credentials: 'omit'
                     });
                     
                     if (response && response.ok) {
                         data = await response.json();
-                        dataSource = `${currentCDN.name} (使用 commit SHA)`;
+                        dataSource = currentCDN.name;
                         console.log(`   ✅ 从 CDN 获取数据成功`);
                     } else {
                         throw new Error(`CDN 请求失败: HTTP ${response ? response.status : 'unknown'}`);
@@ -523,7 +429,6 @@
                     // 如果数据超过5分钟，提示用户可能不是最新的
                     if (diffMinutes > 5) {
                         console.warn('⚠️  数据可能不是最新的（超过5分钟）');
-                        console.warn('💡 提示：当前使用 commit SHA 构建的 CDN URL，应该获取最新数据');
                     } else if (diffSeconds > 30) {
                         console.info('ℹ️  数据较新');
                     } else {
@@ -746,19 +651,8 @@
             renderVideos();
         }
 
-        // 将 getCommitSha 函数暴露到全局作用域，方便外部调用
-        window.getCommitSha = getCommitSha;
-        
-        // 页面加载时，直接加载视频（commit SHA 已由 update.py 设置）
+        // 页面加载时，直接加载视频
         document.addEventListener('DOMContentLoaded', async () => {
-            // commit SHA 应该已经由 update.py 设置，无需获取
-            if (globalCommitSha && globalCommitSha !== null) {
-                console.log(`✅ [index.html] 页面加载：commit SHA 已由 update.py 设置: ${globalCommitSha.substring(0, 7)}...`);
-                console.log(`   💡 可以通过 window.getCommitSha() 获取 commit SHA`);
-            } else {
-                console.warn('⚠️  [index.html] 页面加载：commit SHA 未设置，将使用 @main（可能返回缓存数据）');
-            }
-            
             // 加载视频数据
             await loadAllVideos();
         });
