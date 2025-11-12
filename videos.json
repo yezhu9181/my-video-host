@@ -13,27 +13,11 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "a3cf097",
-      "lastUpdated": "2025-11-12T17:04:26.443516"
+      "cacheVersion": "6133736",
+      "lastUpdated": "2025-11-12T17:29:28.768152"
     },
     {
       "id": 2,
-      "title": "蛙泳(breaststroke)",
-      "filename": "MTA=.mp4",
-      "url": "videos/MTA=.mp4",
-      "description": "这是关于蛙泳(breaststroke)的详细说明视频",
-      "duration": "1:28",
-      "size": "29.8 MB",
-      "thumbnail": "thumbnails/MTA=.jpg",
-      "codec": "H.264",
-      "resolution": "0x1",
-      "createdAt": "2025-11-12",
-      "thumbnailType": "JPG",
-      "cacheVersion": "a3cf097",
-      "lastUpdated": "2025-11-12T17:04:26.538662"
-    },
-    {
-      "id": 3,
       "title": "自由泳(freestyle)",
       "filename": "MTE=.mp4",
       "url": "videos/MTE=.mp4",
@@ -45,11 +29,11 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "a3cf097",
-      "lastUpdated": "2025-11-12T17:04:26.671617"
+      "cacheVersion": "6133736",
+      "lastUpdated": "2025-11-12T17:29:28.878985"
     },
     {
-      "id": 4,
+      "id": 3,
       "title": "八极拳(Baji Quan)",
       "filename": "MTQ=.mp4",
       "url": "videos/MTQ=.mp4",
@@ -61,11 +45,11 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "a3cf097",
-      "lastUpdated": "2025-11-12T17:04:26.777955"
+      "cacheVersion": "6133736",
+      "lastUpdated": "2025-11-12T17:29:28.968796"
     },
     {
-      "id": 5,
+      "id": 4,
       "title": "街舞(street dance)",
       "filename": "Mg==.mp4",
       "url": "videos/Mg==.mp4",
@@ -77,11 +61,11 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "a3cf097",
-      "lastUpdated": "2025-11-12T17:04:26.889959"
+      "cacheVersion": "6133736",
+      "lastUpdated": "2025-11-12T17:29:29.063567"
     },
     {
-      "id": 6,
+      "id": 5,
       "title": "天鹅舞(Swan Dance)",
       "filename": "Mw==.mp4",
       "url": "videos/Mw==.mp4",
@@ -93,11 +77,11 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "a3cf097",
-      "lastUpdated": "2025-11-12T17:04:26.979864"
+      "cacheVersion": "6133736",
+      "lastUpdated": "2025-11-12T17:29:29.159984"
     },
     {
-      "id": 7,
+      "id": 6,
       "title": "街舞(street-dance)",
       "filename": "NA==.mp4",
       "url": "videos/NA==.mp4",
@@ -109,11 +93,11 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "a3cf097",
-      "lastUpdated": "2025-11-12T17:04:27.096050"
+      "cacheVersion": "6133736",
+      "lastUpdated": "2025-11-12T17:29:29.251006"
     },
     {
-      "id": 8,
+      "id": 7,
       "title": "太极(Tai Chi)",
       "filename": "NQ==.mp4",
       "url": "videos/NQ==.mp4",
@@ -125,11 +109,11 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "a3cf097",
-      "lastUpdated": "2025-11-12T17:04:27.194482"
+      "cacheVersion": "6133736",
+      "lastUpdated": "2025-11-12T17:29:29.342237"
     },
     {
-      "id": 9,
+      "id": 8,
       "title": "太极(Tai Chi)",
       "filename": "Ng==.mp4",
       "url": "videos/Ng==.mp4",
@@ -141,11 +125,11 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "a3cf097",
-      "lastUpdated": "2025-11-12T17:04:27.308469"
+      "cacheVersion": "6133736",
+      "lastUpdated": "2025-11-12T17:29:29.429355"
     },
     {
-      "id": 10,
+      "id": 9,
       "title": "自由泳(freestyle-)",
       "filename": "Nw==.mp4",
       "url": "videos/Nw==.mp4",
@@ -157,11 +141,11 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "a3cf097",
-      "lastUpdated": "2025-11-12T17:04:27.433094"
+      "cacheVersion": "6133736",
+      "lastUpdated": "2025-11-12T17:29:29.535021"
     },
     {
-      "id": 11,
+      "id": 10,
       "title": "太极(Tai-Chi-)",
       "filename": "OA==.mp4",
       "url": "videos/OA==.mp4",
@@ -173,11 +157,11 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "a3cf097",
-      "lastUpdated": "2025-11-12T17:04:27.530960"
+      "cacheVersion": "6133736",
+      "lastUpdated": "2025-11-12T17:29:29.620227"
     },
     {
-      "id": 12,
+      "id": 11,
       "title": "太极(Tai-Chi-1)",
       "filename": "OQ==.mp4",
       "url": "videos/OQ==.mp4",
@@ -189,22 +173,22 @@
       "resolution": "0x1",
       "createdAt": "2025-11-12",
       "thumbnailType": "JPG",
-      "cacheVersion": "a3cf097",
-      "lastUpdated": "2025-11-12T17:04:27.645466"
+      "cacheVersion": "6133736",
+      "lastUpdated": "2025-11-12T17:29:29.726385"
     }
   ],
   "pagination": {
-    "total": 12,
+    "total": 11,
     "page": 1,
     "pageSize": 10,
     "totalPages": 2,
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-12T17:04:27Z",
+  "lastUpdated": "2025-11-12T17:29:29Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
-  "cacheVersion": "a3cf097",
+  "cacheVersion": "6133736",
   "cachePolicy": {
     "maxAge": 0,
     "mustRevalidate": true,
@@ -216,6 +200,5 @@
     "paginated": "/videos.json?page={page}&limit={limit}",
     "search": "/videos.json?search={keyword}",
     "byId": "/videos.json?id={id}"
-  },
-  "latestCommitSha": "bde81ed5f487a69c258ade78659a66669d6f3906"
+  }
 }
