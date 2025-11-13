@@ -2,10 +2,10 @@
   "videos": [
     {
       "id": 1,
-      "title": "蛙泳",
+      "title": "蛙泳(breaststroke)",
       "filename": "M18xNzYyOTQ4MjIx.mp4",
       "url": "videos/M18xNzYyOTQ4MjIx.mp4",
-      "description": "这是关于蛙泳的详细说明视频",
+      "description": "这是关于蛙泳(breaststroke)的详细说明视频",
       "duration": "0:10",
       "size": "4.1 MB",
       "thumbnail": "thumbnails/M18xNzYyOTQ4MjIx.jpg",
@@ -13,15 +13,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-13",
       "thumbnailType": "JPG",
-      "cacheVersion": "52d50ca",
-      "lastUpdated": "2025-11-13T00:54:34.475265"
+      "cacheVersion": "bb9e816",
+      "lastUpdated": "2025-11-13T14:07:58.782061"
     },
     {
       "id": 2,
-      "title": "太极拳",
+      "title": "太极拳(Tai_Chi)",
       "filename": "MTBfMTc2Mjk0ODIyMQ==.mp4",
       "url": "videos/MTBfMTc2Mjk0ODIyMQ==.mp4",
-      "description": "这是关于太极拳的详细说明视频",
+      "description": "这是关于太极拳(Tai_Chi)的详细说明视频",
       "duration": "0:29",
       "size": "7.5 MB",
       "thumbnail": "thumbnails/MTBfMTc2Mjk0ODIyMQ==.jpg",
@@ -29,15 +29,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-13",
       "thumbnailType": "JPG",
-      "cacheVersion": "52d50ca",
-      "lastUpdated": "2025-11-13T00:54:34.564165"
+      "cacheVersion": "bb9e816",
+      "lastUpdated": "2025-11-13T14:07:58.878258"
     },
     {
       "id": 3,
-      "title": "太极拳",
+      "title": "太极拳(TaiChi-)",
       "filename": "MTFfMTc2Mjk0ODIyMQ==.mp4",
       "url": "videos/MTFfMTc2Mjk0ODIyMQ==.mp4",
-      "description": "这是关于太极拳的详细说明视频",
+      "description": "这是关于太极拳(TaiChi-)的详细说明视频",
       "duration": "0:33",
       "size": "11.8 MB",
       "thumbnail": "thumbnails/MTFfMTc2Mjk0ODIyMQ==.jpg",
@@ -45,15 +45,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-13",
       "thumbnailType": "JPG",
-      "cacheVersion": "52d50ca",
-      "lastUpdated": "2025-11-13T00:54:34.684226"
+      "cacheVersion": "bb9e816",
+      "lastUpdated": "2025-11-13T14:07:58.987603"
     },
     {
       "id": 4,
-      "title": "街舞",
+      "title": "街舞(Street-dance)",
       "filename": "MV8xNzYyOTQ4MjIx.mp4",
       "url": "videos/MV8xNzYyOTQ4MjIx.mp4",
-      "description": "这是关于街舞的详细说明视频",
+      "description": "这是关于街舞(Street-dance)的详细说明视频",
       "duration": "0:28",
       "size": "9.2 MB",
       "thumbnail": "thumbnails/MV8xNzYyOTQ4MjIx.jpg",
@@ -61,15 +61,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-13",
       "thumbnailType": "JPG",
-      "cacheVersion": "52d50ca",
-      "lastUpdated": "2025-11-13T00:54:34.785432"
+      "cacheVersion": "bb9e816",
+      "lastUpdated": "2025-11-13T14:07:59.078246"
     },
     {
       "id": 5,
-      "title": "芭蕾舞",
+      "title": "芭蕾舞(Ballet)",
       "filename": "Ml8xNzYyOTQ4MjIx.mp4",
       "url": "videos/Ml8xNzYyOTQ4MjIx.mp4",
-      "description": "这是关于芭蕾舞的详细说明视频",
+      "description": "这是关于芭蕾舞(Ballet)的详细说明视频",
       "duration": "0:27",
       "size": "5.1 MB",
       "thumbnail": "thumbnails/Ml8xNzYyOTQ4MjIx.jpg",
@@ -77,15 +77,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-13",
       "thumbnailType": "JPG",
-      "cacheVersion": "52d50ca",
-      "lastUpdated": "2025-11-13T00:54:34.863631"
+      "cacheVersion": "bb9e816",
+      "lastUpdated": "2025-11-13T14:07:59.159089"
     },
     {
       "id": 6,
-      "title": "太极拳",
+      "title": "太极拳(TaiChi)",
       "filename": "N18xNzYyOTQ4MjIx.mp4",
       "url": "videos/N18xNzYyOTQ4MjIx.mp4",
-      "description": "这是关于太极拳的详细说明视频",
+      "description": "这是关于太极拳(TaiChi)的详细说明视频",
       "duration": "0:19",
       "size": "4.5 MB",
       "thumbnail": "thumbnails/N18xNzYyOTQ4MjIx.jpg",
@@ -93,15 +93,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-13",
       "thumbnailType": "JPG",
-      "cacheVersion": "52d50ca",
-      "lastUpdated": "2025-11-13T00:54:34.953561"
+      "cacheVersion": "bb9e816",
+      "lastUpdated": "2025-11-13T14:07:59.245699"
     },
     {
       "id": 7,
-      "title": "八极拳",
+      "title": "八极拳(Baji Quan)",
       "filename": "NF8xNzYyOTQ4MjIx.mp4",
       "url": "videos/NF8xNzYyOTQ4MjIx.mp4",
-      "description": "这是关于八极拳的详细说明视频",
+      "description": "这是关于八极拳(Baji Quan)的详细说明视频",
       "duration": "0:32",
       "size": "6.2 MB",
       "thumbnail": "thumbnails/NF8xNzYyOTQ4MjIx.jpg",
@@ -109,15 +109,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-13",
       "thumbnailType": "JPG",
-      "cacheVersion": "52d50ca",
-      "lastUpdated": "2025-11-13T00:54:35.044486"
+      "cacheVersion": "bb9e816",
+      "lastUpdated": "2025-11-13T14:07:59.346864"
     },
     {
       "id": 8,
-      "title": "天鹅湖",
+      "title": "天鹅湖(Swan Lake)",
       "filename": "NV8xNzYyOTQ4MjIx.mp4",
       "url": "videos/NV8xNzYyOTQ4MjIx.mp4",
-      "description": "这是关于天鹅湖的详细说明视频",
+      "description": "这是关于天鹅湖(Swan Lake)的详细说明视频",
       "duration": "1:03",
       "size": "9.0 MB",
       "thumbnail": "thumbnails/NV8xNzYyOTQ4MjIx.jpg",
@@ -125,15 +125,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-13",
       "thumbnailType": "JPG",
-      "cacheVersion": "52d50ca",
-      "lastUpdated": "2025-11-13T00:54:35.142559"
+      "cacheVersion": "bb9e816",
+      "lastUpdated": "2025-11-13T14:07:59.431665"
     },
     {
       "id": 9,
-      "title": "街舞",
+      "title": "街舞(Street dance)",
       "filename": "Nl8xNzYyOTQ4MjIx.mp4",
       "url": "videos/Nl8xNzYyOTQ4MjIx.mp4",
-      "description": "这是关于街舞的详细说明视频",
+      "description": "这是关于街舞(Street dance)的详细说明视频",
       "duration": "0:19",
       "size": "4.8 MB",
       "thumbnail": "thumbnails/Nl8xNzYyOTQ4MjIx.jpg",
@@ -141,15 +141,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-13",
       "thumbnailType": "JPG",
-      "cacheVersion": "52d50ca",
-      "lastUpdated": "2025-11-13T00:54:35.239593"
+      "cacheVersion": "bb9e816",
+      "lastUpdated": "2025-11-13T14:07:59.529232"
     },
     {
       "id": 10,
-      "title": "太极拳",
+      "title": "太极拳(Tai-Chi)",
       "filename": "OF8xNzYyOTQ4MjIx.mp4",
       "url": "videos/OF8xNzYyOTQ4MjIx.mp4",
-      "description": "这是关于太极拳的详细说明视频",
+      "description": "这是关于太极拳(Tai-Chi)的详细说明视频",
       "duration": "0:29",
       "size": "5.8 MB",
       "thumbnail": "thumbnails/OF8xNzYyOTQ4MjIx.jpg",
@@ -157,15 +157,15 @@
       "resolution": "0x1",
       "createdAt": "2025-11-13",
       "thumbnailType": "JPG",
-      "cacheVersion": "52d50ca",
-      "lastUpdated": "2025-11-13T00:54:35.340342"
+      "cacheVersion": "bb9e816",
+      "lastUpdated": "2025-11-13T14:07:59.616577"
     },
     {
       "id": 11,
-      "title": "自由泳",
+      "title": "自由泳(Freestyle)",
       "filename": "OV8xNzYyOTQ4MjIx.mp4",
       "url": "videos/OV8xNzYyOTQ4MjIx.mp4",
-      "description": "这是关于自由泳的详细说明视频",
+      "description": "这是关于自由泳(Freestyle)的详细说明视频",
       "duration": "0:18",
       "size": "6.1 MB",
       "thumbnail": "thumbnails/OV8xNzYyOTQ4MjIx.jpg",
@@ -173,8 +173,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-13",
       "thumbnailType": "JPG",
-      "cacheVersion": "52d50ca",
-      "lastUpdated": "2025-11-13T00:54:35.429739"
+      "cacheVersion": "bb9e816",
+      "lastUpdated": "2025-11-13T14:07:59.712520"
     }
   ],
   "pagination": {
@@ -185,10 +185,10 @@
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-13T00:54:35Z",
+  "lastUpdated": "2025-11-13T14:07:59Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
-  "cacheVersion": "52d50ca",
+  "cacheVersion": "bb9e816",
   "cachePolicy": {
     "maxAge": 0,
     "mustRevalidate": true,
@@ -200,6 +200,5 @@
     "paginated": "/videos.json?page={page}&limit={limit}",
     "search": "/videos.json?search={keyword}",
     "byId": "/videos.json?id={id}"
-  },
-  "latestCommitSha": "b41064b90bfd75dbc0c5627613b3223efcc354a8"
+  }
 }
