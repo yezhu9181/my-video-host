@@ -561,6 +561,7 @@ class VideoLibraryUpdater:
             video_data = {
                 "id": i,
                 "title": title,
+                "type": "",  # 视频类型，默认为空字符串
                 "filename": video_filename,
                 "url": video_url,  # 相对路径：videos/文件名
                 "description": description,

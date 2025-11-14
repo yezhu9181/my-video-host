@@ -3,6 +3,7 @@
     {
       "id": 1,
       "title": "蛙泳(breaststroke)",
+      "type": "",
       "filename": "M18xNzYyOTQ4MjIx.mp4",
       "url": "videos/M18xNzYyOTQ4MjIx.mp4",
       "description": "这是关于蛙泳(breaststroke)的详细说明视频",
@@ -13,12 +14,13 @@
       "resolution": "0x1",
       "createdAt": "2025-11-14",
       "thumbnailType": "JPG",
-      "cacheVersion": "749d970",
-      "lastUpdated": "2025-11-14T10:50:38.884567"
+      "cacheVersion": "30a664c",
+      "lastUpdated": "2025-11-14T10:53:00.705489"
     },
     {
       "id": 2,
       "title": "篮球过人(basketball crossover)",
+      "type": "",
       "filename": "M18xNzYzMDI1Mzc0.mp4",
       "url": "videos/M18xNzYzMDI1Mzc0.mp4",
       "description": "这是关于篮球过人(basketball crossover)的详细说明视频",
@@ -29,12 +31,13 @@
       "resolution": "0x1",
       "createdAt": "2025-11-14",
       "thumbnailType": "JPG",
-      "cacheVersion": "749d970",
-      "lastUpdated": "2025-11-14T10:50:38.981122"
+      "cacheVersion": "30a664c",
+      "lastUpdated": "2025-11-14T10:53:00.801993"
     },
     {
       "id": 3,
       "title": "太极拳(Tai_Chi)",
+      "type": "",
       "filename": "MTBfMTc2Mjk0ODIyMQ==.mp4",
       "url": "videos/MTBfMTc2Mjk0ODIyMQ==.mp4",
       "description": "这是关于太极拳(Tai_Chi)的详细说明视频",
@@ -45,12 +48,13 @@
       "resolution": "0x1",
       "createdAt": "2025-11-14",
       "thumbnailType": "JPG",
-      "cacheVersion": "749d970",
-      "lastUpdated": "2025-11-14T10:50:39.066114"
+      "cacheVersion": "30a664c",
+      "lastUpdated": "2025-11-14T10:53:00.889284"
     },
     {
       "id": 4,
       "title": "太极拳(TaiChi-)",
+      "type": "",
       "filename": "MTFfMTc2Mjk0ODIyMQ==.mp4",
       "url": "videos/MTFfMTc2Mjk0ODIyMQ==.mp4",
       "description": "这是关于太极拳(TaiChi-)的详细说明视频",
@@ -61,12 +65,13 @@
       "resolution": "0x1",
       "createdAt": "2025-11-14",
       "thumbnailType": "JPG",
-      "cacheVersion": "749d970",
-      "lastUpdated": "2025-11-14T10:50:39.165103"
+      "cacheVersion": "30a664c",
+      "lastUpdated": "2025-11-14T10:53:00.990076"
     },
     {
       "id": 5,
       "title": "睡前瑜伽(Bedtime Yoga)",
+      "type": "",
       "filename": "MTFfMTc2MzAyNTM3NA==.mp4",
       "url": "videos/MTFfMTc2MzAyNTM3NA==.mp4",
       "description": "这是关于睡前瑜伽(Bedtime Yoga)的详细说明视频",
@@ -77,12 +82,13 @@
       "resolution": "0x1",
       "createdAt": "2025-11-14",
       "thumbnailType": "JPG",
-      "cacheVersion": "749d970",
-      "lastUpdated": "2025-11-14T10:50:39.253811"
+      "cacheVersion": "30a664c",
+      "lastUpdated": "2025-11-14T10:53:01.079145"
     },
     {
       "id": 6,
       "title": "街舞(Street-dance)",
+      "type": "",
       "filename": "MV8xNzYyOTQ4MjIx.mp4",
       "url": "videos/MV8xNzYyOTQ4MjIx.mp4",
       "description": "这是关于街舞(Street-dance)的详细说明视频",
@@ -93,12 +99,13 @@
       "resolution": "0x1",
       "createdAt": "2025-11-14",
       "thumbnailType": "JPG",
-      "cacheVersion": "749d970",
-      "lastUpdated": "2025-11-14T10:50:39.358360"
+      "cacheVersion": "30a664c",
+      "lastUpdated": "2025-11-14T10:53:01.184593"
     },
     {
       "id": 7,
       "title": "五步拳(Five-Step Boxing)",
+      "type": "",
       "filename": "MV8xNzYzMDIyNDIw.mp4",
       "url": "videos/MV8xNzYzMDIyNDIw.mp4",
       "description": "这是关于五步拳(Five-Step Boxing)的详细说明视频",
@@ -109,12 +116,13 @@
       "resolution": "0x1",
       "createdAt": "2025-11-14",
       "thumbnailType": "JPG",
-      "cacheVersion": "749d970",
-      "lastUpdated": "2025-11-14T10:50:39.457621"
+      "cacheVersion": "30a664c",
+      "lastUpdated": "2025-11-14T10:53:01.284982"
     },
     {
       "id": 8,
       "title": "芭蕾舞(Ballet)",
+      "type": "",
       "filename": "Ml8xNzYyOTQ4MjIx.mp4",
       "url": "videos/Ml8xNzYyOTQ4MjIx.mp4",
       "description": "这是关于芭蕾舞(Ballet)的详细说明视频",
@@ -125,12 +133,13 @@
       "resolution": "0x1",
       "createdAt": "2025-11-14",
       "thumbnailType": "JPG",
-      "cacheVersion": "749d970",
-      "lastUpdated": "2025-11-14T10:50:39.536301"
+      "cacheVersion": "30a664c",
+      "lastUpdated": "2025-11-14T10:53:01.361421"
     },
     {
       "id": 9,
       "title": "街头格斗(Street Fight)",
+      "type": "",
       "filename": "Ml8xNzYzMDIyNDIw.mp4",
       "url": "videos/Ml8xNzYzMDIyNDIw.mp4",
       "description": "这是关于街头格斗(Street Fight)的详细说明视频",
@@ -141,12 +150,13 @@
       "resolution": "0x1",
       "createdAt": "2025-11-14",
       "thumbnailType": "JPG",
-      "cacheVersion": "749d970",
-      "lastUpdated": "2025-11-14T10:50:39.624359"
+      "cacheVersion": "30a664c",
+      "lastUpdated": "2025-11-14T10:53:01.447790"
     },
     {
       "id": 10,
       "title": "太极拳(TaiChi)",
+      "type": "",
       "filename": "N18xNzYyOTQ4MjIx.mp4",
       "url": "videos/N18xNzYyOTQ4MjIx.mp4",
       "description": "这是关于太极拳(TaiChi)的详细说明视频",
@@ -157,12 +167,13 @@
       "resolution": "0x1",
       "createdAt": "2025-11-14",
       "thumbnailType": "JPG",
-      "cacheVersion": "749d970",
-      "lastUpdated": "2025-11-14T10:50:39.712792"
+      "cacheVersion": "30a664c",
+      "lastUpdated": "2025-11-14T10:53:01.532967"
     },
     {
       "id": 11,
       "title": "八极拳(Baji Quan)",
+      "type": "",
       "filename": "NF8xNzYyOTQ4MjIx.mp4",
       "url": "videos/NF8xNzYyOTQ4MjIx.mp4",
       "description": "这是关于八极拳(Baji Quan)的详细说明视频",
@@ -173,12 +184,13 @@
       "resolution": "0x1",
       "createdAt": "2025-11-14",
       "thumbnailType": "JPG",
-      "cacheVersion": "749d970",
-      "lastUpdated": "2025-11-14T10:50:39.799708"
+      "cacheVersion": "30a664c",
+      "lastUpdated": "2025-11-14T10:53:01.631900"
     },
     {
       "id": 12,
       "title": "天鹅湖(Swan Lake)",
+      "type": "",
       "filename": "NV8xNzYyOTQ4MjIx.mp4",
       "url": "videos/NV8xNzYyOTQ4MjIx.mp4",
       "description": "这是关于天鹅湖(Swan Lake)的详细说明视频",
@@ -189,12 +201,13 @@
       "resolution": "0x1",
       "createdAt": "2025-11-14",
       "thumbnailType": "JPG",
-      "cacheVersion": "749d970",
-      "lastUpdated": "2025-11-14T10:50:39.894564"
+      "cacheVersion": "30a664c",
+      "lastUpdated": "2025-11-14T10:53:01.711203"
     },
     {
       "id": 13,
       "title": "街舞(Street dance)",
+      "type": "",
       "filename": "Nl8xNzYyOTQ4MjIx.mp4",
       "url": "videos/Nl8xNzYyOTQ4MjIx.mp4",
       "description": "这是关于街舞(Street dance)的详细说明视频",
@@ -205,12 +218,13 @@
       "resolution": "0x1",
       "createdAt": "2025-11-14",
       "thumbnailType": "JPG",
-      "cacheVersion": "749d970",
-      "lastUpdated": "2025-11-14T10:50:39.987770"
+      "cacheVersion": "30a664c",
+      "lastUpdated": "2025-11-14T10:53:01.808052"
     },
     {
       "id": 14,
       "title": "太极拳(Tai-Chi)",
+      "type": "",
       "filename": "OF8xNzYyOTQ4MjIx.mp4",
       "url": "videos/OF8xNzYyOTQ4MjIx.mp4",
       "description": "这是关于太极拳(Tai-Chi)的详细说明视频",
@@ -221,12 +235,13 @@
       "resolution": "0x1",
       "createdAt": "2025-11-14",
       "thumbnailType": "JPG",
-      "cacheVersion": "749d970",
-      "lastUpdated": "2025-11-14T10:50:40.076351"
+      "cacheVersion": "30a664c",
+      "lastUpdated": "2025-11-14T10:53:01.894356"
     },
     {
       "id": 15,
       "title": "自由泳(Freestyle)",
+      "type": "",
       "filename": "OV8xNzYyOTQ4MjIx.mp4",
       "url": "videos/OV8xNzYyOTQ4MjIx.mp4",
       "description": "这是关于自由泳(Freestyle)的详细说明视频",
@@ -237,8 +252,8 @@
       "resolution": "0x1",
       "createdAt": "2025-11-14",
       "thumbnailType": "JPG",
-      "cacheVersion": "749d970",
-      "lastUpdated": "2025-11-14T10:50:40.166821"
+      "cacheVersion": "30a664c",
+      "lastUpdated": "2025-11-14T10:53:01.983022"
     }
   ],
   "pagination": {
@@ -249,10 +264,10 @@
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-14T10:50:40Z",
+  "lastUpdated": "2025-11-14T10:53:01Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
-  "cacheVersion": "749d970",
+  "cacheVersion": "30a664c",
   "cachePolicy": {
     "maxAge": 0,
     "mustRevalidate": true,
@@ -264,6 +279,5 @@
     "paginated": "/videos.json?page={page}&limit={limit}",
     "search": "/videos.json?search={keyword}",
     "byId": "/videos.json?id={id}"
-  },
-  "latestCommitSha": "ed4b9232ec655735d24bcce6d73c503b776a62ca"
+  }
 }
