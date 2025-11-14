@@ -91,10 +91,11 @@
         <!-- 原有内容保持不变 -->
         <div class="main-content">
             <div class="card">
-                <h2 class="section-title"><i class="fas fa-play-circle"></i> 视频列表</h2>
+                <!-- 视频列表相关元素已隐藏 -->
+                <h2 class="section-title" style="display: none;"><i class="fas fa-play-circle"></i> 视频列表</h2>
                 
                 <!-- 搜索和筛选 -->
-                <div class="search-box">
+                <div class="search-box" style="display: none;">
                     <input type="text" id="searchInput" class="search-input" placeholder="搜索视频标题或描述...">
                     <button onclick="searchVideos()" class="search-btn">
                         <i class="fas fa-search"></i> 搜索
@@ -104,7 +105,7 @@
                     </button>
                 </div>
                 
-                <div class="filters">
+                <div class="filters" style="display: none;">
                     <select id="sortSelect" class="filter-select" onchange="loadVideos()">
                         <option value="title">按标题排序</option>
                         <option value="duration">按时长排序</option>
@@ -120,7 +121,7 @@
                     </select>
                 </div>
                 
-                <div id="video-container">
+                <div id="video-container" style="display: none;">
                     <div class="loading" id="loading">
                         <div class="loading-spinner"></div>
                         <p>正在加载视频列表...</p>
@@ -140,6 +141,7 @@
                     </button>
                 </div>
                 
+                <!-- 视频播放器 -->
                 <div class="video-player-container" id="player-container" style="display: none;">
                     <h3 id="current-video-title">视频播放器</h3>
                     <div class="cdn-status-bar" style="margin-bottom: 15px; background: #f0fdf4; border-color: #bbf7d0;">
@@ -251,9 +253,110 @@
         let currentSort = 'title';
         let currentCDN = null;
         let cdnSpeeds = {};
+        let userRegion = null; // 'cn' 或 'global'，根据IP判断
 
         // 初始化视频播放器
         const player = videojs('my-video');
+
+        // 根据IP地址检测用户地理位置
+        async function detectUserRegionByIP() {
+            // 如果已经检测过，直接返回
+            if (userRegion) {
+                return userRegion;
+            }
+
+            // 使用多个免费IP地理位置API检测（按优先级排序）
+            const geoApis = [
+                {
+                    name: 'ipapi.co',
+                    url: 'https://ipapi.co/json/',
+                    parse: (data) => {
+                        // 检查国家代码是否为CN
+                        return data.country_code === 'CN' ? 'cn' : 'global';
+                    }
+                },
+                {
+                    name: 'ip-api.com',
+                    url: 'https://ip-api.com/json/?fields=countryCode',
+                    parse: (data) => {
+                        return data.countryCode === 'CN' ? 'cn' : 'global';
+                    }
+                },
+                {
+                    name: 'ip.sb',
+                    url: 'https://api.ip.sb/geoip',
+                    parse: (data) => {
+                        return data.country_code === 'CN' ? 'cn' : 'global';
+                    }
+                },
+                {
+                    name: 'ipify',
+                    url: 'https://api.ipify.org?format=json',
+                    parse: async (data) => {
+                        // ipify只返回IP，需要再次查询地理位置
+                        try {
+                            const geoResponse = await fetch(`https://ipapi.co/${data.ip}/json/`);
+                            const geoData = await geoResponse.json();
+                            return geoData.country_code === 'CN' ? 'cn' : 'global';
+                        } catch {
+                            return 'global';
+                        }
+                    }
+                }
+            ];
+
+            // 尝试每个API，直到成功
+            for (const api of geoApis) {
+                try {
+                    const response = await Promise.race([
+                        fetch(api.url, {
+                            method: 'GET',
+                            credentials: 'omit',
+                            cache: 'no-cache'
+                        }),
+                        new Promise((_, reject) => 
+                            setTimeout(() => reject(new Error('Timeout')), 3000)
+                        )
+                    ]);
+
+                    if (response && response.ok) {
+                        const data = await response.json();
+                        
+                        // 执行parse函数（可能是同步或异步）
+                        const result = api.parse(data);
+                        userRegion = result instanceof Promise ? await result : result;
+                        
+                        console.log(`🌍 [${api.name}] 检测到用户IP位置: ${userRegion === 'cn' ? '中国' : '国际'}`);
+                        return userRegion;
+                    }
+                } catch (error) {
+                    // 静默失败，尝试下一个API
+                    console.debug(`⚠️ [${api.name}] IP检测失败，尝试下一个API`);
+                    continue;
+                }
+            }
+
+            // 如果所有API都失败，使用备用方案：通过时区和语言推断
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const language = navigator.language || navigator.userLanguage;
+            
+            // 中国时区或中文语言环境
+            if (timezone.includes('Shanghai') || 
+                timezone.includes('Beijing') || 
+                timezone.includes('Chongqing') ||
+                timezone.includes('Urumqi') ||
+                timezone.includes('Hong_Kong') ||
+                language.startsWith('zh')) {
+                userRegion = 'cn';
+                console.log(`🌍 通过时区/语言推断: 中国 (${timezone}, ${language})`);
+                return userRegion;
+            }
+
+            // 默认使用国际CDN
+            userRegion = 'global';
+            console.log(`🌍 使用默认设置: 国际`);
+            return userRegion;
+        }
 
 
         // 测试CDN速度
@@ -262,11 +365,28 @@
             const speedTest = document.getElementById('speedTest');
             const switcher = document.getElementById('cdnSwitcher');
             
-            statusText.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> 正在测试CDN速度...';
+            statusText.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> 正在检测IP位置并测试CDN速度...';
             
-            // 优先测试国内友好的 CDN（并行测试，但优先处理结果）
+            // 先根据IP检测用户地理位置
+            await detectUserRegionByIP();
+            
+            // 根据IP位置决定优先测试的CDN
             const cnCDNs = FREE_CDNS.filter(cdn => cdn.region === 'cn');
             const globalCDNs = FREE_CDNS.filter(cdn => cdn.region === 'global');
+            
+            // 根据用户IP位置决定优先测试顺序
+            let primaryCDNs, secondaryCDNs, regionName, regionEmoji;
+            if (userRegion === 'cn') {
+                primaryCDNs = cnCDNs;
+                secondaryCDNs = globalCDNs;
+                regionName = '中国';
+                regionEmoji = '🇨🇳';
+            } else {
+                primaryCDNs = globalCDNs;
+                secondaryCDNs = cnCDNs;
+                regionName = '国际';
+                regionEmoji = '🌍';
+            }
             
             // 测试函数
             const testCDN = async (cdn) => {
@@ -304,29 +424,32 @@
                 }
             };
             
-            // 先测试国内 CDN（并行）
-            const cnTests = cnCDNs.map(cdn => testCDN(cdn));
-            const cnResults = await Promise.all(cnTests);
+            // 先测试主要CDN（根据IP位置决定是国内还是国际）
+            const primaryTests = primaryCDNs.map(cdn => testCDN(cdn));
+            const primaryResults = await Promise.all(primaryTests);
             
-            // 检查是否有可用的国内 CDN
-            const workingCnCDNs = cnResults.filter(r => r.success && r.speed < 3000);
+            // 检查是否有可用的主要CDN（根据区域设置不同的速度阈值）
+            const speedThreshold = userRegion === 'cn' ? 3000 : 5000;
+            const workingPrimaryCDNs = primaryResults.filter(r => r.success && r.speed < speedThreshold);
             
-            if (workingCnCDNs.length > 0) {
-                // 优先使用国内 CDN，按速度和优先级排序
-                workingCnCDNs.sort((a, b) => {
-                    // 如果速度相近（差异小于 800ms），按优先级排序
-                    if (Math.abs(a.speed - b.speed) < 800) {
+            if (workingPrimaryCDNs.length > 0) {
+                // 按速度和优先级排序
+                workingPrimaryCDNs.sort((a, b) => {
+                    // 如果速度相近（差异小于阈值），按优先级排序
+                    const speedDiff = Math.abs(a.speed - b.speed);
+                    const threshold = userRegion === 'cn' ? 800 : 1000;
+                    if (speedDiff < threshold) {
                         return (a.cdn.priority || 999) - (b.cdn.priority || 999);
                     }
                     return a.speed - b.speed;
                 });
                 
-                currentCDN = workingCnCDNs[0].cdn;
+                currentCDN = workingPrimaryCDNs[0].cdn;
                 
                 statusText.innerHTML = `
                     <i class="fas fa-check-circle" style="color: #10b981;"></i>
-                    已选择最快CDN: <span class="cdn-badge success">${currentCDN.name}</span>
-                    <span style="color: #6b7280; font-size: 12px;">(${Math.round(workingCnCDNs[0].speed)}ms)</span>
+                    已选择最快CDN ${regionEmoji} (${regionName}IP): <span class="cdn-badge success">${currentCDN.name}</span>
+                    <span style="color: #6b7280; font-size: 12px;">(${Math.round(workingPrimaryCDNs[0].speed)}ms)</span>
                 `;
                 
                 // 显示CDN切换器
@@ -342,33 +465,35 @@
                 }).join('');
                 
                 // 显示速度测试结果
-                const topResults = workingCnCDNs.slice(0, 3);
-                speedTest.innerHTML = '速度测试: ' + topResults.map((result, index) => 
+                const topResults = workingPrimaryCDNs.slice(0, 3);
+                speedTest.innerHTML = `速度测试 (${regionName}IP优先): ` + topResults.map((result, index) => 
                     `${result.cdn.name}(${Math.round(result.speed)}ms)${index < topResults.length - 1 ? ' → ' : ''}`
                 ).join('');
                 
                 return true;
             }
             
-            // 如果国内 CDN 都失败，测试国际 CDN
-            const globalTests = globalCDNs.map(cdn => testCDN(cdn));
-            const globalResults = await Promise.all(globalTests);
+            // 如果主要CDN都失败，测试备用CDN
+            const secondaryTests = secondaryCDNs.map(cdn => testCDN(cdn));
+            const secondaryResults = await Promise.all(secondaryTests);
             
-            const workingGlobalCDNs = globalResults.filter(r => r.success && r.speed < 5000);
-            workingGlobalCDNs.sort((a, b) => {
+            const workingSecondaryCDNs = secondaryResults.filter(r => r.success && r.speed < 5000);
+            workingSecondaryCDNs.sort((a, b) => {
                 if (Math.abs(a.speed - b.speed) < 1000) {
                     return (a.cdn.priority || 999) - (b.cdn.priority || 999);
                 }
                 return a.speed - b.speed;
             });
             
-            if (workingGlobalCDNs.length > 0) {
-                currentCDN = workingGlobalCDNs[0].cdn;
+            if (workingSecondaryCDNs.length > 0) {
+                currentCDN = workingSecondaryCDNs[0].cdn;
+                const fallbackRegion = userRegion === 'cn' ? '国际' : '中国';
+                const fallbackEmoji = userRegion === 'cn' ? '🌍' : '🇨🇳';
                 
                 statusText.innerHTML = `
                     <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i>
-                    使用国际CDN: <span class="cdn-badge warning">${currentCDN.name}</span>
-                    <span style="color: #6b7280; font-size: 12px;">(${Math.round(workingGlobalCDNs[0].speed)}ms)</span>
+                    使用备用${fallbackRegion}CDN ${fallbackEmoji}: <span class="cdn-badge warning">${currentCDN.name}</span>
+                    <span style="color: #6b7280; font-size: 12px;">(${Math.round(workingSecondaryCDNs[0].speed)}ms)</span>
                 `;
                 
                 // 显示CDN切换器
@@ -604,84 +729,25 @@
                 
             } catch (error) {
                 console.error('加载视频失败:', error);
-                document.getElementById('loading').innerHTML = 
-                    `<div class="error">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        加载视频列表失败: ${error.message}
-                        <button onclick="loadAllVideos()" style="margin-left: 10px; padding: 5px 10px; background: #3b82f6; color: white; border: none; border-radius: 4px;">重试</button>
-                    </div>`;
+                // 视频列表已隐藏，不再显示错误信息
+                const loading = document.getElementById('loading');
+                if (loading) {
+                    loading.style.display = 'none';
+                }
             }
         }
 
-        // 渲染视频列表
+        // 渲染视频列表（已隐藏，仅保留数据加载功能）
         function renderVideos() {
-            const container = document.getElementById('video-container');
+            // 视频列表已隐藏，不再渲染
+            // 只保留数据加载功能，供其他功能使用
             const loading = document.getElementById('loading');
-            const pagination = document.getElementById('pagination');
-            
-            if (allVideos.length === 0) {
-                loading.innerHTML = '<div class="error">没有找到视频数据</div>';
-                pagination.style.display = 'none';
-                return;
+            if (loading) {
+                loading.style.display = 'none';
             }
             
-            loading.style.display = 'none';
-            
-            // 过滤和排序
-            let filteredVideos = filterVideos(allVideos);
-            filteredVideos = sortVideos(filteredVideos);
-            
-            // 分页计算
-            const totalVideos = filteredVideos.length;
-            const totalPages = Math.ceil(totalVideos / pageSize);
-            const startIndex = (currentPage - 1) * pageSize;
-            const endIndex = startIndex + pageSize;
-            const paginatedVideos = filteredVideos.slice(startIndex, endIndex);
-            
-            // 渲染视频卡片
-            let html = '<div class="video-grid">';
-            paginatedVideos.forEach(video => {
-                const thumbnailFilename = video.thumbnail ? 
-                    video.thumbnail.split('/').pop() : 
-                    video.filename.replace('.mp4', '.jpg').replace('.mov', '.jpg');
-                
-                html += `
-                    <div class="video-card" onclick="playVideo('${video.filename}', '${video.title.replace(/'/g, "\\'")}')">
-                        <div class="video-thumbnail">
-                            <img src="${generateThumbnailUrl(thumbnailFilename)}" 
-                                 alt="${video.title}"
-                                 onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZjNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPua1geafpeeJueauijwvdGV4dD48L3N2Zz4=';" />
-                        </div>
-                        <div class="video-info">
-                            <div class="video-title">${video.title}</div>
-                            <div class="video-description">${video.description}</div>
-                            <div class="video-meta">
-                                <div class="meta-item">
-                                    <i class="fas fa-clock"></i>
-                                    <span>${video.duration}</span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="fas fa-weight-hanging"></i>
-                                    <span>${video.size}</span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="fas fa-wifi"></i>
-                                    <span>${currentCDN.name}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            html += '</div>';
-            
-            container.innerHTML = html;
-            updatePagination(totalVideos, totalPages);
-            
-            // 自动播放第一个视频
-            if (paginatedVideos.length > 0) {
-                playVideo(paginatedVideos[0].filename, paginatedVideos[0].title);
-            }
+            // 不再自动播放视频
+            // 视频需要通过其他方式（如URL参数或API调用）来播放
         }
 
         // 播放视频（带CDN回退）
@@ -698,25 +764,29 @@
             let retryCount = 0;
             const maxRetries = Math.min(6, FREE_CDNS.length); // 最多尝试6个CDN
 
-            // 获取下一个要尝试的 CDN（优先国内 CDN）
+            // 获取下一个要尝试的 CDN（根据IP位置优先选择）
             const getNextCDN = () => {
-                // 优先尝试国内 CDN
-                const untriedCnCDNs = FREE_CDNS.filter(cdn => 
-                    cdn.region === 'cn' && !triedCDNs.has(cdn.id)
+                // 根据IP位置决定优先尝试的CDN类型
+                const preferredRegion = userRegion || 'cn'; // 默认优先国内
+                
+                // 优先尝试与IP位置匹配的 CDN
+                const untriedPreferredCDNs = FREE_CDNS.filter(cdn => 
+                    cdn.region === preferredRegion && !triedCDNs.has(cdn.id)
                 );
-                if (untriedCnCDNs.length > 0) {
+                if (untriedPreferredCDNs.length > 0) {
                     // 按优先级排序
-                    untriedCnCDNs.sort((a, b) => (a.priority || 999) - (b.priority || 999));
-                    return untriedCnCDNs[0];
+                    untriedPreferredCDNs.sort((a, b) => (a.priority || 999) - (b.priority || 999));
+                    return untriedPreferredCDNs[0];
                 }
                 
-                // 如果没有可用的国内 CDN，尝试国际 CDN
-                const untriedGlobalCDNs = FREE_CDNS.filter(cdn => 
-                    cdn.region === 'global' && !triedCDNs.has(cdn.id)
+                // 如果没有可用的优先 CDN，尝试备用区域的 CDN
+                const fallbackRegion = preferredRegion === 'cn' ? 'global' : 'cn';
+                const untriedFallbackCDNs = FREE_CDNS.filter(cdn => 
+                    cdn.region === fallbackRegion && !triedCDNs.has(cdn.id)
                 );
-                if (untriedGlobalCDNs.length > 0) {
-                    untriedGlobalCDNs.sort((a, b) => (a.priority || 999) - (b.priority || 999));
-                    return untriedGlobalCDNs[0];
+                if (untriedFallbackCDNs.length > 0) {
+                    untriedFallbackCDNs.sort((a, b) => (a.priority || 999) - (b.priority || 999));
+                    return untriedFallbackCDNs[0];
                 }
                 
                 return null;
