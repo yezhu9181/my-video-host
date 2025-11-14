@@ -157,48 +157,89 @@
     <script>
         // 免配置CDN列表 - 全部基于GitHub
         // 顺序已优化：在中国网络环境下更稳定的 CDN 排在前面
+        // 优先使用国内友好的代理服务
         const FREE_CDNS = [
+            // 国内友好的 GitHub 代理服务（优先）
             {
-                id: 'jsdelivr',
-                name: 'jsDelivr',
-                url: 'https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main',
-                testUrl: 'https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json',
-                region: 'global'
+                id: 'ghproxy',
+                name: 'GHProxy (推荐)',
+                url: 'https://ghproxy.com/https://raw.githubusercontent.com/yezhu9181/my-video-host/main',
+                testUrl: 'https://ghproxy.com/https://raw.githubusercontent.com/yezhu9181/my-video-host/main/videos.json',
+                region: 'cn',
+                priority: 1
             },
+            {
+                id: 'ghps',
+                name: 'GHPS',
+                url: 'https://ghps.cc/https://raw.githubusercontent.com/yezhu9181/my-video-host/main',
+                testUrl: 'https://ghps.cc/https://raw.githubusercontent.com/yezhu9181/my-video-host/main/videos.json',
+                region: 'cn',
+                priority: 2
+            },
+            {
+                id: 'fastgit',
+                name: 'FastGit',
+                url: 'https://raw.fastgit.org/yezhu9181/my-video-host/main',
+                testUrl: 'https://raw.fastgit.org/yezhu9181/my-video-host/main/videos.json',
+                region: 'cn',
+                priority: 3
+            },
+            {
+                id: 'hubfastgit',
+                name: 'Hub FastGit',
+                url: 'https://hub.fastgit.xyz/yezhu9181/my-video-host/raw/main',
+                testUrl: 'https://hub.fastgit.xyz/yezhu9181/my-video-host/raw/main/videos.json',
+                region: 'cn',
+                priority: 4
+            },
+            // 国际 CDN（备用）
             {
                 id: 'statically',
                 name: 'Statically',
                 url: 'https://cdn.statically.io/gh/yezhu9181/my-video-host/main',
                 testUrl: 'https://cdn.statically.io/gh/yezhu9181/my-video-host/main/videos.json',
-                region: 'global'
+                region: 'global',
+                priority: 5
             },
             {
                 id: 'combat',
                 name: 'Combat CDN',
                 url: 'https://combat.cdn.workers.dev/gh/yezhu9181/my-video-host/main',
                 testUrl: 'https://combat.cdn.workers.dev/gh/yezhu9181/my-video-host/main/videos.json',
-                region: 'global'
+                region: 'global',
+                priority: 6
             },
             {
                 id: 'githack',
                 name: 'GitHack',
                 url: 'https://rawcdn.githack.com/yezhu9181/my-video-host/main',
                 testUrl: 'https://rawcdn.githack.com/yezhu9181/my-video-host/main/videos.json',
-                region: 'global'
+                region: 'global',
+                priority: 7
             },
             {
                 id: 'gitcdn',
                 name: 'GitCDN',
                 url: 'https://gitcdn.link/cdn/yezhu9181/my-video-host/main',
                 testUrl: 'https://gitcdn.link/cdn/yezhu9181/my-video-host/main/videos.json',
-                region: 'global'
+                region: 'global',
+                priority: 8
+            },
+            {
+                id: 'jsdelivr',
+                name: 'jsDelivr',
+                url: 'https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main',
+                testUrl: 'https://cdn.jsdelivr.net/gh/yezhu9181/my-video-host@main/videos.json',
+                region: 'global',
+                priority: 9
             },
             {
                 id: 'github',
                 name: 'GitHub Raw',
                 url: 'https://raw.githubusercontent.com/yezhu9181/my-video-host/main',
                 testUrl: 'https://raw.githubusercontent.com/yezhu9181/my-video-host/main/videos.json',
-                region: 'global'
+                region: 'global',
+                priority: 10
             }
         ];
 
@@ -223,84 +264,146 @@
             
             statusText.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> 正在测试CDN速度...';
             
-            // 测试每个CDN的速度
-            const speedTests = FREE_CDNS.map(async (cdn) => {
+            // 优先测试国内友好的 CDN（并行测试，但优先处理结果）
+            const cnCDNs = FREE_CDNS.filter(cdn => cdn.region === 'cn');
+            const globalCDNs = FREE_CDNS.filter(cdn => cdn.region === 'global');
+            
+            // 测试函数
+            const testCDN = async (cdn) => {
                 const startTime = performance.now();
                 
                 try {
                     const testUrl = getCdnUrl(cdn.testUrl);
                     
-                    // 使用 Promise.race 添加超时控制
+                    // 使用 GET 方法测试（某些 CDN 不支持 HEAD）
                     const fetchPromise = fetch(`${testUrl}`, {
-                        method: 'HEAD',
-                        mode: 'no-cors',
-                        credentials: 'omit'
+                        method: 'GET',
+                        credentials: 'omit',
+                        cache: 'no-cache'
                     });
                     
                     const timeoutPromise = new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('Timeout')), 10000)
+                        setTimeout(() => reject(new Error('Timeout')), 8000)
                     );
                     
-                    await Promise.race([fetchPromise, timeoutPromise]);
+                    const response = await Promise.race([fetchPromise, timeoutPromise]);
                     
-                    const speed = performance.now() - startTime;
-                    cdnSpeeds[cdn.id] = speed;
-                    
-                    return { cdn, speed, success: true };
+                    // 检查响应状态
+                    if (response && response.ok) {
+                        // 只读取一小部分数据来测试速度
+                        await response.text();
+                        const speed = performance.now() - startTime;
+                        cdnSpeeds[cdn.id] = speed;
+                        return { cdn, speed, success: true };
+                    } else {
+                        throw new Error('Response not ok');
+                    }
                 } catch (error) {
-                    // 静默处理错误，不输出到控制台，避免污染日志
                     cdnSpeeds[cdn.id] = Infinity;
                     return { cdn, speed: Infinity, success: false };
                 }
-            });
-
-            const results = await Promise.all(speedTests);
+            };
             
-            // 排序并选择最快的CDN
-            // 优先选择非 GitHub Raw 的 CDN（在中国更稳定）
-            const workingCDNs = results.filter(r => r.success && r.speed < 2000);
-            workingCDNs.sort((a, b) => {
-                // 如果速度相近（差异小于 500ms），优先选择非 GitHub Raw
-                if (Math.abs(a.speed - b.speed) < 500) {
-                    if (a.cdn.id === 'github' && b.cdn.id !== 'github') return 1;
-                    if (b.cdn.id === 'github' && a.cdn.id !== 'github') return -1;
-                }
-                return a.speed - b.speed;
-            });
+            // 先测试国内 CDN（并行）
+            const cnTests = cnCDNs.map(cdn => testCDN(cdn));
+            const cnResults = await Promise.all(cnTests);
             
-            if (workingCDNs.length > 0) {
-                currentCDN = workingCDNs[0].cdn;
+            // 检查是否有可用的国内 CDN
+            const workingCnCDNs = cnResults.filter(r => r.success && r.speed < 3000);
+            
+            if (workingCnCDNs.length > 0) {
+                // 优先使用国内 CDN，按速度和优先级排序
+                workingCnCDNs.sort((a, b) => {
+                    // 如果速度相近（差异小于 800ms），按优先级排序
+                    if (Math.abs(a.speed - b.speed) < 800) {
+                        return (a.cdn.priority || 999) - (b.cdn.priority || 999);
+                    }
+                    return a.speed - b.speed;
+                });
+                
+                currentCDN = workingCnCDNs[0].cdn;
                 
                 statusText.innerHTML = `
                     <i class="fas fa-check-circle" style="color: #10b981;"></i>
                     已选择最快CDN: <span class="cdn-badge success">${currentCDN.name}</span>
-                    <span style="color: #6b7280; font-size: 12px;">(${Math.round(workingCDNs[0].speed)}ms)</span>
+                    <span style="color: #6b7280; font-size: 12px;">(${Math.round(workingCnCDNs[0].speed)}ms)</span>
                 `;
                 
                 // 显示CDN切换器
-                switcher.innerHTML = '切换CDN: ' + FREE_CDNS.map(cdn => 
-                    `<button class="cdn-btn ${cdn.id === currentCDN.id ? 'active' : ''}" 
+                switcher.innerHTML = '切换CDN: ' + FREE_CDNS.map(cdn => {
+                    const speed = cdnSpeeds[cdn.id];
+                    const speedText = speed && speed < Infinity ? `${Math.round(speed)}ms` : '未测试';
+                    const regionBadge = cdn.region === 'cn' ? ' 🇨🇳' : '';
+                    return `<button class="cdn-btn ${cdn.id === currentCDN.id ? 'active' : ''}" 
                             onclick="switchCDN('${cdn.id}')"
-                            title="${cdnSpeeds[cdn.id] ? Math.round(cdnSpeeds[cdn.id]) + 'ms' : '测试失败'}">
-                        ${cdn.name}
-                    </button>`
-                ).join('');
+                            title="${speedText}">
+                        ${cdn.name}${regionBadge}
+                    </button>`;
+                }).join('');
                 
                 // 显示速度测试结果
-                speedTest.innerHTML = '速度测试: ' + workingCDNs.slice(0, 3).map((result, index) => 
-                    `${result.cdn.name}(${Math.round(result.speed)}ms)${index < 2 ? ' → ' : ''}`
+                const topResults = workingCnCDNs.slice(0, 3);
+                speedTest.innerHTML = '速度测试: ' + topResults.map((result, index) => 
+                    `${result.cdn.name}(${Math.round(result.speed)}ms)${index < topResults.length - 1 ? ' → ' : ''}`
                 ).join('');
                 
-            } else {
-                // 所有CDN都失败，使用jsDelivr作为备用
-                currentCDN = FREE_CDNS[0];
-                statusText.innerHTML = `
-                    <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i>
-                    使用备用CDN: <span class="cdn-badge warning">${currentCDN.name}</span>
-                `;
+                return true;
             }
             
-            return workingCDNs.length > 0;
+            // 如果国内 CDN 都失败，测试国际 CDN
+            const globalTests = globalCDNs.map(cdn => testCDN(cdn));
+            const globalResults = await Promise.all(globalTests);
+            
+            const workingGlobalCDNs = globalResults.filter(r => r.success && r.speed < 5000);
+            workingGlobalCDNs.sort((a, b) => {
+                if (Math.abs(a.speed - b.speed) < 1000) {
+                    return (a.cdn.priority || 999) - (b.cdn.priority || 999);
+                }
+                return a.speed - b.speed;
+            });
+            
+            if (workingGlobalCDNs.length > 0) {
+                currentCDN = workingGlobalCDNs[0].cdn;
+                
+                statusText.innerHTML = `
+                    <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i>
+                    使用国际CDN: <span class="cdn-badge warning">${currentCDN.name}</span>
+                    <span style="color: #6b7280; font-size: 12px;">(${Math.round(workingGlobalCDNs[0].speed)}ms)</span>
+                `;
+                
+                // 显示CDN切换器
+                switcher.innerHTML = '切换CDN: ' + FREE_CDNS.map(cdn => {
+                    const speed = cdnSpeeds[cdn.id];
+                    const speedText = speed && speed < Infinity ? `${Math.round(speed)}ms` : '未测试';
+                    const regionBadge = cdn.region === 'cn' ? ' 🇨🇳' : '';
+                    return `<button class="cdn-btn ${cdn.id === currentCDN.id ? 'active' : ''}" 
+                            onclick="switchCDN('${cdn.id}')"
+                            title="${speedText}">
+                        ${cdn.name}${regionBadge}
+                    </button>`;
+                }).join('');
+                
+                return true;
+            }
+            
+            // 所有 CDN 都失败，使用第一个作为备用
+            currentCDN = FREE_CDNS[0];
+            statusText.innerHTML = `
+                <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+                使用备用CDN: <span class="cdn-badge error">${currentCDN.name}</span>
+                <span style="color: #6b7280; font-size: 12px;">(请手动切换)</span>
+            `;
+            
+            // 显示所有 CDN 选项供手动切换
+            switcher.innerHTML = '切换CDN: ' + FREE_CDNS.map(cdn => {
+                const regionBadge = cdn.region === 'cn' ? ' 🇨🇳' : '';
+                return `<button class="cdn-btn ${cdn.id === currentCDN.id ? 'active' : ''}" 
+                        onclick="switchCDN('${cdn.id}')">
+                    ${cdn.name}${regionBadge}
+                </button>`;
+            }).join('');
+            
+            return false;
         }
 
         // 切换CDN
@@ -591,43 +694,100 @@
             currentVideoTitle.textContent = title;
             playerCdnInfo.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i> 正在通过 ${currentCDN.name} 加载视频...`;
 
-            let videoUrl = generateVideoUrl(filename);
+            let triedCDNs = new Set([currentCDN.id]);
             let retryCount = 0;
-            const maxRetries = 3;
+            const maxRetries = Math.min(6, FREE_CDNS.length); // 最多尝试6个CDN
+
+            // 获取下一个要尝试的 CDN（优先国内 CDN）
+            const getNextCDN = () => {
+                // 优先尝试国内 CDN
+                const untriedCnCDNs = FREE_CDNS.filter(cdn => 
+                    cdn.region === 'cn' && !triedCDNs.has(cdn.id)
+                );
+                if (untriedCnCDNs.length > 0) {
+                    // 按优先级排序
+                    untriedCnCDNs.sort((a, b) => (a.priority || 999) - (b.priority || 999));
+                    return untriedCnCDNs[0];
+                }
+                
+                // 如果没有可用的国内 CDN，尝试国际 CDN
+                const untriedGlobalCDNs = FREE_CDNS.filter(cdn => 
+                    cdn.region === 'global' && !triedCDNs.has(cdn.id)
+                );
+                if (untriedGlobalCDNs.length > 0) {
+                    untriedGlobalCDNs.sort((a, b) => (a.priority || 999) - (b.priority || 999));
+                    return untriedGlobalCDNs[0];
+                }
+                
+                return null;
+            };
 
             const tryPlay = async () => {
                 try {
+                    const videoUrl = generateVideoUrl(filename);
+                    
+                    // 设置视频源
                     player.src({
                         src: videoUrl,
                         type: 'video/mp4'
                     });
                     
-                    player.one('loadeddata', () => {
+                    // 监听加载成功
+                    const successHandler = () => {
+                        const regionBadge = currentCDN.region === 'cn' ? ' 🇨🇳' : '';
                         playerCdnInfo.innerHTML = 
-                            `<i class="fas fa-check-circle" style="color: #10b981;"></i> 正在通过 ${currentCDN.name} 播放`;
-                    });
+                            `<i class="fas fa-check-circle" style="color: #10b981;"></i> 正在通过 ${currentCDN.name}${regionBadge} 播放`;
+                        player.off('error', errorHandler);
+                    };
                     
-                    player.one('error', async () => {
+                    // 监听加载失败
+                    const errorHandler = async () => {
+                        player.off('loadeddata', successHandler);
+                        const failedCDN = currentCDN; // 保存失败的 CDN
                         retryCount++;
-                        if (retryCount < maxRetries) {
-                            // 切换到下一个CDN
-                            const currentIndex = FREE_CDNS.findIndex(cdn => cdn.id === currentCDN.id);
-                            const nextCDN = FREE_CDNS[(currentIndex + 1) % FREE_CDNS.length];
-                            
-                            playerCdnInfo.innerHTML = 
-                                `<i class="fas fa-sync-alt fa-spin"></i> ${currentCDN.name} 加载失败，尝试 ${nextCDN.name}...`;
-                            
+                        
+                        const nextCDN = getNextCDN();
+                        
+                        if (nextCDN && retryCount < maxRetries) {
+                            triedCDNs.add(failedCDN.id);
                             currentCDN = nextCDN;
-                            videoUrl = generateVideoUrl(filename);
-                            await tryPlay();
+                            
+                            const regionBadge = nextCDN.region === 'cn' ? ' 🇨🇳' : '';
+                            playerCdnInfo.innerHTML = 
+                                `<i class="fas fa-sync-alt fa-spin"></i> ${failedCDN.name} 加载失败，尝试 ${nextCDN.name}${regionBadge}... (${retryCount}/${maxRetries})`;
+                            
+                            // 短暂延迟后重试
+                            setTimeout(() => {
+                                tryPlay();
+                            }, 500);
                         } else {
                             playerCdnInfo.innerHTML = 
-                                `<i class="fas fa-times-circle" style="color: #ef4444;"></i> 所有CDN均无法加载视频`;
+                                `<i class="fas fa-times-circle" style="color: #ef4444;"></i> 已尝试 ${retryCount} 个CDN，均无法加载视频。请手动切换CDN或检查网络连接。`;
                         }
-                    });
+                    };
+                    
+                    player.one('loadeddata', successHandler);
+                    player.one('error', errorHandler);
+                    
+                    // 设置超时检测
+                    const timeoutId = setTimeout(() => {
+                        if (player.readyState() < 2) { // 如果视频还没开始加载数据
+                            errorHandler();
+                        }
+                    }, 10000); // 10秒超时
+                    
+                    player.one('loadeddata', () => clearTimeout(timeoutId));
+                    player.one('error', () => clearTimeout(timeoutId));
                     
                 } catch (error) {
                     console.error('播放视频失败:', error);
+                    const nextCDN = getNextCDN();
+                    if (nextCDN && retryCount < maxRetries) {
+                        retryCount++;
+                        triedCDNs.add(currentCDN.id);
+                        currentCDN = nextCDN;
+                        setTimeout(() => tryPlay(), 500);
+                    }
                 }
             };
 
