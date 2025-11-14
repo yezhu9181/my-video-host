@@ -499,10 +499,12 @@ class VideoLibraryUpdater:
             seconds = estimated_seconds % 60
             return f"{minutes}:{seconds:02d}"
     
-    def generate_video_data(self, video_files, existing_titles=None, original_to_base64_map=None):
+    def generate_video_data(self, video_files, existing_titles=None, existing_types=None, original_to_base64_map=None):
         """生成视频数据（带缓存优化）"""
         if existing_titles is None:
             existing_titles = {}
+        if existing_types is None:
+            existing_types = {}
         if original_to_base64_map is None:
             original_to_base64_map = {}
         
@@ -538,6 +540,17 @@ class VideoLibraryUpdater:
             if not title:
                 title = self.generate_friendly_title(name_without_ext)
             
+            # 获取已有的 type 值，如果没有则使用空字符串
+            video_type = ""
+            if video_filename in existing_types:
+                video_type = existing_types[video_filename] or ""
+            else:
+                # 尝试通过原始文件名查找（如果存在映射）
+                for orig_name, base64_name in original_to_base64_map.items():
+                    if base64_name == video_filename and orig_name in existing_types:
+                        video_type = existing_types[orig_name] or ""
+                        break
+            
             description = self.generate_description(title)
             file_size = self.get_file_size(video_filename)
             
@@ -561,7 +574,7 @@ class VideoLibraryUpdater:
             video_data = {
                 "id": i,
                 "title": title,
-                "type": "",  # 视频类型，默认为空字符串
+                "type": video_type,  # 视频类型，保留已有值或默认为空字符串
                 "filename": video_filename,
                 "url": video_url,  # 相对路径：videos/文件名
                 "description": description,
@@ -786,8 +799,9 @@ class VideoLibraryUpdater:
         
         print(f"📁 找到 {len(video_files)} 个视频文件")
         
-        # 读取现有的videos.json文件，提取原有的title值
+        # 读取现有的videos.json文件，提取原有的title和type值
         existing_titles = {}
+        existing_types = {}
         if self.json_path.exists():
             try:
                 with open(self.json_path, 'r', encoding='utf-8') as f:
@@ -795,13 +809,20 @@ class VideoLibraryUpdater:
                     if 'videos' in existing_data:
                         for video in existing_data['videos']:
                             filename = video.get('filename')
-                            title = video.get('title')
-                            if filename and title:
-                                existing_titles[filename] = title
+                            if filename:
+                                title = video.get('title')
+                                if title:
+                                    existing_titles[filename] = title
+                                # 读取 type 值，如果存在则保留
+                                video_type = video.get('type')
+                                if video_type is not None:  # 包括空字符串
+                                    existing_types[filename] = video_type
                 if existing_titles:
                     print(f"📋 从现有文件读取到 {len(existing_titles)} 个视频的title")
+                if existing_types:
+                    print(f"📋 从现有文件读取到 {len(existing_types)} 个视频的type")
             except Exception as e:
-                print(f"⚠️  读取现有videos.json失败: {e}，将使用新生成的title")
+                print(f"⚠️  读取现有videos.json失败: {e}，将使用新生成的title和type")
         
         # 重命名视频文件为base64格式（文件名+时间戳）
         print("\n🔄 开始重命名视频文件为base64格式（文件名+时间戳）...")
@@ -835,7 +856,7 @@ class VideoLibraryUpdater:
         else:
             print("✅ 所有文件都已经是base64格式")
         
-        videos = self.generate_video_data(renamed_files, existing_titles, original_to_base64_map)
+        videos = self.generate_video_data(renamed_files, existing_titles, existing_types, original_to_base64_map)
         
         # 计算分页信息
         total_videos = len(videos)
