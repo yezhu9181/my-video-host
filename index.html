@@ -251,15 +251,25 @@
         let pageSize = 10;
         let currentSearch = '';
         let currentSort = 'title';
-        let currentCDN = null;
+        let currentCDN = null; // 将在初始化时设置为 Combat CDN
         let cdnSpeeds = {};
 
         // 初始化视频播放器
         const player = videojs('my-video');
+        
+        // 初始化默认 CDN 为 Combat CDN
+        function initDefaultCDN() {
+            if (!currentCDN) {
+                currentCDN = FREE_CDNS.find(cdn => cdn.id === 'combat') || FREE_CDNS[0];
+            }
+        }
 
 
         // 测试CDN速度
         async function testCDNSpeeds() {
+            // 初始化默认 CDN 为 Combat CDN
+            initDefaultCDN();
+            
             const statusText = document.getElementById('cdnStatusText');
             const speedTest = document.getElementById('speedTest');
             const switcher = document.getElementById('cdnSwitcher');
@@ -388,11 +398,11 @@
                 return true;
             }
             
-            // 所有 CDN 都失败，使用第一个作为备用
-            currentCDN = FREE_CDNS[0];
+            // 所有 CDN 都失败，使用 Combat CDN 作为备用
+            currentCDN = FREE_CDNS.find(cdn => cdn.id === 'combat') || FREE_CDNS[0];
             statusText.innerHTML = `
                 <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
-                使用备用CDN: <span class="cdn-badge error">${currentCDN.name}</span>
+                使用默认CDN: <span class="cdn-badge error">${currentCDN.name}</span>
                 <span style="color: #6b7280; font-size: 12px;">(请手动切换)</span>
             `;
             
@@ -494,6 +504,9 @@
 
         // 加载视频数据
         async function loadAllVideos() {
+            // 确保默认 CDN 已初始化
+            initDefaultCDN();
+            
             try {
                 let data = null;
                 let dataSource = '';
@@ -506,7 +519,8 @@
                     const cdnAvailable = await testCDNSpeeds();
                     
                     if (!cdnAvailable) {
-                        throw new Error('没有可用的 CDN，请检查网络连接');
+                        // 即使测试失败，也使用默认的 Combat CDN
+                        initDefaultCDN();
                     }
                     
                     if (!currentCDN) {
@@ -816,6 +830,8 @@
 
         // 页面加载时，直接加载视频
         document.addEventListener('DOMContentLoaded', async () => {
+            // 初始化默认 CDN 为 Combat CDN
+            initDefaultCDN();
             // 加载视频数据
             await loadAllVideos();
         });
