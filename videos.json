@@ -12,10 +12,10 @@
       "thumbnail": "thumbnails/M18xNzYyOTQ4MjIx.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:15.763654"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:35.883365"
     },
     {
       "id": 2,
@@ -29,10 +29,10 @@
       "thumbnail": "thumbnails/M18xNzYzMDI1Mzc0.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:15.849137"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:35.978311"
     },
     {
       "id": 3,
@@ -46,30 +46,13 @@
       "thumbnail": "thumbnails/M18xNzYzMzc0NTc2.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:15.930961"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:36.071854"
     },
     {
       "id": 4,
-      "title": "太极拳(Tai_Chi)",
-      "type": "武术",
-      "filename": "MTBfMTc2Mjk0ODIyMQ==.mp4",
-      "url": "videos/MTBfMTc2Mjk0ODIyMQ==.mp4",
-      "description": "这是关于太极拳(Tai_Chi)的详细说明视频",
-      "duration": "0:29",
-      "size": "7.5 MB",
-      "thumbnail": "thumbnails/MTBfMTc2Mjk0ODIyMQ==.jpg",
-      "codec": "H.264",
-      "resolution": "0x1",
-      "createdAt": "2025-11-17",
-      "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:16.009739"
-    },
-    {
-      "id": 5,
       "title": "拳击(Boxing)",
       "type": "武术",
       "filename": "MTBfMTc2MzM3NDU3Ng==.mp4",
@@ -80,13 +63,13 @@
       "thumbnail": "thumbnails/MTBfMTc2MzM3NDU3Ng==.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:16.093799"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:36.161758"
     },
     {
-      "id": 6,
+      "id": 5,
       "title": "睡前瑜伽(Bedtime Yoga)",
       "type": "其他",
       "filename": "MTFfMTc2MzAyNTM3NA==.mp4",
@@ -97,13 +80,13 @@
       "thumbnail": "thumbnails/MTFfMTc2MzAyNTM3NA==.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:16.176760"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:36.254463"
     },
     {
-      "id": 7,
+      "id": 6,
       "title": "篮球(basketball)",
       "type": "运动",
       "filename": "MTJfMTc2MzM3NDU3Ng==.mp4",
@@ -114,13 +97,13 @@
       "thumbnail": "thumbnails/MTJfMTc2MzM3NDU3Ng==.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:16.249256"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:36.342144"
     },
     {
-      "id": 8,
+      "id": 7,
       "title": "街舞(Street dance)",
       "type": "舞蹈",
       "filename": "MTNfMTc2MzM3NDU3Ng==.mp4",
@@ -131,13 +114,13 @@
       "thumbnail": "thumbnails/MTNfMTc2MzM3NDU3Ng==.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:16.338878"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:36.450147"
     },
     {
-      "id": 9,
+      "id": 8,
       "title": "八极拳(Baji Quan)",
       "type": "武术",
       "filename": "MTVfMTc2MzM3NDU3Ng==.mp4",
@@ -148,13 +131,13 @@
       "thumbnail": "thumbnails/MTVfMTc2MzM3NDU3Ng==.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:16.417006"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:36.536219"
     },
     {
-      "id": 10,
+      "id": 9,
       "title": "太极(Tai_Chi)",
       "type": "武术",
       "filename": "MTZfMTc2MzM3NDU3Ng==.mp4",
@@ -165,13 +148,13 @@
       "thumbnail": "thumbnails/MTZfMTc2MzM3NDU3Ng==.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:16.492274"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:36.618709"
     },
     {
-      "id": 11,
+      "id": 10,
       "title": "瑜伽(Yoga)",
       "type": "其他",
       "filename": "MTdfMTc2MzM3NDU3Ng==.mp4",
@@ -182,13 +165,13 @@
       "thumbnail": "thumbnails/MTdfMTc2MzM3NDU3Ng==.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:16.569039"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:36.701939"
     },
     {
-      "id": 12,
+      "id": 11,
       "title": "拳击(Boxing)",
       "type": "武术",
       "filename": "MTlfMTc2MzM3NDU3Ng==.mp4",
@@ -199,13 +182,13 @@
       "thumbnail": "thumbnails/MTlfMTc2MzM3NDU3Ng==.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:16.645665"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:36.783873"
     },
     {
-      "id": 13,
+      "id": 12,
       "title": "五步拳(Five-Step Boxing)",
       "type": "武术",
       "filename": "MV8xNzYzMDIyNDIw.mp4",
@@ -216,13 +199,13 @@
       "thumbnail": "thumbnails/MV8xNzYzMDIyNDIw.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:16.732993"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:36.877900"
     },
     {
-      "id": 14,
+      "id": 13,
       "title": "瑜伽(Yoga)",
       "type": "其他",
       "filename": "MV8xNzYzMzc0NTc2.mp4",
@@ -233,13 +216,13 @@
       "thumbnail": "thumbnails/MV8xNzYzMzc0NTc2.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:16.804987"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:36.956965"
     },
     {
-      "id": 15,
+      "id": 14,
       "title": "瑜伽(Yoga)",
       "type": "其他",
       "filename": "MjBfMTc2MzM3NDU3Ng==.mp4",
@@ -250,13 +233,13 @@
       "thumbnail": "thumbnails/MjBfMTc2MzM3NDU3Ng==.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:16.879192"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:37.036657"
     },
     {
-      "id": 16,
+      "id": 15,
       "title": "瑜伽(Yoga)",
       "type": "其他",
       "filename": "MjFfMTc2MzM3NDU3Ng==.mp4",
@@ -267,13 +250,13 @@
       "thumbnail": "thumbnails/MjFfMTc2MzM3NDU3Ng==.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:16.950748"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:37.113734"
     },
     {
-      "id": 17,
+      "id": 16,
       "title": "散打(Sanda)",
       "type": "武术",
       "filename": "MjJfMTc2MzM3NDU3Ng==.mp4",
@@ -284,13 +267,13 @@
       "thumbnail": "thumbnails/MjJfMTc2MzM3NDU3Ng==.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:17.025997"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:37.193469"
     },
     {
-      "id": 18,
+      "id": 17,
       "title": "散打(Sanda)",
       "type": "武术",
       "filename": "MjNfMTc2MzM3NDU3Ng==.mp4",
@@ -301,13 +284,13 @@
       "thumbnail": "thumbnails/MjNfMTc2MzM3NDU3Ng==.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:17.104353"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:37.277506"
     },
     {
-      "id": 19,
+      "id": 18,
       "title": "太极(Tai_Chi)",
       "type": "武术",
       "filename": "MjRfMTc2MzM3NDU3Ng==.mp4",
@@ -318,13 +301,13 @@
       "thumbnail": "thumbnails/MjRfMTc2MzM3NDU3Ng==.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:17.184794"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:37.365365"
     },
     {
-      "id": 20,
+      "id": 19,
       "title": "街头格斗(Street Fight)",
       "type": "武术",
       "filename": "Ml8xNzYzMDIyNDIw.mp4",
@@ -335,13 +318,13 @@
       "thumbnail": "thumbnails/Ml8xNzYzMDIyNDIw.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:17.269661"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:37.451233"
     },
     {
-      "id": 21,
+      "id": 20,
       "title": "篮球(basketball)",
       "type": "运动",
       "filename": "N18xNzYzMzc0NTc2.mp4",
@@ -352,13 +335,13 @@
       "thumbnail": "thumbnails/N18xNzYzMzc0NTc2.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:17.343819"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:37.531964"
     },
     {
-      "id": 22,
+      "id": 21,
       "title": "八极拳(Baji Quan)",
       "type": "武术",
       "filename": "NF8xNzYyOTQ4MjIx.mp4",
@@ -369,13 +352,13 @@
       "thumbnail": "thumbnails/NF8xNzYyOTQ4MjIx.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:17.422757"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:37.617409"
     },
     {
-      "id": 23,
+      "id": 22,
       "title": "太极(Tai Chi)",
       "type": "武术",
       "filename": "NF8xNzYzMzc0NTc2.mp4",
@@ -386,13 +369,13 @@
       "thumbnail": "thumbnails/NF8xNzYzMzc0NTc2.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:17.503641"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:37.710419"
     },
     {
-      "id": 24,
+      "id": 23,
       "title": "拳击(Boxing)",
       "type": "武术",
       "filename": "NW91ejVZZTdYekUzTmpNek9UTTFNVEk9XzE3NjMzOTM4NDI=.mp4",
@@ -403,13 +386,13 @@
       "thumbnail": "thumbnails/NW91ejVZZTdYekUzTmpNek9UTTFNVEk9XzE3NjMzOTM4NDI=.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:17.590135"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:37.873859"
     },
     {
-      "id": 25,
+      "id": 24,
       "title": "欧洲步详解(basketball)",
       "type": "运动",
       "filename": "NXF5bjVyU3k1cTJsNksrbTZLZWpYekUzTmpNek9UTTFNVEk9XzE3NjMzOTM4NDI=.mp4",
@@ -420,13 +403,13 @@
       "thumbnail": "thumbnails/NXF5bjVyU3k1cTJsNksrbTZLZWpYekUzTmpNek9UTTFNVEk9XzE3NjMzOTM4NDI=.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:17.659140"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:37.954848"
     },
     {
-      "id": 26,
+      "id": 25,
       "title": "欧洲步(basketball)",
       "type": "运动",
       "filename": "NXF5bjVyU3k1cTJsWHpFM05qTXpPVE0xTVRJPV8xNzYzMzkzODQy.mp4",
@@ -437,13 +420,13 @@
       "thumbnail": "thumbnails/NXF5bjVyU3k1cTJsWHpFM05qTXpPVE0xTVRJPV8xNzYzMzkzODQy.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:17.739977"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:38.042207"
     },
     {
-      "id": 27,
+      "id": 26,
       "title": "横撤步(basketball)",
       "type": "运动",
       "filename": "NXFpcTVwS2s1cTJsWHpFM05qTXpPVE0xTVRJPV8xNzYzMzkzODQy.mp4",
@@ -454,13 +437,13 @@
       "thumbnail": "thumbnails/NXFpcTVwS2s1cTJsWHpFM05qTXpPVE0xTVRJPV8xNzYzMzkzODQy.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:17.814558"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:38.123619"
     },
     {
-      "id": 28,
+      "id": 27,
       "title": "舞蹈(Street dance)",
       "type": "舞蹈",
       "filename": "NklpZTZMbUlYekUzTmpNek9UTTFNVEk9XzE3NjMzOTM4NDI=.mp4",
@@ -471,13 +454,13 @@
       "thumbnail": "thumbnails/NklpZTZMbUlYekUzTmpNek9UTTFNVEk9XzE3NjMzOTM4NDI=.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:17.897512"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:38.213284"
     },
     {
-      "id": 29,
+      "id": 28,
       "title": "街舞(Street dance)",
       "type": "舞蹈",
       "filename": "NktHWDZJaWVYekUzTmpNek9UTTFNVEk9XzE3NjMzOTM4NDI=.mp4",
@@ -488,13 +471,13 @@
       "thumbnail": "thumbnails/NktHWDZJaWVYekUzTmpNek9UTTFNVEk9XzE3NjMzOTM4NDI=.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:17.965841"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:38.286782"
     },
     {
-      "id": 30,
+      "id": 29,
       "title": "八极拳(Baji Quan)",
       "type": "武术",
       "filename": "Nl8xNzYzMzc0NTc2.mp4",
@@ -505,13 +488,13 @@
       "thumbnail": "thumbnails/Nl8xNzYzMzc0NTc2.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:18.043925"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:38.372602"
     },
     {
-      "id": 31,
+      "id": 30,
       "title": "街舞(Street dance)",
       "type": "舞蹈",
       "filename": "OF8xNzYzMzc0NTc2.mp4",
@@ -522,13 +505,13 @@
       "thumbnail": "thumbnails/OF8xNzYzMzc0NTc2.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:18.117099"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:38.452319"
     },
     {
-      "id": 32,
+      "id": 31,
       "title": "自由泳(Freestyle)",
       "type": "运动",
       "filename": "OV8xNzYyOTQ4MjIx.mp4",
@@ -539,13 +522,13 @@
       "thumbnail": "thumbnails/OV8xNzYyOTQ4MjIx.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:18.198777"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:38.541368"
     },
     {
-      "id": 33,
+      "id": 32,
       "title": "金刚八式(Baji Quan)",
       "type": "武术",
       "filename": "OV8xNzYzMzc0NTc2.mp4",
@@ -556,24 +539,24 @@
       "thumbnail": "thumbnails/OV8xNzYzMzc0NTc2.jpg",
       "codec": "H.264",
       "resolution": "0x1",
-      "createdAt": "2025-11-17",
+      "createdAt": "2025-12-03",
       "thumbnailType": "JPG",
-      "cacheVersion": "3507003",
-      "lastUpdated": "2025-11-17T23:46:18.267919"
+      "cacheVersion": "5cfa417",
+      "lastUpdated": "2025-12-03T14:47:38.615819"
     }
   ],
   "pagination": {
-    "total": 33,
+    "total": 32,
     "page": 1,
     "pageSize": 10,
     "totalPages": 4,
     "hasNext": false,
     "hasPrev": false
   },
-  "lastUpdated": "2025-11-17T23:46:18Z",
+  "lastUpdated": "2025-12-03T14:47:38Z",
   "repository": "https://github.com/yezhu9181/my-video-host",
   "ffmpegAvailable": true,
-  "cacheVersion": "3507003",
+  "cacheVersion": "5cfa417",
   "cachePolicy": {
     "maxAge": 0,
     "mustRevalidate": true,
@@ -585,6 +568,5 @@
     "paginated": "/videos.json?page={page}&limit={limit}",
     "search": "/videos.json?search={keyword}",
     "byId": "/videos.json?id={id}"
-  },
-  "latestCommitSha": "e194ab59a039a77ae3fee388d516b43681acc065"
+  }
 }
